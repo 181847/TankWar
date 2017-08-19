@@ -1,7 +1,7 @@
 #pragma once
 #include "Scence.h"
 
-/*
+
 //用一个整数来标记一个Pawn的类型。
 typedef unsigned int PawnType;
 
@@ -41,12 +41,14 @@ class BasePawn
 public:
 	BasePawn();
 	~BasePawn();
+	//获取Pawn的类型。
 	PawnType GetType();
+	//生成Pawn的生成代理结构，这个结构用于PawnMaster中，使得PawnMaster能够控制生成Pawn。
+	virtual PawnCommandTemplate GeneratePawnCommandTemplate() = 0;
 
 protected:
 	//Pawn的类型。
 	PawnType m_type = PAWN_TYPE_NONE;
 	//Pawn的根控制器，一个Pawn的所有可控制Item都在这个链表上。
-	ControlItem* p_mRootControl = nullptr;
+	ControlItem* m_pRootControl = nullptr;
 };
-*/

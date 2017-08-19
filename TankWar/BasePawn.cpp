@@ -1,7 +1,5 @@
 #include "BasePawn.h"
 
-/*
-
 BasePawn::BasePawn()
 {
 }
@@ -17,4 +15,3 @@ PawnType BasePawn::GetType()
 {
 	return m_type;
 }
-*/

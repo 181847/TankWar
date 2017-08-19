@@ -65,8 +65,8 @@ bool MyShapesApp::Initialize()
 
 	//设置角色创建在对应的Commander上。
 	PlayerPawn.SetCommanders(m_playerCommander, m_FollowCommander, m_CollideCommander);
-	MechanicalSpiderPawn.SetAICommanders(m_AICommander, m_FollowCommander, m_CollideCommander);
-	ArmoredCarPawn.SetAICommanders(m_AICommander, m_FollowCommander, m_CollideCommander);
+	MechanicalSpiderPawn.SetCommanders(m_AICommander, m_FollowCommander, m_CollideCommander);
+	ArmoredCarPawn.SetCommanders(m_AICommander, m_FollowCommander, m_CollideCommander);
 	ScatterPawn.SetCommanders(m_AICommander, m_FollowCommander, m_CollideCommander);
 	FrozenPlanePawn.SetCommanders(m_AICommander. m_FollowCommander, m_CollideCommander);
 	AmmoPawn.SetCommanders(m_AICommander. m_FollowCommander, m_CollideCommander);

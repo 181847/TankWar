@@ -7,7 +7,6 @@
 #include "FrameResource.h"
 #include "LinkedAllocator.h"
 //************************************** 以Z轴正半轴为前	以Y轴正方向为上		X轴正方向为右**********************************************
-/*
 struct ControlItem
 {
 	//旋转，x对应翻滚角，y对应俯仰角，z对应偏航角。
@@ -82,5 +81,3 @@ public:
 	//材质定义
 	std::vector<Material> m_meterials;
 };
-
-*/
