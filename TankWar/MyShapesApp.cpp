@@ -118,6 +118,8 @@ bool MyShapesApp::Initialize()
 	BuildConstantsBufferView();
 	//创建PipelineState。
 	BuildPSOs();
+	//创建场景。
+	BuildScence();
 
 	//强制执行相关Command。
 	ThrowIfFailed(mCommandList->Close());
@@ -1046,6 +1048,11 @@ void MyShapesApp::BuildRenderItems()
 		mOpaqueRitems.push_back(item.get());
 	}
 
+}
+
+void MyShapesApp::BuildScence()
+{
+	m_scence = std::make_unique<Scence>(totalRitemInScence, totalCameraInScence)
 }
 
 void MyShapesApp::DrawRenderItems(ID3D12GraphicsCommandList * cmdList, const std::vector<RenderItem*>& ritems)

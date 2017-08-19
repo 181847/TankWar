@@ -13,6 +13,9 @@ typedef unsigned int PawnType;
 #define PAWN_TYPE_FROZEN_PLANE 5
 #define PAWN_TYPE_AMMO 6
 
+//获取Pawn的根控制器。
+#define P_Root_Control(pBasePawn) (pBasePawn->m_pRootControl)
+
 //类前导声明。
 class BasePawn;
 
@@ -30,9 +33,9 @@ class PawnCommandTemplate
 {
 public:
 	//pDesc是一个动态分配的内存，CreatePawn需要自行释放这个内存。
-	void virtual CreatePawn(PawnDesc* pDesc, Scence* pScence) = 0;
+	virtual BasePawn* CreatePawn(PawnDesc* pDesc, Scence* pScence) = 0;
 	//pPawn是一个动态分配的内存，在销毁对应的Pawn之后，DestoryPawn需要自行释放这个内存。
-	void virtual DestoryPawn(BasePawn* pPawn, Scence* pScence) = 0;
+	virtual void DestoryPawn(BasePawn* pPawn, Scence* pScence) = 0;
 };
 
 //所有Pawn的父类。
@@ -44,7 +47,7 @@ public:
 	//获取Pawn的类型。
 	PawnType GetType();
 	//生成Pawn的生成代理结构，这个结构用于PawnMaster中，使得PawnMaster能够控制生成Pawn。
-	virtual PawnCommandTemplate GeneratePawnCommandTemplate() = 0;
+	virtual PawnCommandTemplate* GeneratePawnCommandTemplate() = 0;
 
 protected:
 	//Pawn的类型。

@@ -102,6 +102,8 @@ private:
 	void BuildFrameResources();
 	//创建所有可渲染对象。
 	void BuildRenderItems();
+	//创建场景对象。
+	void BuildScence();
 
 	//向CommandList记录渲染RenderItem中所有物体的CommandList。
 	void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& ritems);
@@ -137,6 +139,8 @@ private:
 	std::unordered_map<std::string, ComPtr<ID3DBlob>> mShaders;
 	//所有PipelineStateObject，后期可能会分成透明和不透明的PSO。
 	std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> mPSOs;
+	//场景对象。
+	std::unique_ptr<Scence> m_scence;
 
 	//顶点格式声明。
 	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
@@ -179,6 +183,10 @@ private:
 	float mKeyLightPhi = 0.2f*XM_PI;
 	float mKeyLightRadius = 1.0f;
 
+	//场景中最多渲染物体的数量。
+	UINT totalRitemInScence = 5000;
+	//场景中最多摄像头的数量。
+	UINT totalCameraInScence = 3;
 
 	//*******************************************游戏代码定义部分**************************************************************************************************************************************************
 public:
