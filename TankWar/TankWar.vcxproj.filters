@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="App文件">
+      <UniqueIdentifier>{15e291da-337b-4cd9-81c3-1bf6a31f7845}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\源文件">
+      <UniqueIdentifier>{643021e1-9dc0-48e2-8f54-4519aebcc1c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\头文件">
+      <UniqueIdentifier>{68f32ead-4dfc-4de0-8363-493b925b50f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Commander">
+      <UniqueIdentifier>{fc5d41bb-94d7-4ac4-9ef3-ab39ae557c27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Commander\PlayerCommander">
+      <UniqueIdentifier>{7df703d8-be47-4011-9a23-e9c51f34b15e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Commander\AICommander">
+      <UniqueIdentifier>{8db8e83d-8d66-424a-a8b5-d0aedcae4d8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Commander\FollowCommander">
+      <UniqueIdentifier>{b69122c3-96aa-4164-9849-8166b6765784}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Commander\CollideCommander">
+      <UniqueIdentifier>{01e6bf7e-e5b7-4900-a144-88f575188d44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Commander\PawnMaster">
+      <UniqueIdentifier>{a88cd3cc-1fc8-4832-be32-b72ec01371f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Commander\ControlItemMaster">
+      <UniqueIdentifier>{4a4f4801-23ea-469d-9a68-96a5c575f581}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Pawn">
+      <UniqueIdentifier>{c98a1eaa-e54b-4f46-9ed1-95df4028122d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Pawn\Player">
+      <UniqueIdentifier>{e692cda5-fc92-4664-8aaf-4d9155d079e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Pawn\BasePawn">
+      <UniqueIdentifier>{d0cfbe4a-e759-4ef4-8ad8-06cda17a6810}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\Common\Camera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\d3dApp.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\d3dUtil.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\DDSTextureLoader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\GameTimer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\GeometryGenerator.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\MathHelper.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameResource.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MyShapesApp.cpp">
+      <Filter>App文件\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Scence.cpp">
+      <Filter>App文件\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BasePawn.cpp">
+      <Filter>App文件\Pawn\BasePawn</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Common\Camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\d3dApp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\d3dUtil.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\d3dx12.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\DDSTextureLoader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\GameTimer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\GeometryGenerator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\MathHelper.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\UploadBuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameResource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyShapesApp.h">
+      <Filter>App文件\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyStaticAllocator.h">
+      <Filter>App文件\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyAssert.h">
+      <Filter>App文件\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DeLinkedList.h">
+      <Filter>App文件\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Scence.h">
+      <Filter>App文件\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BasePawn.h">
+      <Filter>App文件\Pawn\BasePawn</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
