@@ -49,6 +49,7 @@ bool MyShapesApp::Initialize()
 	//程序运行的过程中这个Allocator基本上就没有什么用了。
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
+	/*
 	//创建场景。
 	m_scence = std::make_unique<Scence>(5000, 5000);
 	//创建Pawn制造机。
@@ -94,6 +95,8 @@ bool MyShapesApp::Initialize()
 	//PawnMaster记录创建、删除弹药的命令模板。
 	m_pawnMaster.RememberCommandTemplate(
 		AmmoPawn.GeneratePawnCommandTemplate());
+		
+	*/
 
 	//创建Shader参数定义。
 	BuildRootSignature();
@@ -1120,6 +1123,7 @@ XMFLOAT3 MyShapesApp::HelpCalculateFresnelR0(float refractionIndex)
 //游戏的主要逻辑循环
 void MyShapesApp::UpdateScence(const GameTimer& gt)
 {
+	/*
 	//更新玩家操作的Pawn。
 	m_playerCommander.LogCommand(m_controlItemMaster, m_pawnMaster, gt);
 
@@ -1144,4 +1148,5 @@ void MyShapesApp::UpdateScence(const GameTimer& gt)
 
 	//PawnMaster执行生产和销毁Pawn的功能。
 	m_pawnMaster.ExcecuteeCommands();
+	*/
 }

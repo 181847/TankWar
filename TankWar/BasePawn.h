@@ -1,6 +1,7 @@
 #pragma once
 #include "Scence.h"
 
+/*
 //用一个整数来标记一个Pawn的类型。
 typedef unsigned int PawnType;
 
@@ -48,4 +49,4 @@ protected:
 	//Pawn的根控制器，一个Pawn的所有可控制Item都在这个链表上。
 	ControlItem* p_mRootControl = nullptr;
 };
-
+*/
