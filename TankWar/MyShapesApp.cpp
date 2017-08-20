@@ -49,55 +49,6 @@ bool MyShapesApp::Initialize()
 	//程序运行的过程中这个Allocator基本上就没有什么用了。
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
-	/*
-	//创建场景。
-	m_scence = std::make_unique<Scence>(5000, 5000);
-	//创建Pawn制造机。
-	m_pawnMaster = std::make_unique<PawnMaster>(m_scence.get());
-	//创建PlayerCommander。 
-	m_playerCommander = std::make_unique<PlayerCommander>();
-	//创建AICommander。
-	m_AICommander = std::make_unique<AICommander>();
-	//创建FollowCommander。
-	m_FollowCommander = std::make_unique<FollowCommander>();
-	//创建CollideCommander。
-	m_CollideCommander = std::make_unique<CollideCommander>();
-
-	//设置角色创建在对应的Commander上。
-	PlayerPawn.SetCommanders(m_playerCommander, m_FollowCommander, m_CollideCommander);
-	MechanicalSpiderPawn.SetCommanders(m_AICommander, m_FollowCommander, m_CollideCommander);
-	ArmoredCarPawn.SetCommanders(m_AICommander, m_FollowCommander, m_CollideCommander);
-	ScatterPawn.SetCommanders(m_AICommander, m_FollowCommander, m_CollideCommander);
-	FrozenPlanePawn.SetCommanders(m_AICommander. m_FollowCommander, m_CollideCommander);
-	AmmoPawn.SetCommanders(m_AICommander. m_FollowCommander, m_CollideCommander);
-
-
-	//PawnMaster记录创建、删除玩家的命令模板。
-	m_pawnMaster.RememberCommandTemplate(
-		PlayerPawn.GeneratePawnCommandTemplate());
-
-	//PawnMaster记录创建、删除机械蜘蛛的命令模板。
-	m_pawnMaster.RememberCommandTemplate(
-		MechanicalSpiderPawn.GeneratePawnCommandTemplate());
-
-	//PawnMaster记录创建、删除装甲车的命令模板。
-	m_pawnMaster.RememberCommandTemplate(
-		ArmoredCarPawn.GeneratePawnCommandTemplate());
-
-	//PawnMaster记录创建、删除散射器的命令模板。
-	m_pawnMaster.RememberCommandTemplate(
-		ScatterPawn.GeneratePawnCommandTemplate());
-
-	//PawnMaster记录创建、删除冰冻平面的命令模板。
-	m_pawnMaster.RememberCommandTemplate(
-		FrozenPlanePawn.GeneratePawnCommandTemplate());
-
-	//PawnMaster记录创建、删除弹药的命令模板。
-	m_pawnMaster.RememberCommandTemplate(
-		AmmoPawn.GeneratePawnCommandTemplate());
-		
-	*/
-
 	//创建Shader参数定义。
 	BuildRootSignature();
 	//创建Shader的顶点参数和编译Shader。
@@ -118,6 +69,7 @@ bool MyShapesApp::Initialize()
 	BuildConstantsBufferView();
 	//创建PipelineState。
 	BuildPSOs();
+
 	//创建场景。
 	BuildScence();
 
@@ -225,6 +177,8 @@ void MyShapesApp::Update(const GameTimer& gt)
 	OnKeyboardInput(gt);
 	//更新摄像机信息。
 	UpdateCamera(gt);
+	//从场景中的0号摄像机位置更新摄像机镜头。
+	UpdateCameraFromScence(gt, 0);
 	//更新灯光位置。
 	UpdateLights(gt);
 
@@ -531,6 +485,11 @@ void MyShapesApp::UpdateMaterialCB(const GameTimer & gt)
 			currMaterialCB->CopyData(mat->MatCBIndex, matConstants);
 		}
 	}
+}
+
+void MyShapesApp::UpdateCameraFromScence(const GameTimer & gt, UINT cameraIndexInScence)
+{
+	MyCamera* pCurrentCamera = m_scence->GetCamera(cameraIndexInScence);
 }
 
 void MyShapesApp::BuildDescriptorHeap()
@@ -1047,12 +1006,84 @@ void MyShapesApp::BuildRenderItems()
 	{
 		mOpaqueRitems.push_back(item.get());
 	}
-
 }
 
 void MyShapesApp::BuildScence()
 {
-	m_scence = std::make_unique<Scence>(totalRitemInScence, totalCameraInScence)
+	m_scence = std::make_unique<Scence>(
+		totalRitemInScence, totalCameraInScence, &mMaterials, &mGeometries);
+
+	//创建PawnMaster，用于自动化生成Pawn。
+	BuildPawnMaster();
+	//创建玩家指令官、AI指令官、控制跟随指令官。
+	BuildPlayerCommander();
+	BuildAICommander();
+	BuildFollowCommander();
+	BuildCollideCommander();
+
+	//注册Pawn类
+	RegisterPawnClassToPawnMaster();
+	//创建初始的pawn对象，可以在这里创建玩家角色，初始化场景，
+	//建议通过PawnMaster来创建。
+	BuildInitPawn();
+
+}
+
+void MyShapesApp::BuildPlayerCommander()
+{
+	m_playerCommander = std::make_unique<PlayerCommander>(COMMANDER_PLAYER_MAX_COMMANDS);
+}
+
+void MyShapesApp::BuildAICommander()
+{
+	m_AICommander = std::make_unique<AICommander>(COMMANDER_AI_UNIT_MAX_NUM);
+}
+
+void MyShapesApp::BuildFollowCommander()
+{
+	m_followCommander = std::make_unique<FollowCommander>(COMMANDER_FOLLOW_MAX_COMMANDS);
+}
+
+void MyShapesApp::BuildCollideCommander()
+{
+	m_collideCommander = std::make_unique<CollideCommander>(COMMANDER_COLLIDE_MAX_NUM);
+}
+
+void MyShapesApp::RegisterPawnClass()
+{
+	//注册PawnMaster
+	PlayerPawn				.RegisterPawnMaster(m_pawnMaster.get());
+	MechanicalSpiderPawn	.RegisterPawnMaster(m_pawnMaster.get());
+	ArmoredCar				.RegisterPawnMaster(m_pawnMaster.get());
+	ScatterPawn				.RegisterPawnMaster(m_pawnMaster.get());
+	FrozenPlanePawn			.RegisterPawnMaster(m_pawnMaster.get());
+	AmmoPawn				.RegisterPawnMaster(m_pawnMaster.get());
+
+	//注册PlayerCommander
+	PlayerPawn				.RegisterPlayerCommander(m_playerCommander.get());
+
+	//注册AICommander
+	MechanicalSpiderPawn	.RegisterAICommander(m_AICommander.get());
+	ArmoredCar				.RegisterAICommander(m_AICommander.get());
+	ScatterPawn				.RegisterAICommander(m_AICommander.get());
+	FrozenPlanePawn			.RegisterAICommander(m_AICommander.get());
+	AmmoPawn				.RegisterAICommander(m_AICommander.get());
+
+	//注册FollowCommander
+	PlayerPawn				.RegisterFollowCommander(m_followCommander.get());
+	MechanicalSpiderPawn	.RegisterFollowCommander(m_followCommander.get());
+	ArmoredCar				.RegisterFollowCommander(m_followCommander.get());
+	ScatterPawn				.RegisterFollowCommander(m_followCommander.get());
+	FrozenPlanePawn			.RegisterFollowCommander(m_followCommander.get());
+	AmmoPawn				.RegisterFollowCommander(m_followCommander.get());
+
+	//注册CollideCommander
+	PlayerPawn				.RegisterCollideCommander(m_collideCommander.get());
+	MechanicalSpiderPawn	.RegisterCollideCommander(m_collideCommander.get());
+	ArmoredCar				.RegisterCollideCommander(m_collideCommander.get());
+	ScatterPawn				.RegisterCollideCommander(m_collideCommander.get());
+	FrozenPlanePawn			.RegisterCollideCommander(m_collideCommander.get());
+	AmmoPawn				.RegisterCollideCommander(m_collideCommander.get());
 }
 
 void MyShapesApp::DrawRenderItems(ID3D12GraphicsCommandList * cmdList, const std::vector<RenderItem*>& ritems)

@@ -48,10 +48,14 @@ public:
 	PawnType GetType();
 	//生成Pawn的生成代理结构，这个结构用于PawnMaster中，使得PawnMaster能够控制生成Pawn。
 	virtual PawnCommandTemplate* GeneratePawnCommandTemplate() = 0;
+	//注册Pawn到PawnMaster、PawnMaster能够实现自动生成Pawn对象。
+	virtual void RegisterPawnMaster(PawnMaster * pPawnMaster);
 
 protected:
 	//Pawn的类型。
 	PawnType m_type = PAWN_TYPE_NONE;
 	//Pawn的根控制器，一个Pawn的所有可控制Item都在这个链表上。
 	ControlItem* m_pRootControl = nullptr;
+	//负责这个Pawn生成的PawnMaster。
+	PawnMaster* m_pPawnMaster;
 };

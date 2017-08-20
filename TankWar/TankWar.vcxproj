@@ -153,6 +153,7 @@
     <ClCompile Include="..\..\..\..\Common\GameTimer.cpp" />
     <ClCompile Include="..\..\..\..\Common\GeometryGenerator.cpp" />
     <ClCompile Include="..\..\..\..\Common\MathHelper.cpp" />
+    <ClCompile Include="AI_Follow_Collide_BasePawn.cpp" />
     <ClCompile Include="BasePawn.cpp" />
     <ClCompile Include="FrameResource.cpp" />
     <ClCompile Include="MyShapesApp.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="..\..\..\..\Common\GeometryGenerator.h" />
     <ClInclude Include="..\..\..\..\Common\MathHelper.h" />
     <ClInclude Include="..\..\..\..\Common\UploadBuffer.h" />
+    <ClInclude Include="AI_Follow_Collide_BasePawn.h" />
     <ClInclude Include="BasePawn.h" />
     <ClInclude Include="DeLinkedList.h" />
     <ClInclude Include="FrameResource.h" />

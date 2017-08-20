@@ -80,6 +80,9 @@ private:
 	void UpdateMainPassCB(const GameTimer& gt);
 	void UpdateMaterialCB(const GameTimer& gt);
 
+	//从场景中指定序号的摄像头处更摄像机。
+	void UpdateCameraFromScence(const GameTimer& gt, UINT cameraIndexInScence);
+
 
 	//创建一个DescriptorHeap，这个Heap中存储了程序中所有要用到Resource的Descriptor，
 	//包括每个FrameResource中的资源的Descriptor都会在这一个Heap中。
@@ -102,8 +105,7 @@ private:
 	void BuildFrameResources();
 	//创建所有可渲染对象。
 	void BuildRenderItems();
-	//创建场景对象。
-	void BuildScence();
+
 
 	//向CommandList记录渲染RenderItem中所有物体的CommandList。
 	void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& ritems);
@@ -139,8 +141,6 @@ private:
 	std::unordered_map<std::string, ComPtr<ID3DBlob>> mShaders;
 	//所有PipelineStateObject，后期可能会分成透明和不透明的PSO。
 	std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> mPSOs;
-	//场景对象。
-	std::unique_ptr<Scence> m_scence;
 
 	//顶点格式声明。
 	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
@@ -189,7 +189,45 @@ private:
 	UINT totalCameraInScence = 3;
 
 	//*******************************************游戏代码定义部分**************************************************************************************************************************************************
+
+//PlayerCommander一次最多能够记住的Player数量。
+#define COMMANDER_PLAYER_MAX_COMMANDS 3
+//FollowCommander一次最多能够记录的跟随指令数量。
+#define COMMANDER_FOLLOW_MAX_COMMANDS 1000
+//AICommander最多可控制多少个AI对象。
+#define COMMANDER_AI_UNIT_MAX_NUM 100
+//最多有多少个碰撞体。
+#define COMMANDER_COLLIDE_MAX_NUM 2000
+
 public:
 	void UpdateScence(const GameTimer& gt);
+
+	//创建场景对象。
+	void BuildScence();
+	//创建PawnMaster，用于自动化生成Pawn。
+	void BuildPawnMaster();
+	//创建玩家指令官、AI指令官、控制跟随指令官。
+	void BuildPlayerCommander();
+	void BuildAICommander();
+	void BuildFollowCommander();
+	void BuildCollideCommander();
+
+	//注册Pawn类到各个需要的PawnMaster和Commander中。
+	void RegisterPawnClass();
+	//创建初始的pawn对象，可以在这里创建玩家角色，初始化场景，
+	//建议通过PawnMaster来创建。
+	void BuildInitPawn();
+
+
+public:
+	//场景对象
+	std::unique_ptr<Scence> m_scence;
+	//PawnMaster
+	std::unique_ptr<PawnMaster> m_pawnMaster;
+	
+	std::unique_ptr<PlayerCommmander> m_playerCommander;
+	std::unique_ptr<AICommander> m_AICommander;
+	std::unique_ptr<FollowCommander> m_followCommander;
+	std::unique_ptr<CollideCommander> m_collideCommander;
 	//*******************************************游戏代码定义部分**************************************************************************************************************************************************
 };

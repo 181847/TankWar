@@ -5,7 +5,7 @@ Scence::Scence(UINT totalRenderItemNum, UINT totalCameraNum,
 	std::unordered_map<std::string, std::unique_ptr<Material>>* pMaterials,
 	std::unordered_map<std::string, std::unique_ptr<MeshGeometry>>* pGeometries)
 {
-	m_renderItemAllocator = std::make_unique<LinkedAllocator<RenderItem>>(totalRenderItemNum);
+	m_renderItemAllocator = std::make_unique<LinkedAllocator<MyRenderItem>>(totalRenderItemNum);
 	m_controlItemAllocator = std::make_unique<LinkedAllocator<ControlItem>>(totalRenderItemNum);
 	m_pMaterials = pMaterials;
 	m_pGeometries = pGeometries;
@@ -44,9 +44,14 @@ void Scence::UpdateData(const GameTimer & gt)
 	}
 }
 
-Camera * Scence::AppendCamera()
+MyCamera * Scence::GetCamera(UINT cameraIndex)
 {
-	m_pCamera = new Camera();
+	return m_pCamera;
+}
+
+MyCamera * Scence::AppendCamera()
+{
+	m_pCamera = new MyCamera();
 	m_pCamera->Id = 0;
 	m_pCamera->m_cameraPos = m_controlItemAllocator->Malloc();
 	m_pCamera->m_cameraPos->Next = m_controlItemAllocator->Malloc();

@@ -52,6 +52,12 @@
     <Filter Include="App文件\Pawn\PlayerPawn">
       <UniqueIdentifier>{e692cda5-fc92-4664-8aaf-4d9155d079e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="App文件\Pawn\NewFilter1">
+      <UniqueIdentifier>{ba6672bc-d8d5-4d56-ab9a-c4000bb9ee6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Pawn\AI_Follow_Collide_BasePawn">
+      <UniqueIdentifier>{e96703da-f016-4ff6-a04a-0ad69951dd19}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\Camera.cpp">
@@ -89,6 +95,9 @@
     </ClCompile>
     <ClCompile Include="PlayerPawn.cpp">
       <Filter>App文件\Pawn\PlayerPawn</Filter>
+    </ClCompile>
+    <ClCompile Include="AI_Follow_Collide_BasePawn.cpp">
+      <Filter>App文件\Pawn\AI_Follow_Collide_BasePawn</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +154,9 @@
     </ClInclude>
     <ClInclude Include="PlayerPawn.h">
       <Filter>App文件\Pawn\PlayerPawn</Filter>
+    </ClInclude>
+    <ClInclude Include="AI_Follow_Collide_BasePawn.h">
+      <Filter>App文件\Pawn\AI_Follow_Collide_BasePawn</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
