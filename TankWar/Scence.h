@@ -7,10 +7,29 @@
 #include <vector>
 #include "FrameResource.h"
 #include "LinkedAllocator.h"
-//************************************** 以Z轴正半轴为前	以Y轴正方向为上		X轴正方向为右**********************************************
 
-struct MyRenderItem
+//判断ControlItem是否处于显示状态
+#define IS_CONTROLITEM_VISIBLE(ControlItemRef) (ControlItemRef.Property && (0x01))
+
+//************************************** 以Z轴正半轴为前	以Y轴正方向为上		X轴正方向为右**********************************************
+struct ControlItem
 {
+	//旋转，x对应翻滚角，y对应俯仰角，z对应偏航角。
+	XMFLOAT3 Rotation;
+
+	//平移信息。
+	XMFLOAT3 Translation;
+
+	//相对坐标系，默认是世界坐标，即一个单位矩阵，只能包含旋转和平移变换。
+	XMFLOAT4X4 ReferenceCoordinate;
+
+	//ControlItem的其他属性标记，
+	//**** ***1显示渲染物体，	**** ***0表示隐藏渲染物体。
+	BYTE Property;
+
+	//对应FrameResource的更新次数。
+	UINT NumFramesDirty = gNumFrameResources;
+
 	//世界变换矩阵。
 	XMFLOAT4X4 World = MathHelper::Identity4x4();
 
@@ -33,42 +52,18 @@ struct MyRenderItem
 	//基本顶点位置。
 	int BaseVertexLocation = 0;
 
-	//网格是否可渲染，利用此项来隐藏部分物体。
-	//**** ***1显示渲染物体，	**** ***0表示隐藏渲染物体；
-	BYTE Property;
-};
-
-struct ControlItem
-{
-	//旋转，x对应翻滚角，y对应俯仰角，z对应偏航角。
-	XMFLOAT3 Rotation;
-
-	//平移信息。
-	XMFLOAT3 Translation;
-
-	//下一个ControlItem，这个指针不是用来连接Scence中的ControlItem的，
-	//而是用来连接Pawn中的ControlItem的。
-	ControlItem* Next;
-
-	//ControlItem的其他属性标记，
-	//**** ***1显示渲染物体，	**** ***0表示隐藏渲染物体；
-	//**** **1*表示被跟随、		**** **0*表示没有被跟随；
-	//**** *1**表示主动跟随、	**** *0**表示没有主动跟随；
-	BYTE Property;
-
-	UINT NumFramesDirty = gNumFrameResources;
-
-	//被控制的渲染物体指针。
-	MyRenderItem* pRenderItem;
 };
 
 //摄像机结构，包含渲染一个画面所需要的所有镜头信息。
 struct MyCamera
 {
+public:
 	//摄像机的序号，一个场景中可以创建多个摄像机，通过这个序号来区分摄像机。
 	UINT Id;
 	//摄像机位置，规定m_cameraPos.Next是摄像机的观察点。
-	ControlItem* m_cameraPos;
+	ControlItem* Pos;
+	//摄像机的目标。
+	ControlItem* Target;
 };
 
 //Scence用来保存所有可渲染物体的位置，并且更新物体的位置。

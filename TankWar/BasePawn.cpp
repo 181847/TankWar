@@ -2,6 +2,7 @@
 
 BasePawn::BasePawn()
 {
+
 }
 
 
@@ -13,13 +14,10 @@ BasePawn::~BasePawn()
 //基础的几个PawnType宏定义在BasePawn.h中。
 PawnType BasePawn::GetType()
 {
-	return m_type;
+	ThrowIfFailed(false && "BasePawn获取类型的方法没有被覆盖。");
 }
 
 void BasePawn::RegisterPawnMaster(PawnMaster * pPawnMaster)
 {
-	m_pPawnMaster = pPawnMaster;
-	//将本Pawn的生成模板放到PawnMaster，
-	//通过PawnMaster.NewPawn(PawnType)就可以自动创建相应的Pawn对象了
-	pPawnMaster->RegisterCommandTemplate(this->GeneratePawnCommandTemplate());
+	ThrowIfFailed(false && "BasePawn的注册方法没有被覆盖。");
 }
