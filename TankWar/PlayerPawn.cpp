@@ -29,7 +29,7 @@ void PlayerPawn::RegisterAll(
 	m_pPlayerCommander = pPlayerCommander;
 	//添加一个新的玩家控制模式
 	m_playerControlType = m_pPlayerCommander->AddCommandTemplate(
-		new PlayerControlCommandTemplate());
+		std::make_unique<PlayerControlCommandTemplate>());
 
 	m_pBoneCommander = pBoneCommander;
 	//m_pCollideCommander = pCollideCommander;
@@ -40,11 +40,12 @@ void PlayerPawn::RegisterPawnMaster(PawnMaster * pPawnMaster)
 	ASSERT(PlayerPawn::m_pPawnMaster == nullptr && "不可重复注册PawnMaster");
 	//注册一个CommandTempalte，并且获得一个pawnType。
 	PlayerPawn::m_pawnType = pPawnMaster->AddCommandTemplate(
-		new PlayerPawnCommandTemplate());
+		std::make_unique<PlayerPawnCommandTemplate>());
 }
 
 ControlItem *& PlayerPawn::RootControl()
 {
+	//返回控制器数组。
 	return m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_ROOT];
 }
 
@@ -55,6 +56,7 @@ BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnProperty* pProperty, Scence*
 	//从场景中创建摄像机，把摄像机存储到Player中。
 	newPawn->m_pCamera = pScence->AppendCamera();
 
+	//根节点控制器分配一个可控制的额网格物体。
 	newPawn->RootControl() =
 		//指定玩家的一个渲染网格时shapeGeo中的box网格，
 		//指定MeshGeometry、SubMesh、Material。
@@ -85,14 +87,14 @@ void PlayerPawnCommandTemplate::DestoryPawn(BasePawn* pPawn, Scence* pScence)
 	//TODO PlayerPawn的碰撞体删除。
 	//DeleteCollideItems();
 
-	//释放这个ControlItem链表上所有的ControlItem。
+	//释放这个ControlItem数组上所有指针。
 	pScence->DeleteControlItem(toDeletePawn->RootControl());
 
 	//释放摄像机镜头。
 	pScence->DeleteCamera(toDeletePawn->m_pCamera);
 
 	//回收Pawn对象。
-	m_playerAllocator.Free(toDeletePawn);
+	PlayerPawn::m_PlayerPawnAllocator.Free(toDeletePawn);
 }
 
 void PlayerPawnCommandTemplate::AddPlayerControl(PlayerPawn * pPlayerPawn)
@@ -113,7 +115,7 @@ void PlayerPawnCommandTemplate::AddBones(PlayerPawn * pPlayerPawn)
 	//摄像机位置的骨骼。
 	Bone* cameraPos = 
 		pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_CAMERA_POS] =
-		PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->m_pCamera->Pos());
+		(PlayerPawn::m_pBoneCommander)->NewBone(pPlayerPawn->m_pCamera->Pos());
 
 	//摄像机拍摄目标的骨骼。
 	Bone* cameraTarget = 
@@ -167,28 +169,28 @@ void PlayerControlCommandTemplate::HitKey_W(BasePawn * pPawn)
 {
 	//前进
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
-	pPlayerPawn->RootControl()->MoveX(0.1f * m_pProperty->MoveSpeed);
+	pPlayerPawn->RootControl()->MoveX(0.1f * pPlayerPawn->m_pProperty->MoveSpeed);
 }
 
 void PlayerControlCommandTemplate::HitKey_A(BasePawn * pPawn)
 {
 	//左转
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
-	pPlayerPawn->RootControl()->RotateYaw(-0.1f * m_pProperty->RotateSpeed);
+	pPlayerPawn->RootControl()->RotateYaw(-0.1f * pPlayerPawn->m_pProperty->RotateSpeed);
 }
 
 void PlayerControlCommandTemplate::HitKey_S(BasePawn * pPawn)
 {
 	//后退
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
-	pPlayerPawn->RootControl()->MoveX(-0.1f * m_pProperty->MoveSpeed);
+	pPlayerPawn->RootControl()->MoveX(-0.1f * pPlayerPawn->m_pProperty->MoveSpeed);
 }
 
 void PlayerControlCommandTemplate::HitKey_D(BasePawn * pPawn)
 {
 	//右转
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
-	pPlayerPawn->RootControl()->RotateYaw(0.1f * m_pProperty->RotateSpeed);
+	pPlayerPawn->RootControl()->RotateYaw(0.1f * pPlayerPawn->m_pProperty->RotateSpeed);
 }
 
 void PlayerControlCommandTemplate::PressMouseButton_Left(BasePawn * pPawn)

@@ -5,6 +5,11 @@
 #include "../../../../Common/GeometryGenerator.h"
 #include "FrameResource.h"
 #include "Scence.h"
+#include "PawnMaster.h"
+
+//定义一个简单的从Float3获取三个成员xyz作为函数的参数的宏。
+#define GET_X_Y_Z_Float3_ARGS(Float3) Float3.x, Float3.y, Float3.z
+
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -190,6 +195,8 @@ private:
 
 	//*******************************************游戏代码定义部分**************************************************************************************************************************************************
 
+//PawnMaster一次最多能够记住多少个生成或者删除Pawn的指令。
+#define PAWN_MASTER_COMMAND_MAX_NUM 200
 //PlayerCommander一次最多能够记住的Player数量。
 #define COMMANDER_PLAYER_MAX_COMMANDS 3
 //FollowCommander一次最多能够记录的跟随指令数量。
@@ -200,8 +207,6 @@ private:
 #define COMMANDER_COLLIDE_MAX_NUM 2000
 
 public:
-	void UpdateScence(const GameTimer& gt);
-
 	//创建场景对象。
 	void BuildScence();
 	//创建PawnMaster，用于自动化生成Pawn。
@@ -210,7 +215,7 @@ public:
 	void BuildPlayerCommander();
 	void BuildAICommander();
 	void BuildFollowCommander();
-	void BuildCollideCommander();
+	//void BuildCollideCommander();
 
 	//注册Pawn类到各个需要的PawnMaster和Commander中。
 	void RegisterPawnClass();
@@ -227,7 +232,7 @@ public:
 	
 	std::unique_ptr<PlayerCommmander> m_playerCommander;
 	std::unique_ptr<AICommander> m_AICommander;
-	std::unique_ptr<FollowCommander> m_followCommander;
-	std::unique_ptr<CollideCommander> m_collideCommander;
+	std::unique_ptr<BoneCommander> m_BoneCommander;
+	//std::unique_ptr<CollideCommander> m_collideCommander;
 	//*******************************************游戏代码定义部分**************************************************************************************************************************************************
 };

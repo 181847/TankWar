@@ -13,9 +13,8 @@ class BasePawn;
 
 //一个简单的Pawn描述结构，子类的Pawn需要继承这个结构，
 //创建自己的描述，这个描述将会用于创建和设置Pawn的初始属性。
-struct PawnDesc 
+struct PawnProperty 
 {
-	PawnType type;
 };
 
 //创建指定类型pawn的代理结构，
@@ -25,7 +24,7 @@ class PawnCommandTemplate
 {
 public:
 	//pDesc是一个动态分配的内存，CreatePawn需要自行释放这个内存。
-	virtual BasePawn* CreatePawn(PawnDesc* pDesc, Scence* pScence) = 0;
+	virtual BasePawn* CreatePawn(PawnProperty* pProperty, Scence* pScence) = 0;
 	//pPawn是一个动态分配的内存，在销毁对应的Pawn之后，DestoryPawn需要自行释放这个内存。
 	virtual void DestoryPawn(BasePawn* pPawn, Scence* pScence) = 0;
 };

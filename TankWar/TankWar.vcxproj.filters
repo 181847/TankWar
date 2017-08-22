@@ -31,17 +31,11 @@
     <Filter Include="App文件\Commander\AICommander">
       <UniqueIdentifier>{8db8e83d-8d66-424a-a8b5-d0aedcae4d8c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="App文件\Commander\FollowCommander">
-      <UniqueIdentifier>{b69122c3-96aa-4164-9849-8166b6765784}</UniqueIdentifier>
-    </Filter>
     <Filter Include="App文件\Commander\CollideCommander">
       <UniqueIdentifier>{01e6bf7e-e5b7-4900-a144-88f575188d44}</UniqueIdentifier>
     </Filter>
     <Filter Include="App文件\Commander\PawnMaster">
       <UniqueIdentifier>{a88cd3cc-1fc8-4832-be32-b72ec01371f2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="App文件\Commander\ControlItemMaster">
-      <UniqueIdentifier>{4a4f4801-23ea-469d-9a68-96a5c575f581}</UniqueIdentifier>
     </Filter>
     <Filter Include="App文件\Pawn">
       <UniqueIdentifier>{c98a1eaa-e54b-4f46-9ed1-95df4028122d}</UniqueIdentifier>
@@ -92,6 +86,12 @@
     </ClCompile>
     <ClCompile Include="PlayerPawn.cpp">
       <Filter>App文件\Pawn\PlayerPawn</Filter>
+    </ClCompile>
+    <ClCompile Include="PawnMaster.cpp">
+      <Filter>App文件\Commander\PawnMaster</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerCommander.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +148,12 @@
     </ClInclude>
     <ClInclude Include="PlayerPawn.h">
       <Filter>App文件\Pawn\PlayerPawn</Filter>
+    </ClInclude>
+    <ClInclude Include="PawnMaster.h">
+      <Filter>App文件\Commander\PawnMaster</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerCommander.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -156,6 +156,8 @@
     <ClCompile Include="BasePawn.cpp" />
     <ClCompile Include="FrameResource.cpp" />
     <ClCompile Include="MyShapesApp.cpp" />
+    <ClCompile Include="PawnMaster.cpp" />
+    <ClCompile Include="PlayerCommander.cpp" />
     <ClCompile Include="PlayerPawn.cpp" />
     <ClCompile Include="Scence.cpp" />
   </ItemGroup>
@@ -176,6 +178,8 @@
     <ClInclude Include="MyAssert.h" />
     <ClInclude Include="MyShapesApp.h" />
     <ClInclude Include="MyStaticAllocator.h" />
+    <ClInclude Include="PawnMaster.h" />
+    <ClInclude Include="PlayerCommander.h" />
     <ClInclude Include="PlayerPawn.h" />
     <ClInclude Include="Scence.h" />
   </ItemGroup>

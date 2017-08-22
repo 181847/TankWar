@@ -1,6 +1,8 @@
 #pragma once
 #include "BasePawn.h"
 #include "LinkedAllocator.h"
+#include "PawnMaster.h"
+#include "PlayerCommander.h"
 
 
 //可生成的PawnPlayer的数量
@@ -33,7 +35,9 @@ public :
 	static BoneCommander *		m_pBoneCommander;
 	//static CollideCommander *	m_pCollideCommander;
 
+	//属性分配池
 	static MyStaticAllocator<PlayerProperty> m_propertyAllocator;
+	//类对象分配池
 	static MyStaticAllocator<PlayerPawn> m_PlayerPawnAllocator;
 
 public:
@@ -55,30 +59,25 @@ public:
 
 //这一部分是关于Player的非静态属性。
 protected:
-	//static PlayerCommander* m_pPlayerCommander;
+	//摄像机对象;
 	MyCamera* m_pCamera;
-	//PlayerPawn可控制的ControlItem数量，注意保存的都是指针，
-	//这是一个存放指针的数组。
-	ControlItem* m_arr_ControlItem[CONTROLITEM_NUM_PLAYER_PAWN];
-
-	//存储于PlayerCommander中的Player对象指针，方便释放。
+	//在PlayerCommander中的控制单元指针。
 	PlayerControl* m_pPlayerControl;
-	//这里给每一个ControlItem都分配一个骨骼，
-	//每个Player存储这个指针，方便释放，
-	//多余的两个骨骼用来控制摄像机。
+	//PlayerPawn可控制的ControlItem数量，注意保存的都是指针。
+	ControlItem* m_arr_ControlItem[CONTROLITEM_NUM_PLAYER_PAWN];
+	//所有骨骼，骨骼对应ControlItem，注意这个骨骼数组中有两个控制摄像机的骨骼。
 	Bone* m_arr_Bones[CONTROLITEM_NUM_PLAYER_PAWN + 2];
 
 public:
-	//指向这个PlayerPawn对象的相关游戏属性，比如前进速度，
-	//车身旋转速度，炮弹冷却时间……
+	//指向这个PlayerPawn对象的相关游戏属性，比如前进速度，车身旋转速度，炮弹冷却时间……
 	PlayerProperty* m_pProperty;
 
 public:
-	//PlayerPawn的根节点控制器。
-	ControlItem*& RootControl();
+	//PlayerPawn的根控制器。
+	ControlItem *& RootControl();
 };
 
-//初始时静态对象。
+//初始时静态成员。
 PawnType			PlayerPawn::m_pawnType			= PAWN_TYPE_NONE;
 //Player控制器类型。
 PlayerControlType	PlayerPawn::m_playerControlType = PLAYER_CONTROL_TYPE_NONE;
@@ -89,11 +88,18 @@ PlayerCommander *	PlayerPawn::m_pPlayerCommander	= nullptr;
 //骨骼指令官。
 BoneCommander *		PlayerPawn::m_pBoneCommander	= nullptr;
 //碰撞指令官。
-//static CollideCommander *	m_pCollideCommander	= nullptr;
-MyStaticAllocator<PlayerProperty> PlayerPawn::m_propertyAllocator(MAX_PLAYER_PAWN_NUM);
-MyStaticAllocator<PlayerPawn> PlayerPawn::m_PlayerPawnAllocator(MAX_PLAYER_PAWN_NUM);
+//CollideCommander *	PlayerPawn::m_pCollideCommander		= nullptr;
+MyStaticAllocator<PlayerProperty>	PlayerPawn::m_propertyAllocator(	MAX_PLAYER_PAWN_NUM);
+MyStaticAllocator<PlayerPawn>		PlayerPawn::m_PlayerPawnAllocator(	MAX_PLAYER_PAWN_NUM);
 
-
+//玩家属性定义
+struct PlayerProperty : public PawnProperty
+{
+	//直线速度
+	float MoveSpeed;
+	//车身旋转速度
+	float rotationSpeed;
+};
 
 //用于PawnMaster中自动化生成Pawn的命令模板，禁止直接生成Pawn对象。
 class PlayerPawnCommandTemplate : public PawnCommandTemplate
@@ -114,14 +120,22 @@ protected:
 	void DeleteBones(PlayerPawn* pPlayerPawn);
 };
 
-class PlayerControlCommandTemplate
+//控制单元，响应用户输入。
+class PlayerControlCommandTemplate : public ControlCommandTemplate
 {
 public:
+	//鼠标移动
 	virtual void MouseMove(BasePawn* pPawn, float lastX, float lastY, float currX, float currY, WPARAM btnState);
+	//按下W键
 	virtual void HitKey_W(BasePawn* pPawn);
+	//按下A键
 	virtual void HitKey_A(BasePawn* pPawn);
+	//按下S键
 	virtual void HitKey_S(BasePawn* pPawn);
+	//按下D键
 	virtual void HitKey_D(BasePawn* pPawn);
+	//按下鼠标左键
 	virtual void PressMouseButton_Left(BasePawn* pPawn);
+	//按下鼠标右键
 	virtual void PressMouseButton_Right(BasePawn* pPawn);
 };

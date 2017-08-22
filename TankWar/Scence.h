@@ -9,12 +9,14 @@
 #include "LinkedAllocator.h"
 
 //判断ControlItem是否处于显示状态
-#define IS_CONTROLITEM_VISIBLE(ControlItemRef) (ControlItemRef.Property && (0x01))
+#define IS_CONTROLITEM_VISIBLE(ControlItemRef) (ControlItemRef.Property & (0x01))
 
 //************************************** 以Z轴正半轴为前	以Y轴正方向为上		X轴正方向为右**********************************************
+
+//可控制对象。
 struct ControlItem
 {
-	//旋转，x对应翻滚角，y对应俯仰角，z对应偏航角。
+	//旋转，x对应俯仰角(Pitch)，y对应偏航角（Yaw），z对应滚动角（Roll）。
 	XMFLOAT3 Rotation;
 
 	//平移信息。
@@ -52,6 +54,58 @@ struct ControlItem
 	//基本顶点位置。
 	int BaseVertexLocation = 0;
 
+public:
+	//增加偏航角
+	void RotateYaw(float d) 
+	{
+		this->Rotation.y += d; 
+		NumFramesDirty = gNumFrameResources;
+	}
+	//增加俯仰角
+	void RotatePitch(float d)
+	{
+		this->Rotation.x += d;
+		NumFramesDirty = gNumFrameResources;
+	}
+	//增加滚动角
+	void RotateRoll(float d)
+	{
+		this->Rotation.z += d;
+		NumFramesDirty = gNumFrameResources;
+	}
+	//向X轴正向移动。
+	void MoveX(float d)
+	{
+		this->Translation.x += d;
+		NumFramesDirty = gNumFrameResources;
+	}
+	//向Y轴正向移动。
+	void MoveY(float d)
+	{
+		this->Translation.y += d;
+		NumFramesDirty = gNumFrameResources;
+	}
+	//向Z轴正向移动。
+	void MoveZ(float d)
+	{
+		this->Translation.z += d;
+		NumFramesDirty = gNumFrameResources;
+	}
+
+	//将ControlItemd的显示属性设为隐藏。
+	void Hide()
+	{
+		//0xfe = b 1111 1110，
+		//最后一个字设为0。
+		this->Property &= 0xfe;
+	}
+	//将ControlItemd的显示属性设为显示。
+	void Show()
+	{
+		//0x01 = b 0000 0001，
+		//最后一个字设为1。
+		this->Property |= 0x01;
+	}
 };
 
 //摄像机结构，包含渲染一个画面所需要的所有镜头信息。
@@ -76,19 +130,31 @@ public:
 		std::unordered_map<std::string, std::unique_ptr<Material>>* pMaterials,
 		std::unordered_map<std::string, std::unique_ptr<MeshGeometry>>* m_pGeometries);
 	~Scence();
+	Scence() = delete;
+	Scence(const Scence&) = delete;
+	Scence& operator = (const Scence&) = delete;
+
 	//将ControlItem中的旋转和平移信息更新到对应的RenderItem中。
-	void UpdateData(const GameTimer& gt);
-	//场景中会存储固定数量个摄像机，每个摄像机对应一个序号，
-	//一个摄像机由两个ControlItem来控制。
+	void UpdateData(const GameTimer& gt, FrameResource* pCurrFrameResource);
+
+	//场景中指定序号的摄像机，目前这个方法只会返回序号为0的摄像机，如果这个摄像机还没有创建，就返回nullptr。
 	MyCamera* GetCamera(UINT cameraIndex);
 	//创建新的摄像机，目前这个方法没有功能实现，只考虑一个摄像头的情况。
 	MyCamera* AppendCamera();
+	//删除摄像机。
+	void DeleteCamera(MyCamera* pCamera);
+
+	//返回一个ControlItem，
+	//NameofGeometry，几何形体集合的名字；
+	//NameOfSubmesh，具体网格的名字；
+	//NameOfMaterial，材质的名字。
+	ControlItem* NewControlItem(const char* NameOfGeometry, const char* NameOfSubmesh, const char* NameOfMaterial);
+	//回收ControlItem的内存。
+	void DeleteControlItem(ControlItem* pControlItem);
 
 public:
 	//ControlItem分配池。
 	std::unique_ptr<LinkedAllocator<ControlItem>> m_controlItemAllocator;
-	//RenderItem分配池。
-	std::unique_ptr<LinkedAllocator<MyRenderItem>> m_renderItemAllocator;
 	//指向程序里面创建的所有材质，注意：这是个指针。
 	std::unordered_map<std::string, std::unique_ptr<Material>>* m_pMaterials;
 	//指向程序里面创建的所有形状，注意：这是个指针。

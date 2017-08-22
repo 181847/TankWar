@@ -199,8 +199,13 @@ void MyShapesApp::Update(const GameTimer& gt)
 	UpdateMainPassCB(gt);
 	UpdateMaterialCB(gt);
 
+	m_playerCommander->Executee();
+	m_AICommander->Executee();
+	m_BoneCommander->Executee();
+	//m_collideCommander->Executee();
+
 	//在这个方法里面完成游戏中所有的指令。
-	UpdateScence(gt);
+	m_scence->UpdateData(gt, mCurrFrameResource);
 }
 
 void MyShapesApp::Draw(const GameTimer& gt)
@@ -490,6 +495,15 @@ void MyShapesApp::UpdateMaterialCB(const GameTimer & gt)
 void MyShapesApp::UpdateCameraFromScence(const GameTimer & gt, UINT cameraIndexInScence)
 {
 	MyCamera* pCurrentCamera = m_scence->GetCamera(cameraIndexInScence);
+	ASSERT(pCurrentCamera && "无法获取摄像机，请检查是否生成了至少一个PlayerPawn。");
+
+	XMVECTOR pos = XMVectorSet(GET_X_Y_Z_Float3_ARGS(pCurrentCamera->Target->Translation), 1.0f);
+	XMVECTOR target = XMVectorSet(GET_X_Y_Z_Float3_ARGS(pCurrentCamera->Pos->Rotation), 1.0f);
+	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+	//计算世界至观察矩阵。
+	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
+	XMStoreFloat4x4(&mView, view);
 }
 
 void MyShapesApp::BuildDescriptorHeap()
@@ -914,7 +928,7 @@ void MyShapesApp::BuildFrameResources()
 			1000,
 			//TODO
 			//(UINT)mAllRitems.size(),//ObjectConstants的数量。
-			(UINT)mMaterials.size()));	
+			(UINT)mMaterials.size()));
 	}
 }
 
@@ -1019,7 +1033,7 @@ void MyShapesApp::BuildScence()
 	BuildPlayerCommander();
 	BuildAICommander();
 	BuildFollowCommander();
-	BuildCollideCommander();
+	//BuildCollideCommander();
 
 	//注册Pawn类
 	RegisterPawnClassToPawnMaster();
@@ -1027,6 +1041,11 @@ void MyShapesApp::BuildScence()
 	//建议通过PawnMaster来创建。
 	BuildInitPawn();
 
+}
+
+void MyShapesApp::BuildPawnMaster()
+{
+	m_pawnMaster = std::make_unique<PawnMaster>(PAWN_MASTER_COMMAND_MAX_NUM, m_scence);
 }
 
 void MyShapesApp::BuildPlayerCommander()
@@ -1044,10 +1063,10 @@ void MyShapesApp::BuildFollowCommander()
 	m_followCommander = std::make_unique<FollowCommander>(COMMANDER_FOLLOW_MAX_COMMANDS);
 }
 
-void MyShapesApp::BuildCollideCommander()
-{
-	m_collideCommander = std::make_unique<CollideCommander>(COMMANDER_COLLIDE_MAX_NUM);
-}
+//void MyShapesApp::BuildCollideCommander()
+//{
+//	m_collideCommander = std::make_unique<CollideCommander>(COMMANDER_COLLIDE_MAX_NUM);
+//}
 
 void MyShapesApp::RegisterPawnClass()
 {
@@ -1158,33 +1177,4 @@ XMFLOAT3 MyShapesApp::HelpCalculateFresnelR0(float refractionIndex)
 	return XMFLOAT3(R0_X_or_Y_or_Z, R0_X_or_Y_or_Z, R0_X_or_Y_or_Z);
 }
 
-//游戏的主要逻辑循环
-void MyShapesApp::UpdateScence(const GameTimer& gt)
-{
-	/*
-	//更新玩家操作的Pawn。
-	m_playerCommander.LogCommand(m_controlItemMaster, m_pawnMaster, gt);
 
-	//AI操作更新，在这里控制敌人移动以及各种物体的自动位移，比如子弹的飞行，道具的移动……
-	m_AICommander.LogCommand(m_controlItemMaster, m_pawnMaster, gt);
-
-	//跟随操作，在这里执行ControlItem级别的旋转和变换，主要用来使得ControlItem的平移和旋转之间产生联系。
-	m_followCommander.LogCommand(m_controlItemMaster, m_pawnMaster, gt);
-
-	//ControlItemMaster执行命令，变换ControlItem的旋转和位移。
-	m_controlItemMaster.ExcecuteeCommands();
-
-	//Scence对象拥有所有的ControlItem和RenderItem，
-	//使用ControlItem来更新RenderItem的世界变换矩阵，
-	//同时更新
-	m_scence.UpdateData();
-
-	//使用场景中的第一个摄像机位置来进行渲染。
-	m_scence.DrawFromCamera(0);
-
-	m_collideCommander.LogCommand(m_controlItemMaster, m_pawnMaster, gt);
-
-	//PawnMaster执行生产和销毁Pawn的功能。
-	m_pawnMaster.ExcecuteeCommands();
-	*/
-}
