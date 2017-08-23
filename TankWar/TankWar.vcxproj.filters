@@ -91,7 +91,7 @@
       <Filter>App文件\Commander\PawnMaster</Filter>
     </ClCompile>
     <ClCompile Include="PlayerCommander.cpp">
-      <Filter>源文件</Filter>
+      <Filter>App文件\Commander\PlayerCommander</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -153,7 +153,7 @@
       <Filter>App文件\Commander\PawnMaster</Filter>
     </ClInclude>
     <ClInclude Include="PlayerCommander.h">
-      <Filter>头文件</Filter>
+      <Filter>App文件\Commander\PlayerCommander</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

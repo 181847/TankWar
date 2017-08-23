@@ -57,22 +57,35 @@ void PawnMaster::Executee()
 		switch (CommandBuffer[i].CommandType)
 		{
 		case PAWN_COMMAND_TYPE_CREATE:
-			CommandTemplateList[CommandBuffer[i].CreateCommand.pawnType]
+			CommandTemplateList[CommandBuffer[i].CreateCommand.pawnType - 1]
 				->CreatePawn(
 					CommandBuffer[i].CreateCommand.pProperty, 
 					m_pScence);
+
+			//清空当前命令信息。
+			CommandBuffer[i].CreateCommand.pawnType = PAWN_TYPE_NONE;
+			CommandBuffer[i].CreateCommand.pProperty = nullptr;
 			break;
 
 		case PAWN_COMMAND_TYPE_DESTORY:
-			CommandTemplateList[CommandBuffer[i].CreateCommand.pawnType]
+			CommandTemplateList[CommandBuffer[i].CreateCommand.pawnType - 1]
 				->DestoryPawn(
 					CommandBuffer[i].DestoryCommand.pPawn_to_destory,
 					m_pScence);
+
+			//清空当前命令信息。
+			CommandBuffer[i].DestoryCommand.pPawn_to_destory = nullptr;
 			break;
 
 		default:
-			ASSERT(false && "PawnMaster执行的命令类型在意料之外");
+			ASSERT(false && "PawnMaster执行的命令类型非法");
 			break;
 		}
+
+		//清空当前命令类型。
+		CommandBuffer[i].CommandType = PAWN_COMMAND_TYPE_NONE;
 	}
+
+	//重置未执行命令数量。
+	UnExecuteeCommandNum = 0;
 }

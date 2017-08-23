@@ -15,7 +15,7 @@
 #define BONE_INDEX_PLAYER_PAWN_CAMERA_POS 1
 #define BONE_INDEX_PLAYER_PAWN_CAMERA_TARGET 2
 
-class PlayerPawn
+class PlayerPawn: public BasePawn
 {
 protected:
 	PlayerPawn();
@@ -62,7 +62,7 @@ protected:
 	//摄像机对象;
 	MyCamera* m_pCamera;
 	//在PlayerCommander中的控制单元指针。
-	PlayerControl* m_pPlayerControl;
+	PlayerControlUnit * m_pPlayerControl;
 	//PlayerPawn可控制的ControlItem数量，注意保存的都是指针。
 	ControlItem* m_arr_ControlItem[CONTROLITEM_NUM_PLAYER_PAWN];
 	//所有骨骼，骨骼对应ControlItem，注意这个骨骼数组中有两个控制摄像机的骨骼。

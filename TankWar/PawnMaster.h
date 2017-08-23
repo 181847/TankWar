@@ -2,7 +2,8 @@
 #include "BasePawn.h"
 
 typedef BYTE PawnCommandType;
-#define PAWN_COMMAND_TYPE_CREATE 0x00
+#define PAWN_COMMAND_TYPE_NONE 0x00
+#define PAWN_COMMAND_TYPE_CREATE 0x0f
 #define PAWN_COMMAND_TYPE_DESTORY 0xff
 
 struct PawnCommand 
@@ -13,6 +14,8 @@ struct PawnCommand
 		struct
 		{
 			//要生成的Pawn类型，这个类型只能是在这个pawnMaster中注册过的类型。
+			//注意，这个值对应于CommandTemplateList中数组的元素，
+			//但是不能为0，所以获取元素的时候要注意减一来取到数组中对应的值。
 			PawnType pawnType;
 			//Pawn的属性设定指针，这个指针指向的内存由具体的Pawn类型分配和回收。
 			PawnProperty* pProperty;

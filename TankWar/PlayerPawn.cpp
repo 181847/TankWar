@@ -129,7 +129,8 @@ void PlayerPawnCommandTemplate::AddBones(PlayerPawn * pPlayerPawn)
 
 void PlayerPawnCommandTemplate::DeletePlayerControl(PlayerPawn * pPlayerPawn)
 {
-	PlayerPawn::m_pPlayerCommander->DeletePlayerControl(pPlayerPawn->m_pPlayerControl);
+	PlayerPawn* toDeletePawn = (PlayerPawn*)pPlayerPawn;
+	PlayerPawn::m_pPlayerCommander->DeletePlayerControl(toDeletePawn->m_pPlayerControl);
 	pPlayerPawn->m_pPlayerControl = nullptr;
 }
 
