@@ -6,6 +6,18 @@ typedef BYTE PawnCommandType;
 #define PAWN_COMMAND_TYPE_CREATE 0x0f
 #define PAWN_COMMAND_TYPE_DESTORY 0xff
 
+//创建指定类型pawn的代理结构，
+//这个结构用于PawnMaster中，
+//能够自行创建Pawn对象。
+class PawnCommandTemplate
+{
+public:
+	//pDesc是一个动态分配的内存，CreatePawn需要自行释放这个内存。
+	virtual BasePawn* CreatePawn(PawnProperty* pProperty, Scence* pScence) = 0;
+	//pPawn是一个动态分配的内存，在销毁对应的Pawn之后，DestoryPawn需要自行释放这个内存。
+	virtual void DestoryPawn(BasePawn* pPawn, Scence* pScence) = 0;
+};
+
 struct PawnCommand 
 {
 	PawnCommandType CommandType;

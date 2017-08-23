@@ -71,6 +71,7 @@ BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnProperty* pProperty, Scence*
 	//添加碰撞事件，并指派一个触发事件。
 	//TODO PlayerPawn的碰撞体添加。
 	//AddCollideItems(newPawn);
+	return newPawn;
 }
 
 void PlayerPawnCommandTemplate::DestoryPawn(BasePawn* pPawn, Scence* pScence)
@@ -115,12 +116,12 @@ void PlayerPawnCommandTemplate::AddBones(PlayerPawn * pPlayerPawn)
 	//摄像机位置的骨骼。
 	Bone* cameraPos = 
 		pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_CAMERA_POS] =
-		(PlayerPawn::m_pBoneCommander)->NewBone(pPlayerPawn->m_pCamera->Pos());
+		(PlayerPawn::m_pBoneCommander)->NewBone(pPlayerPawn->m_pCamera->Pos);
 
 	//摄像机拍摄目标的骨骼。
-	Bone* cameraTarget = 
-		pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_CAMERA_TARGET] =
-		PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->m_pCamera->Target());
+	Bone* cameraTarget 
+		= pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_CAMERA_TARGET] 
+		= PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->m_pCamera->Target);
 
 	//创建骨骼连接。
 	cameraTarget->LinkTo(rootBone);
@@ -146,11 +147,11 @@ void PlayerPawnCommandTemplate::DeleteBones(PlayerPawn * pPlayerPawn)
 
 
 //******************玩家控制模板*****************************************
-void PlayerControlCommandTemplate::MouseMove(BasePawn * pPawn, float lastX, float lastY, float currX, float currY, WPARAM btnState)
+void PlayerControlCommandTemplate::MouseMove(BasePawn* pPawn, MouseState mouseState, const GameTimer& gt)
 {
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
-	float dx = currX - lastX;
-	float dy = currY - lastY;
+	float dx = static_cast<float>(mouseState.CurrMousePos.x - mouseState.LastMousePos.x);
+	float dy = static_cast<float>(mouseState.CurrMousePos.y - mouseState.LastMousePos.y);
 
 	//摄像机水平旋转。
 	pPlayerPawn->m_pCamera->Target->RotateYaw(dx);
@@ -166,40 +167,40 @@ void PlayerControlCommandTemplate::MouseMove(BasePawn * pPawn, float lastX, floa
 	
 }
 
-void PlayerControlCommandTemplate::HitKey_W(BasePawn * pPawn)
+void PlayerControlCommandTemplate::HitKey_W(BasePawn * pPawn, const GameTimer& gt)
 {
 	//前进
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
 	pPlayerPawn->RootControl()->MoveX(0.1f * pPlayerPawn->m_pProperty->MoveSpeed);
 }
 
-void PlayerControlCommandTemplate::HitKey_A(BasePawn * pPawn)
+void PlayerControlCommandTemplate::HitKey_A(BasePawn * pPawn, const GameTimer& gt)
 {
 	//左转
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
-	pPlayerPawn->RootControl()->RotateYaw(-0.1f * pPlayerPawn->m_pProperty->RotateSpeed);
+	pPlayerPawn->RootControl()->RotateYaw(-0.1f * pPlayerPawn->m_pProperty->RotationSpeed);
 }
 
-void PlayerControlCommandTemplate::HitKey_S(BasePawn * pPawn)
+void PlayerControlCommandTemplate::HitKey_S(BasePawn * pPawn, const GameTimer& gt)
 {
 	//后退
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
 	pPlayerPawn->RootControl()->MoveX(-0.1f * pPlayerPawn->m_pProperty->MoveSpeed);
 }
 
-void PlayerControlCommandTemplate::HitKey_D(BasePawn * pPawn)
+void PlayerControlCommandTemplate::HitKey_D(BasePawn * pPawn, const GameTimer& gt)
 {
 	//右转
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
-	pPlayerPawn->RootControl()->RotateYaw(0.1f * pPlayerPawn->m_pProperty->RotateSpeed);
+	pPlayerPawn->RootControl()->RotateYaw(0.1f * pPlayerPawn->m_pProperty->RotationSpeed);
 }
 
-void PlayerControlCommandTemplate::PressMouseButton_Left(BasePawn * pPawn)
+void PlayerControlCommandTemplate::PressMouseButton_Left(BasePawn * pPawn, const GameTimer& gt)
 {
 	//发射子弹。
 }
 
-void PlayerControlCommandTemplate::PressMouseButton_Right(BasePawn * pPawn)
+void PlayerControlCommandTemplate::PressMouseButton_Right(BasePawn * pPawn, const GameTimer& gt)
 {
 	//发射炮弹。
 }

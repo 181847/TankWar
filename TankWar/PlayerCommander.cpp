@@ -85,7 +85,7 @@ void PlayerCommander::ExecuteeCommandTeplate(
 	PlayerControlUnit * pUnit, const GameTimer& gt)
 {
 	//获取控制模板，注意ControlType的0表示非法命令，需要手动减一才是对应数组中的元素。
-	auto pCTemplate = CommandTemplateList[pUnit->ControlType - 1].get();
+	auto* pCTemplate = CommandTemplateList[pUnit->ControlType - 1].get();
 
 	//执行MouseMove。
 	pCTemplate->MouseMove(pUnit->pControledPawn, mouseState, gt);
@@ -123,4 +123,17 @@ void PlayerCommander::ExecuteeCommandTeplate(
 			}
 		}
 	}
+}
+
+void MouseState::UpdateLocation(LONG newX, LONG newY)
+{
+	THROW_UNIMPLEMENT_EXCEPTION("鼠标坐标的更新函数");
+}
+
+void KeyState::ChangeState(StateChange newState)
+{
+	ASSERT(newState == RELEASE || newState == PRESS);
+	stateChange =
+		(stateChange << 4 & 0xf0)	//原状态前移4位，保留移动后的前4位
+		& (newState & 0x0f);		//取新状态的后四位，与前面的状态与运算
 }

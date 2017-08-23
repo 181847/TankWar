@@ -4,6 +4,8 @@
 typedef unsigned int PlayerControlType;
 #define PLAYER_CONTROL_TYPE_NONE 0
 
+struct MouseState;
+
 //控制单元，响应用户输入。
 class ControlCommandTemplate
 {
@@ -60,13 +62,7 @@ public:
 	//newState指定为当前的最新状态就可以了，
 	//使用RELEASE_TO_RELEASE表示当前状态处于按键释放
 	//或者PRESS_TO_PRESS表示当前状态处于按压。
-	void ChangeState(StateChange newState)
-	{
-		ASSERT(newState == RELEASE || newState == PRESS);
-		stateChange = 
-			(stateChange << 4 & 0xf0)	//原状态前移4位，保留移动后的前4位
-			& (newState & 0x0f);		//取新状态的后四位，与前面的状态与运算
-	}
+	void ChangeState(StateChange newState);
 };
 
 struct MouseState
@@ -77,10 +73,7 @@ struct MouseState
 	bool IsCaptured = false;
 public:
 	//更新鼠标位置。
-	void UpdateLocation(LONG newX, LONG newY)
-	{
-		THROW_UNIMPLEMENT_EXCEPTION("鼠标坐标的更新函数");
-	}
+	void UpdateLocation(LONG newX, LONG newY);
 };
 
 //玩家控制单元

@@ -5,14 +5,51 @@
 
 typedef unsigned int UINT;
 
+
+/*
+template<typename DataType>
+struct LinkableUnit
+{
+union
+{
+LinkableUnit<DataType>* next;
+DataType data;
+};
+
+public:
+LinkableUnit();
+~LinkableUnit();
+};
+
+template<typename DataType>
+inline LinkableUnit<DataType>::LinkableUnit()
+{
+}
+
+template<typename DataType>
+inline LinkableUnit<DataType>::~LinkableUnit()
+{
+}
+*/
+
+
+
+
+
 template<typename DataType>
 class MyStaticAllocator
 {
-	//作为可分配空间的结点。
-	union LinkableUnit
+	
+	struct LinkableUnit 
 	{
-		DataType data;
-		LinkableUnit* next;
+		union 
+		{
+			LinkableUnit* next;
+			DataType data;
+		};
+	public:
+		LinkableUnit() {}
+		~LinkableUnit() {}
 	};
 
 public:
@@ -43,7 +80,9 @@ MyStaticAllocator<DataType>::MyStaticAllocator(UINT initializeUnitCount)
 	remainCount = totalCount = initializeUnitCount;
 
 	//申请初始空间的时候多申请一个，用来表示头结点。
-	memoryLocation = new LinkableUnit[totalCount + 1];
+	memoryLocation = 
+		new LinkableUnit[totalCount + 1];
+
 	//内存池链接为一个链表。
 	for (UINT i = 0; i < totalCount; ++i) 
 	{

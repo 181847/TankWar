@@ -4,23 +4,23 @@
 Scence::Scence(UINT totalRenderItemNum, UINT totalCameraNum,
 	std::unordered_map<std::string, std::unique_ptr<Material>>* pMaterials,
 	std::unordered_map<std::string, std::unique_ptr<MeshGeometry>>* pGeometries)
+	:m_controlItemAllocator(totalRenderItemNum)
 {
-	m_controlItemAllocator = std::make_unique<LinkedAllocator<ControlItem>>(totalRenderItemNum);
 
 	//对内存池中所有的ControlItem都设置ObjectIndex，在最后的时候添加分配池中。
-	for (int i = 0; i < m_controlItemAllocator->GetRemainCount(); ++i) {
-		m_controlItemAllocator->Malloc()->ObjCBIndex = i;
+	for (UINT i = 0; i < m_controlItemAllocator.GetRemainCount(); ++i) {
+		m_controlItemAllocator.Malloc()->ObjCBIndex = i;
 	}
 	
 	//获取分配池已分配元素的双重循环链表的头结点。
-	auto pHead = m_controlItemAllocator->GetHead();
+	auto pHead = m_controlItemAllocator.GetHead();
 
 	//从头结点开始，将所有元素重新回收到内存池内，
 	//直到头结点的后继是自身，即已分配元素的数量为0，分配池此时重新获得所有可分配的元素内存。
 	while (pHead->m_pNext != pHead)
 	{
 		//回收这个结点内存。
-		m_controlItemAllocator->Remove(pHead->m_pNext);
+		m_controlItemAllocator.Remove(pHead->m_pNext);
 	}
 
 	m_pMaterials = pMaterials;
@@ -40,7 +40,7 @@ void Scence::UpdateData(const GameTimer & gt, FrameResource* pCurrFrameResource)
 {
 	auto* currentCB = pCurrFrameResource->ObjectCB.get();
 
-	DeLinkedElement<ControlItem>* pHead = m_controlItemAllocator->GetHead();
+	DeLinkedElement<ControlItem>* pHead = m_controlItemAllocator.GetHead();
 	DeLinkedElement<ControlItem>* pNode = pHead->m_pNext;
 	while (pNode != pHead 
 		&& pNode->element.NumFramesDirty > 0)
@@ -71,7 +71,7 @@ void Scence::UpdateData(const GameTimer & gt, FrameResource* pCurrFrameResource)
 		XMMATRIX referenceCoordinateMatrix = XMLoadFloat4x4(&controlItem.ReferenceCoordinate);
 		
 
-		//计算世界变换矩阵。
+		//计算世界变换矩阵，注意：先局部变换、后相对坐标系变换。
 		TransformMatrix = TransformMatrix * referenceCoordinateMatrix;
 
 		//更新世界变换矩阵。
@@ -98,8 +98,8 @@ MyCamera * Scence::AppendCamera()
 	ASSERT(m_pCamera == nullptr);
 	m_pCamera = new MyCamera();
 	m_pCamera->Id = 0;
-	m_pCamera->Pos = m_controlItemAllocator->Malloc();
-	m_pCamera->Target = m_controlItemAllocator->Malloc();
+	m_pCamera->Pos = m_controlItemAllocator.Malloc();
+	m_pCamera->Target = m_controlItemAllocator.Malloc();
 	return m_pCamera;
 }
 
@@ -120,7 +120,7 @@ ControlItem * Scence::NewControlItem(
 
 	//获取图形集合，这个集合中包含了顶点和索引的值。
 	MeshGeometry* geo = (*m_pGeometries)[NameOfGeometry].get();
-	ControlItem* pNewCItem = m_controlItemAllocator->Malloc();
+	ControlItem* pNewCItem = m_controlItemAllocator.Malloc();
 	pNewCItem->Geo = geo;
 	pNewCItem->BaseVertexLocation = geo->DrawArgs[NameOfSubmesh].BaseVertexLocation;
 	pNewCItem->IndexCount = geo->DrawArgs[NameOfSubmesh].IndexCount;

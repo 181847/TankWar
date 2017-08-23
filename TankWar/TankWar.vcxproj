@@ -154,6 +154,8 @@
     <ClCompile Include="..\..\..\..\Common\GeometryGenerator.cpp" />
     <ClCompile Include="..\..\..\..\Common\MathHelper.cpp" />
     <ClCompile Include="BasePawn.cpp" />
+    <ClCompile Include="BoneCommander.cpp" />
+    <ClCompile Include="ControlItem.cpp" />
     <ClCompile Include="FrameResource.cpp" />
     <ClCompile Include="MyShapesApp.cpp" />
     <ClCompile Include="PawnMaster.cpp" />
@@ -172,6 +174,7 @@
     <ClInclude Include="..\..\..\..\Common\MathHelper.h" />
     <ClInclude Include="..\..\..\..\Common\UploadBuffer.h" />
     <ClInclude Include="BasePawn.h" />
+    <ClInclude Include="BoneCommander.h" />
     <ClInclude Include="DeLinkedList.h" />
     <ClInclude Include="FrameResource.h" />
     <ClInclude Include="LinkedAllocator.h" />
@@ -182,6 +185,7 @@
     <ClInclude Include="PlayerCommander.h" />
     <ClInclude Include="PlayerPawn.h" />
     <ClInclude Include="Scence.h" />
+    <ClInclude Include="ControlItem.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

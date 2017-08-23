@@ -1,8 +1,8 @@
 #pragma once
 #include "BasePawn.h"
-#include "LinkedAllocator.h"
 #include "PawnMaster.h"
 #include "PlayerCommander.h"
+#include "BoneCommander.h"
 
 
 //可生成的PawnPlayer的数量
@@ -15,11 +15,20 @@
 #define BONE_INDEX_PLAYER_PAWN_CAMERA_POS 1
 #define BONE_INDEX_PLAYER_PAWN_CAMERA_TARGET 2
 
+
+//玩家属性定义
+struct PlayerProperty : public PawnProperty
+{
+	//直线速度
+	float MoveSpeed;
+	//车身旋转速度
+	float RotationSpeed;
+};
+
 class PlayerPawn: public BasePawn
 {
-protected:
-	PlayerPawn();
 public:
+	PlayerPawn();
 	~PlayerPawn();
 
 //这一部分负责关于PlayerPawn类的静态属性
@@ -92,14 +101,6 @@ BoneCommander *		PlayerPawn::m_pBoneCommander	= nullptr;
 MyStaticAllocator<PlayerProperty>	PlayerPawn::m_propertyAllocator(	MAX_PLAYER_PAWN_NUM);
 MyStaticAllocator<PlayerPawn>		PlayerPawn::m_PlayerPawnAllocator(	MAX_PLAYER_PAWN_NUM);
 
-//玩家属性定义
-struct PlayerProperty : public PawnProperty
-{
-	//直线速度
-	float MoveSpeed;
-	//车身旋转速度
-	float rotationSpeed;
-};
 
 //用于PawnMaster中自动化生成Pawn的命令模板，禁止直接生成Pawn对象。
 class PlayerPawnCommandTemplate : public PawnCommandTemplate
@@ -125,17 +126,17 @@ class PlayerControlCommandTemplate : public ControlCommandTemplate
 {
 public:
 	//鼠标移动
-	virtual void MouseMove(BasePawn* pPawn, float lastX, float lastY, float currX, float currY, WPARAM btnState);
+	virtual void MouseMove(BasePawn* pPawn, MouseState mouseState, const GameTimer& gt);
 	//按下W键
-	virtual void HitKey_W(BasePawn* pPawn);
+	virtual void HitKey_W(BasePawn* pPawn, const GameTimer& gt);
 	//按下A键
-	virtual void HitKey_A(BasePawn* pPawn);
+	virtual void HitKey_A(BasePawn* pPawn, const GameTimer& gt);
 	//按下S键
-	virtual void HitKey_S(BasePawn* pPawn);
+	virtual void HitKey_S(BasePawn* pPawn, const GameTimer& gt);
 	//按下D键
-	virtual void HitKey_D(BasePawn* pPawn);
+	virtual void HitKey_D(BasePawn* pPawn, const GameTimer& gt);
 	//按下鼠标左键
-	virtual void PressMouseButton_Left(BasePawn* pPawn);
+	virtual void PressMouseButton_Left(BasePawn* pPawn, const GameTimer& gt);
 	//按下鼠标右键
-	virtual void PressMouseButton_Right(BasePawn* pPawn);
+	virtual void PressMouseButton_Right(BasePawn* pPawn, const GameTimer& gt);
 };

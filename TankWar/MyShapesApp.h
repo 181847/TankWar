@@ -7,8 +7,6 @@
 #include "Scence.h"
 #include "PawnMaster.h"
 
-//定义一个简单的从Float3获取三个成员xyz作为函数的参数的宏。
-#define GET_X_Y_Z_Float3_ARGS(Float3) Float3.x, Float3.y, Float3.z
 
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;

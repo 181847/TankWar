@@ -49,6 +49,9 @@
     <Filter Include="App文件\Pawn\NewFilter1">
       <UniqueIdentifier>{ba6672bc-d8d5-4d56-ab9a-c4000bb9ee6e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="App文件\Commander\BoneCommander">
+      <UniqueIdentifier>{99d46180-291d-4484-b39a-7c7bdc0bb657}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\Camera.cpp">
@@ -92,6 +95,12 @@
     </ClCompile>
     <ClCompile Include="PlayerCommander.cpp">
       <Filter>App文件\Commander\PlayerCommander</Filter>
+    </ClCompile>
+    <ClCompile Include="BoneCommander.cpp">
+      <Filter>App文件\Commander\BoneCommander</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlItem.cpp">
+      <Filter>App文件\源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +163,12 @@
     </ClInclude>
     <ClInclude Include="PlayerCommander.h">
       <Filter>App文件\Commander\PlayerCommander</Filter>
+    </ClInclude>
+    <ClInclude Include="BoneCommander.h">
+      <Filter>App文件\Commander\BoneCommander</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlItem.h">
+      <Filter>App文件\头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
