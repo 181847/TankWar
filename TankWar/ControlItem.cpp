@@ -5,14 +5,14 @@ extern const int gNumFrameResources;
 //增加偏航角
 void ControlItem::RotateYaw(float d)
 {
-	this->Rotation.y += d;
+	Rotation.y += d;
 	NumFramesDirty = gNumFrameResources;
 }
 
 //增加俯仰角
 void ControlItem::RotatePitch(float d)
 {
-	this->Rotation.x += d;
+	Rotation.x += d;
 	NumFramesDirty = gNumFrameResources;
 }
 

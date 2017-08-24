@@ -39,6 +39,8 @@ enum KeyType: BYTE
 
 //用一个字节作为按键状态转换的标志
 typedef unsigned char StateChange;
+#define STATE_CHANGE(CurrentState, NewState) (CurrentState =(CurrentState << 4 & 0xf0)	| (NewState & 0x0f))
+
 //定义按键的4种状态转换。
 //按压到释放
 #define PRESS_TO_RELEASE	(0xf0)
@@ -52,6 +54,18 @@ typedef unsigned char StateChange;
 #define PRESS				PRESS_TO_PRESS
 //释放状态
 #define RELEASE				RELEASE_TO_RELEASE
+//适用于鼠标移动状态的值
+#define MOVE				PRESS
+//鼠标停止
+#define STOP				RELEASE
+//鼠标从移动到静止
+#define MOVE_TO_STOP		PRESS_TO_RELEASE
+//鼠标从静止到移动
+#define STOP_TO_MOVE		RELEASE_TO_PRESS
+//鼠标保持静止
+#define STOP_TO_STOP		RELEASE_TO_RELEASE
+//鼠标保持移动
+#define MOVE_TO_MOVE		PRESS_TO_PRESS
 
 struct KeyState
 {
@@ -68,12 +82,14 @@ public:
 
 struct MouseState
 {
+	//鼠标移动状态用PRESS表示，
+	StateChange moveState;
 	POINT LastMousePos;
 	POINT CurrMousePos;
 	//当前窗口是否获得鼠标的焦点，没有焦点的情况下不发动MouseMove方法，默认为false。
 	bool IsCaptured = false;
 public:
-	//更新鼠标位置。
+	//更新鼠标位置，一旦更新鼠标位置，就表示鼠标移动，将会更新鼠标移动状态。
 	void UpdateLocation(LONG newX, LONG newY);
 };
 

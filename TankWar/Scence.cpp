@@ -42,43 +42,45 @@ void Scence::UpdateData(const GameTimer & gt, FrameResource* pCurrFrameResource)
 
 	DeLinkedElement<ControlItem>* pHead = m_controlItemAllocator.GetHead();
 	DeLinkedElement<ControlItem>* pNode = pHead->m_pNext;
-	while (pNode != pHead 
-		&& pNode->element.NumFramesDirty > 0)
+	while (pNode != pHead)
 	{
-		//对应物体的寄存器数据。
-		ObjectConstants objectConstants;
+		if (pNode->element.NumFramesDirty > 0)
+		{
+			//对应物体的寄存器数据。
+			ObjectConstants objectConstants;
 
-		//获取ControlItem引用
-		ControlItem& controlItem = pNode->element;
-		//计数减小。
-		--controlItem.NumFramesDirty;
+			//获取ControlItem引用
+			ControlItem& controlItem = pNode->element;
+			//计数减小。
+			--controlItem.NumFramesDirty;
 
-		//计算局部变换矩阵。
-		//计算旋转矩阵：俯仰、偏航、翻滚
-		XMMATRIX TransformMatrix = XMMatrixRotationRollPitchYaw(
-			controlItem.Rotation.x,
-			controlItem.Rotation.y, 
-			controlItem.Rotation.z);
-		//平移
-		XMFLOAT4 translation = {
-			controlItem.Translation.x,
-			controlItem.Translation.y,
-			controlItem.Translation.z,
-			1.0 };
-		//存储平移信息。
-		TransformMatrix.r[3] = XMLoadFloat4(&translation);
-		//加载相对坐标变换矩阵。
-		XMMATRIX referenceCoordinateMatrix = XMLoadFloat4x4(&controlItem.ReferenceCoordinate);
-		
+			//计算局部变换矩阵。
+			//计算旋转矩阵：俯仰、偏航、翻滚
+			XMMATRIX TransformMatrix = XMMatrixRotationRollPitchYaw(
+				controlItem.Rotation.x,
+				controlItem.Rotation.y,
+				controlItem.Rotation.z);
+			//平移
+			XMFLOAT4 translation = {
+				controlItem.Translation.x,
+				controlItem.Translation.y,
+				controlItem.Translation.z,
+				1.0 };
+			//存储平移信息。
+			TransformMatrix.r[3] = XMLoadFloat4(&translation);
+			//加载相对坐标变换矩阵。
+			XMMATRIX referenceCoordinateMatrix = XMLoadFloat4x4(&controlItem.ReferenceCoordinate);
 
-		//计算世界变换矩阵，注意：先局部变换、后相对坐标系变换。
-		TransformMatrix = TransformMatrix * referenceCoordinateMatrix;
 
-		//更新世界变换矩阵。
-		XMStoreFloat4x4(&controlItem.World, TransformMatrix);
+			//计算世界变换矩阵，注意：先局部变换、后相对坐标系变换。
+			TransformMatrix = TransformMatrix * referenceCoordinateMatrix;
 
-		//更新物体信息到ConstantsBuffer中。
-		XMStoreFloat4x4(&objectConstants.World, XMMatrixTranspose(TransformMatrix));
+			//更新世界变换矩阵。
+			XMStoreFloat4x4(&controlItem.World, TransformMatrix);
+
+			//更新物体信息到ConstantsBuffer中。
+			XMStoreFloat4x4(&objectConstants.World, XMMatrixTranspose(TransformMatrix));
+		}
 
 		//迭代
 		pNode = pNode->m_pNext;

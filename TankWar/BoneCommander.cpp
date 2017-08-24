@@ -1,6 +1,6 @@
 #include "BoneCommander.h"
 
-
+extern const int gNumFrameResources;
 
 BoneCommander::BoneCommander(UINT maxBoneNum)
 	:BoneAllocator(maxBoneNum)
@@ -87,6 +87,8 @@ void BoneCommander::UpdateTheBone(Bone * pBone)
 
 		//将这个pRefCoodCItem的计算的局部变换作为自己的相对坐标。
 		XMStoreFloat4x4(&pCItem->ReferenceCoordinate, TransformMatrix);
+
+		pCItem->NumFramesDirty = gNumFrameResources;
 
 	}
 	FLIP_THE_STATE(pBone->flipState);

@@ -188,11 +188,10 @@ void MyShapesApp::OnResize()
 
 void MyShapesApp::Update(const GameTimer& gt)
 {
+	
+
 	//更新键盘输入。
 	m_pPlayerCommander->DetactKeyState();
-
-	//检测键盘输入。
-	OnKeyboardInput(gt);
 	//更新摄像机信息。
 	//UpdateCamera(gt);
 	//从场景中的0号摄像机位置更新摄像机镜头。
@@ -314,17 +313,12 @@ void MyShapesApp::OnMouseDown(WPARAM btnState, int x, int y)
 {
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
-
 	SetCapture(mhMainWnd);
-
-	//标记鼠标状态，窗口捕获鼠标焦点，直到用户按下ESC。
-	m_pPlayerCommander->mouseState.IsCaptured = true;
 }
 
 void MyShapesApp::OnMouseUp(WPARAM btnState, int x, int y)
 {
-	//ReleaseCapture();
-	//修改：按ESC才放弃鼠标捕获，参考OnKeyboardInput()
+	ReleaseCapture();
 }
 
 void MyShapesApp::OnMouseMove(WPARAM btnState, int x, int y)
@@ -354,7 +348,7 @@ void MyShapesApp::OnMouseMove(WPARAM btnState, int x, int y)
 	mLastMousePos.y = y;
 
 	//记录新鼠标位置。
-	m_pPlayerCommander->mouseState.UpdateLocation(x, y);
+	m_pPlayerCommander->mouseState.UpdateLocation(static_cast<LONG>(x), static_cast<LONG>(y));
 }
 
 void MyShapesApp::OnKeyboardInput(const GameTimer & gt)
@@ -377,18 +371,16 @@ void MyShapesApp::OnKeyboardInput(const GameTimer & gt)
 		mKeyLightTheta += 1.0f*dt;
 
 	if (GetAsyncKeyState(VK_UP) & 0x8000)
+	{
 		mKeyLightPhi -= 1.0f*dt;
+	}
 
 	if (GetAsyncKeyState(VK_DOWN) & 0x8000) 
 	{
 		//为了以防万一，按下方向键下也会放弃鼠标捕获。
-		ReleaseCapture();
 		mKeyLightPhi += 1.0f*dt;
 	}
 
-	//按下ESC放弃鼠标捕获。
-	if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
-		ReleaseCapture();
 
 	mKeyLightPhi = MathHelper::Clamp(mKeyLightPhi, 0.1f, XM_PIDIV2);
 }
@@ -536,6 +528,19 @@ void MyShapesApp::UpdateCameraFromScence(const GameTimer & gt, UINT cameraIndexI
 	XMVECTOR pos = XMVectorSet(pCurrentCamera->Pos->World._41, pCurrentCamera->Pos->World._42, pCurrentCamera->Pos->World._43, 1.0f);
 	XMVECTOR target = XMVectorSet(pCurrentCamera->Target->World._41, pCurrentCamera->Target->World._42, pCurrentCamera->Target->World._43, 1.0f);
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+	static XMFLOAT4 lastValue;
+	static XMFLOAT4 currValue;
+	lastValue = currValue;
+	XMStoreFloat4(&currValue, target);
+	static int sameCount = 0;
+	if (lastValue.x == currValue.x 
+		&& lastValue.y == currValue.y
+		&& lastValue.z == currValue.z
+		&& lastValue.w == currValue.w)
+	{
+		++sameCount;
+	}
 
 	//计算世界至观察矩阵。
 	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);

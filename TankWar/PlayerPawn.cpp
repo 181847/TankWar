@@ -140,15 +140,16 @@ void PlayerPawnCommandTemplate::AddBones(PlayerPawn * pPlayerPawn)
 		pPlayerPawn->m_arr_Bones[CONTROLITEM_INDEX_PLAYER_PAWN_ROOT] =
 		PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_ROOT]);
 
+	//摄像机拍摄目标的骨骼。
+	Bone* cameraTarget
+		= pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_CAMERA_TARGET]
+		= PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->m_pCamera->Target);
+
 	//摄像机位置的骨骼。
 	Bone* cameraPos = 
 		pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_CAMERA_POS] =
 		(PlayerPawn::m_pBoneCommander)->NewBone(pPlayerPawn->m_pCamera->Pos);
 
-	//摄像机拍摄目标的骨骼。
-	Bone* cameraTarget 
-		= pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_CAMERA_TARGET] 
-		= PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->m_pCamera->Target);
 
 	//创建骨骼连接。
 	cameraTarget->LinkTo(rootBone);
@@ -177,21 +178,26 @@ void PlayerPawnCommandTemplate::DeleteBones(PlayerPawn * pPlayerPawn)
 void PlayerControlCommandTemplate::MouseMove(BasePawn* pPawn, MouseState mouseState, const GameTimer& gt)
 {
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
-	float dx = static_cast<float>(mouseState.CurrMousePos.x - mouseState.LastMousePos.x);
-	float dy = static_cast<float>(mouseState.CurrMousePos.y - mouseState.LastMousePos.y);
+	float dt = gt.DeltaTime();
+	float dx = 0.01f * static_cast<float>(mouseState.CurrMousePos.x - mouseState.LastMousePos.x);
+	float dy = 0.01f * static_cast<float>(mouseState.CurrMousePos.y - mouseState.LastMousePos.y);
+
+
 
 	//摄像机水平旋转。
-	pPlayerPawn->m_pCamera->Target->RotateYaw(dx);
+	pPlayerPawn->m_pCamera->Target->RotateYaw(1.0f * dx);
+
 	//摄像机垂直旋转。
-	pPlayerPawn->m_pCamera->Target->RotatePitch(dy);
-
+	pPlayerPawn->m_pCamera->Target->RotatePitch(1.0f * dy);
 	//限制摄像机的镜头俯仰角角度。
-	pPlayerPawn->m_pCamera->Target->Rotation.y =
-	MathHelper::Clamp(
-	pPlayerPawn->m_pCamera->Target->Rotation.y,
-	-0.333f * XM_PIDIV2,	//限制摄像机的镜头俯仰角不低于1/6 PI，即-30度。
-	XM_PIDIV2 - 0.001f);	//限制写相机的镜头俯仰角不高于 PI/2 - 0.001，即小于90度。
+	pPlayerPawn->m_pCamera->Target->Rotation.x = MathHelper::Clamp(
+	pPlayerPawn->m_pCamera->Target->Rotation.x,
+	0.0f,	//限制摄像机的镜头俯仰角不低于1/6 PI，即-30度。
+	XM_PIDIV2);	//限制写相机的镜头俯仰角不高于 PI/2 - 0.001，即小于90度。
 
+	//pPlayerPawn->m_pCamera->Target->Rotation.x += 0.01f;
+	//pPlayerPawn->m_pCamera->Target->NumFramesDirty = 3;
+	
 	
 }
 

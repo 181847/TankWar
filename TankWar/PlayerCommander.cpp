@@ -55,17 +55,7 @@ void PlayerCommander::DetactKeyState()
 	{
   		if (GetAsyncKeyState(keyState.keyType) & 0x8000)
 		{
-			if (keyState.keyType == KeyType::W
-				|| keyState.keyType == KeyType::A
-				|| keyState.keyType == KeyType::S
-				|| keyState.keyType == KeyType::D)
-			{
-				keyState.ChangeState(PRESS);
-			}
-			else
-			{
-				keyState.ChangeState(PRESS);
-			}
+			keyState.ChangeState(PRESS);
 		}
 		else
 		{
@@ -76,13 +66,6 @@ void PlayerCommander::DetactKeyState()
 
 void PlayerCommander::Executee(const GameTimer& gt)
 {
-	//查看当前APP是否获得鼠标焦点。
-	if ( ! mouseState.IsCaptured) 
-	{
-		//鼠标没有获得焦点，不能执行任何命令。
-		return;
-	}
-
 	auto pHead = UnitAllocator.GetHead();
 	auto pNode = pHead->m_pNext;
 
@@ -103,8 +86,17 @@ void PlayerCommander::ExecuteeCommandTeplate(
 	//获取控制模板，注意ControlType的0表示非法命令，需要手动减一才是对应数组中的元素。
 	auto* pCTemplate = CommandTemplateList[pUnit->ControlType - 1].get();
 
-	//执行MouseMove。
-	pCTemplate->MouseMove(pUnit->pControledPawn, mouseState, gt);
+	//检查鼠标是否移动过，只关注当前状态，即后四位为1时表示当前正在移动。
+	if (mouseState.moveState & 0x0f)
+	{
+		//执行MouseMove。
+		pCTemplate->MouseMove(pUnit->pControledPawn, mouseState, gt);
+		//执行完动作后，将鼠标状态更新为静止，表示鼠标的此次动作完成，
+		//现在静止等待下一次动作，这是为了防止：
+		//{鼠标没有动时，鼠标状态不变，则下一次仍然会判断鼠标懂了，然而实际上鼠标并没有移动
+		//只是上一次的鼠标状态没有改变}
+		STATE_CHANGE(mouseState.moveState, STOP);
+	}
 
 	//遍历所有按键状态，如果按键处于按下状态，执行相应的函数。
 	for (auto& keyState : keyStates)
@@ -146,6 +138,8 @@ void MouseState::UpdateLocation(LONG newX, LONG newY)
 	this->LastMousePos = this->CurrMousePos;
 	this->CurrMousePos.x = newX;
 	this->CurrMousePos.y = newY;
+
+	STATE_CHANGE(moveState, MOVE);
 }
 
 KeyState::KeyState(KeyType type)
