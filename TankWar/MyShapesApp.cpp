@@ -20,6 +20,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE preInstance, PSTR cmdLine, int
 		MessageBox(nullptr, e.ToString().c_str(), L"HR Failed", MB_OK);
 		return 0;
 	}
+	catch (SimpleException e)
+	{
+		char lineInfo[40];
+		sprintf_s(lineInfo, "%d", e.line, 40);
+		std::string exceptionMessage;
+		exceptionMessage += "\n文件：\n";
+		exceptionMessage += e.file;
+		exceptionMessage += "\n行数：\n";
+		exceptionMessage += lineInfo;
+		exceptionMessage += "\n表达式：\n";
+		exceptionMessage += e.expr;
+		MessageBox(nullptr, AnsiToWString(exceptionMessage).c_str(), L"HR Failed", MB_OK);
+		return 0;
+	}
 }
 
 MyShapesApp::MyShapesApp(HINSTANCE hInstance)
@@ -174,9 +188,13 @@ void MyShapesApp::OnResize()
 
 void MyShapesApp::Update(const GameTimer& gt)
 {
+	//更新键盘输入。
+	m_pPlayerCommander->DetactKeyState();
+
+	//检测键盘输入。
 	OnKeyboardInput(gt);
 	//更新摄像机信息。
-	UpdateCamera(gt);
+	//UpdateCamera(gt);
 	//从场景中的0号摄像机位置更新摄像机镜头。
 	UpdateCameraFromScence(gt, 0);
 	//更新灯光位置。
@@ -199,13 +217,15 @@ void MyShapesApp::Update(const GameTimer& gt)
 	UpdateMainPassCB(gt);
 	UpdateMaterialCB(gt);
 
-	m_playerCommander->Executee();
-	m_AICommander->Executee();
-	m_BoneCommander->Executee();
+	m_pPlayerCommander->Executee(gt);
+	//m_AICommander->Executee();
+	m_pBoneCommander->Update();
 	//m_collideCommander->Executee();
 
 	//在这个方法里面完成游戏中所有的指令。
-	m_scence->UpdateData(gt, mCurrFrameResource);
+	m_pScence->UpdateData(gt, mCurrFrameResource);
+	//执行生成pawn的指令，使得Scence中生成一个摄像机。
+	m_pPawnMaster->Executee();
 }
 
 void MyShapesApp::Draw(const GameTimer& gt)
@@ -296,11 +316,15 @@ void MyShapesApp::OnMouseDown(WPARAM btnState, int x, int y)
 	mLastMousePos.y = y;
 
 	SetCapture(mhMainWnd);
+
+	//标记鼠标状态，窗口捕获鼠标焦点，直到用户按下ESC。
+	m_pPlayerCommander->mouseState.IsCaptured = true;
 }
 
 void MyShapesApp::OnMouseUp(WPARAM btnState, int x, int y)
 {
-	ReleaseCapture();
+	//ReleaseCapture();
+	//修改：按ESC才放弃鼠标捕获，参考OnKeyboardInput()
 }
 
 void MyShapesApp::OnMouseMove(WPARAM btnState, int x, int y)
@@ -328,6 +352,9 @@ void MyShapesApp::OnMouseMove(WPARAM btnState, int x, int y)
 
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
+
+	//记录新鼠标位置。
+	m_pPlayerCommander->mouseState.UpdateLocation(x, y);
 }
 
 void MyShapesApp::OnKeyboardInput(const GameTimer & gt)
@@ -352,8 +379,16 @@ void MyShapesApp::OnKeyboardInput(const GameTimer & gt)
 	if (GetAsyncKeyState(VK_UP) & 0x8000)
 		mKeyLightPhi -= 1.0f*dt;
 
-	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+	if (GetAsyncKeyState(VK_DOWN) & 0x8000) 
+	{
+		//为了以防万一，按下方向键下也会放弃鼠标捕获。
+		ReleaseCapture();
 		mKeyLightPhi += 1.0f*dt;
+	}
+
+	//按下ESC放弃鼠标捕获。
+	if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
+		ReleaseCapture();
 
 	mKeyLightPhi = MathHelper::Clamp(mKeyLightPhi, 0.1f, XM_PIDIV2);
 }
@@ -494,11 +529,12 @@ void MyShapesApp::UpdateMaterialCB(const GameTimer & gt)
 
 void MyShapesApp::UpdateCameraFromScence(const GameTimer & gt, UINT cameraIndexInScence)
 {
-	MyCamera* pCurrentCamera = m_scence->GetCamera(cameraIndexInScence);
+	MyCamera* pCurrentCamera = m_pScence->GetCamera(cameraIndexInScence);
 	ASSERT(pCurrentCamera && "无法获取摄像机，请检查是否生成了至少一个PlayerPawn。");
 
-	XMVECTOR pos = XMVectorSet(GET_X_Y_Z_Float3_ARGS(pCurrentCamera->Target->Translation), 1.0f);
-	XMVECTOR target = XMVectorSet(GET_X_Y_Z_Float3_ARGS(pCurrentCamera->Pos->Rotation), 1.0f);
+	//注意：这里的摄像机坐标应该是世界坐标，不要用局部坐标，局部坐标基本不变，会导致摄像机静止。
+	XMVECTOR pos = XMVectorSet(pCurrentCamera->Pos->World._41, pCurrentCamera->Pos->World._42, pCurrentCamera->Pos->World._43, 1.0f);
+	XMVECTOR target = XMVectorSet(pCurrentCamera->Target->World._41, pCurrentCamera->Target->World._42, pCurrentCamera->Target->World._43, 1.0f);
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
 	//计算世界至观察矩阵。
@@ -1024,7 +1060,7 @@ void MyShapesApp::BuildRenderItems()
 
 void MyShapesApp::BuildScence()
 {
-	m_scence = std::make_unique<Scence>(
+	m_pScence = std::make_unique<Scence>(
 		totalRitemInScence, totalCameraInScence, &mMaterials, &mGeometries);
 
 	//创建PawnMaster，用于自动化生成Pawn。
@@ -1032,11 +1068,11 @@ void MyShapesApp::BuildScence()
 	//创建玩家指令官、AI指令官、控制跟随指令官。
 	BuildPlayerCommander();
 	BuildAICommander();
-	BuildFollowCommander();
+	BuildBoneCommander();
 	//BuildCollideCommander();
 
 	//注册Pawn类
-	RegisterPawnClassToPawnMaster();
+	RegisterPawnClass();
 	//创建初始的pawn对象，可以在这里创建玩家角色，初始化场景，
 	//建议通过PawnMaster来创建。
 	BuildInitPawn();
@@ -1045,22 +1081,22 @@ void MyShapesApp::BuildScence()
 
 void MyShapesApp::BuildPawnMaster()
 {
-	m_pawnMaster = std::make_unique<PawnMaster>(PAWN_MASTER_COMMAND_MAX_NUM, m_scence);
+	m_pPawnMaster = std::make_unique<PawnMaster>(PAWN_MASTER_COMMAND_MAX_NUM, m_pScence.get());
 }
 
 void MyShapesApp::BuildPlayerCommander()
 {
-	m_playerCommander = std::make_unique<PlayerCommander>(COMMANDER_PLAYER_MAX_COMMANDS);
+	m_pPlayerCommander = std::make_unique<PlayerCommander>(COMMANDER_PLAYER_MAX_COMMANDS);
 }
 
 void MyShapesApp::BuildAICommander()
 {
-	m_AICommander = std::make_unique<AICommander>(COMMANDER_AI_UNIT_MAX_NUM);
+	//m_AICommander = std::make_unique<AICommander>(COMMANDER_AI_UNIT_MAX_NUM);
 }
 
-void MyShapesApp::BuildFollowCommander()
+void MyShapesApp::BuildBoneCommander()
 {
-	m_followCommander = std::make_unique<FollowCommander>(COMMANDER_FOLLOW_MAX_COMMANDS);
+	m_pBoneCommander = std::make_unique<BoneCommander>(COMMANDER_FOLLOW_MAX_COMMANDS);
 }
 
 //void MyShapesApp::BuildCollideCommander()
@@ -1070,39 +1106,24 @@ void MyShapesApp::BuildFollowCommander()
 
 void MyShapesApp::RegisterPawnClass()
 {
-	//注册PawnMaster
-	PlayerPawn				.RegisterPawnMaster(m_pawnMaster.get());
-	MechanicalSpiderPawn	.RegisterPawnMaster(m_pawnMaster.get());
-	ArmoredCar				.RegisterPawnMaster(m_pawnMaster.get());
-	ScatterPawn				.RegisterPawnMaster(m_pawnMaster.get());
-	FrozenPlanePawn			.RegisterPawnMaster(m_pawnMaster.get());
-	AmmoPawn				.RegisterPawnMaster(m_pawnMaster.get());
+	//PlayerPawn注册所有要用到的Master和Commander。
+	PlayerPawn::RegisterAll(m_pPawnMaster.get(), m_pPlayerCommander.get(), m_pBoneCommander.get());
 
-	//注册PlayerCommander
-	PlayerPawn				.RegisterPlayerCommander(m_playerCommander.get());
+}
 
-	//注册AICommander
-	MechanicalSpiderPawn	.RegisterAICommander(m_AICommander.get());
-	ArmoredCar				.RegisterAICommander(m_AICommander.get());
-	ScatterPawn				.RegisterAICommander(m_AICommander.get());
-	FrozenPlanePawn			.RegisterAICommander(m_AICommander.get());
-	AmmoPawn				.RegisterAICommander(m_AICommander.get());
+void MyShapesApp::BuildInitPawn()
+{
+	ASSERT(PlayerPawn::m_pawnType);
+	//玩家属性。
+	PlayerProperty* pPProperty;
+	pPProperty = PlayerPawn::NewProperty();
+	pPProperty->MoveSpeed = 10.0f;
+	pPProperty->RotationSpeed = 10.0f;
+	//记录一个玩家生成指令。
+	m_pPawnMaster->CreatePawn(PlayerPawn::m_pawnType, pPProperty);
 
-	//注册FollowCommander
-	PlayerPawn				.RegisterFollowCommander(m_followCommander.get());
-	MechanicalSpiderPawn	.RegisterFollowCommander(m_followCommander.get());
-	ArmoredCar				.RegisterFollowCommander(m_followCommander.get());
-	ScatterPawn				.RegisterFollowCommander(m_followCommander.get());
-	FrozenPlanePawn			.RegisterFollowCommander(m_followCommander.get());
-	AmmoPawn				.RegisterFollowCommander(m_followCommander.get());
-
-	//注册CollideCommander
-	PlayerPawn				.RegisterCollideCommander(m_collideCommander.get());
-	MechanicalSpiderPawn	.RegisterCollideCommander(m_collideCommander.get());
-	ArmoredCar				.RegisterCollideCommander(m_collideCommander.get());
-	ScatterPawn				.RegisterCollideCommander(m_collideCommander.get());
-	FrozenPlanePawn			.RegisterCollideCommander(m_collideCommander.get());
-	AmmoPawn				.RegisterCollideCommander(m_collideCommander.get());
+	//为了保证摄像机一定存在，现在就执行生成pawn的指令，使得Scence中生成一个摄像机。
+	m_pPawnMaster->Executee();
 }
 
 void MyShapesApp::DrawRenderItems(ID3D12GraphicsCommandList * cmdList, const std::vector<RenderItem*>& ritems)

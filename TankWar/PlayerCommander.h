@@ -29,10 +29,10 @@ public:
 //已知按键类型，目前只考虑wasd和鼠标左右键。
 enum KeyType: BYTE
 {
-	W = 'w',	
-	A = 'a', 
-	S = 's', 
-	D = 'd', 
+	W = 'W',	
+	A = 'A', 
+	S = 'S', 
+	D = 'D', 
 	M_L = VK_LBUTTON,	//鼠标左键 
 	M_R = VK_RBUTTON		//鼠标右键
 };
@@ -57,8 +57,9 @@ struct KeyState
 {
 	KeyType keyType;
 	//按键的转换状态。
-	StateChange stateChange;
+	StateChange stateChange = RELEASE;
 public:
+	KeyState(KeyType type);
 	//newState指定为当前的最新状态就可以了，
 	//使用RELEASE_TO_RELEASE表示当前状态处于按键释放
 	//或者PRESS_TO_PRESS表示当前状态处于按压。

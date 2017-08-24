@@ -13,13 +13,13 @@ using namespace DirectX::PackedVector;
 struct ControlItem
 {
 	//旋转，x对应俯仰角(Pitch)，y对应偏航角（Yaw），z对应滚动角（Roll）。
-	XMFLOAT3 Rotation;
+	XMFLOAT3 Rotation = {0.0f, 0.0f, 0.0f};
 
 	//平移信息。
-	XMFLOAT3 Translation;
+	XMFLOAT3 Translation = { 0.0f, 0.0f, 0.0f };
 
 	//相对坐标系，默认是世界坐标，即一个单位矩阵，只能包含旋转和平移变换。
-	XMFLOAT4X4 ReferenceCoordinate;
+	XMFLOAT4X4 ReferenceCoordinate = MathHelper::Identity4x4();
 
 	//ControlItem的其他属性标记，
 	//**** ***1显示渲染物体，	**** ***0表示隐藏渲染物体。

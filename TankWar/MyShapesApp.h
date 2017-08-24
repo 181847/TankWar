@@ -6,7 +6,9 @@
 #include "FrameResource.h"
 #include "Scence.h"
 #include "PawnMaster.h"
-
+#include "PlayerCommander.h"
+#include "BoneCommander.h"
+#include "PlayerPawn.h"
 
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
@@ -212,7 +214,7 @@ public:
 	//创建玩家指令官、AI指令官、控制跟随指令官。
 	void BuildPlayerCommander();
 	void BuildAICommander();
-	void BuildFollowCommander();
+	void BuildBoneCommander();
 	//void BuildCollideCommander();
 
 	//注册Pawn类到各个需要的PawnMaster和Commander中。
@@ -224,13 +226,13 @@ public:
 
 public:
 	//场景对象
-	std::unique_ptr<Scence> m_scence;
+	std::unique_ptr<Scence> m_pScence;
 	//PawnMaster
-	std::unique_ptr<PawnMaster> m_pawnMaster;
+	std::unique_ptr<PawnMaster> m_pPawnMaster;
 	
-	std::unique_ptr<PlayerCommmander> m_playerCommander;
-	std::unique_ptr<AICommander> m_AICommander;
-	std::unique_ptr<BoneCommander> m_BoneCommander;
+	std::unique_ptr<PlayerCommander> m_pPlayerCommander;
+	//std::unique_ptr<AICommander> m_AICommander;
+	std::unique_ptr<BoneCommander> m_pBoneCommander;
 	//std::unique_ptr<CollideCommander> m_collideCommander;
 	//*******************************************游戏代码定义部分**************************************************************************************************************************************************
 };

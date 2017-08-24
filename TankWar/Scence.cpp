@@ -66,7 +66,7 @@ void Scence::UpdateData(const GameTimer & gt, FrameResource* pCurrFrameResource)
 			controlItem.Translation.z,
 			1.0 };
 		//存储平移信息。
-		XMStoreFloat4(&translation, TransformMatrix.r[3]);
+		TransformMatrix.r[3] = XMLoadFloat4(&translation);
 		//加载相对坐标变换矩阵。
 		XMMATRIX referenceCoordinateMatrix = XMLoadFloat4x4(&controlItem.ReferenceCoordinate);
 		
@@ -100,6 +100,25 @@ MyCamera * Scence::AppendCamera()
 	m_pCamera->Id = 0;
 	m_pCamera->Pos = m_controlItemAllocator.Malloc();
 	m_pCamera->Target = m_controlItemAllocator.Malloc();
+
+	//初始化旋转和移动。
+	m_pCamera->Pos->Rotation
+		= m_pCamera->Pos->Translation
+		= m_pCamera->Target->Rotation
+		= m_pCamera->Target->Translation
+		= { 0.0f, 0.0f, 0.0f };
+
+	//初始化世界坐标和局部坐标。
+	m_pCamera->Pos->World
+		= m_pCamera->Pos->ReferenceCoordinate
+		= m_pCamera->Target->World
+		= m_pCamera->Target->ReferenceCoordinate
+		= MathHelper::Identity4x4();
+
+	//设定ControlItem的属性为隐藏。
+	m_pCamera->Pos->Hide();
+	m_pCamera->Target->Hide();
+
 	return m_pCamera;
 }
 
@@ -133,8 +152,8 @@ ControlItem * Scence::NewControlItem(
 	pNewCItem->Mat = (*m_pMaterials)[NameOfMaterial].get();
 
 	//清空变换。
-	pNewCItem->Rotation = { 1.0,1.0,1.0 };
-	pNewCItem->Translation = { 0.0,0.0,0.0 };
+	pNewCItem->Rotation = { 0.0f,0.0f,0.0f };
+	pNewCItem->Translation = { 0.0f,0.0f,0.0f };
 	pNewCItem->World 
 		= pNewCItem->ReferenceCoordinate 
 		= MathHelper::Identity4x4();

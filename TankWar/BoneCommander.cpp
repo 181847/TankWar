@@ -45,6 +45,8 @@ void BoneCommander::Update()
 			//更新骨骼数据。
 			UpdateTheBone(&pNode->element);
 		}
+
+		pNode = pNode->m_pNext;
 	}
 }
 
@@ -75,7 +77,7 @@ void BoneCommander::UpdateTheBone(Bone * pBone)
 		//平移
 		XMFLOAT4 translation = { GET_X_Y_Z_Float3_ARGS(pRefCoodCItem->Translation), 1.0 };
 		//存储平移信息。
-		XMStoreFloat4(&translation, TransformMatrix.r[3]);
+		TransformMatrix.r[3] = XMLoadFloat4(&translation);
 		//加载相对坐标变换矩阵。
 		XMMATRIX referenceCoordinateMatrix = XMLoadFloat4x4(&pRefCoodCItem->ReferenceCoordinate);
 
@@ -87,4 +89,10 @@ void BoneCommander::UpdateTheBone(Bone * pBone)
 		XMStoreFloat4x4(&pCItem->ReferenceCoordinate, TransformMatrix);
 
 	}
+	FLIP_THE_STATE(pBone->flipState);
+}
+
+void Bone::LinkTo(Bone * pRoot)
+{
+	this->pRoot = pRoot;
 }

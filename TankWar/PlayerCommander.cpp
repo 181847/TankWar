@@ -5,6 +5,12 @@
 PlayerCommander::PlayerCommander(UINT maxControlUnitNum)
 	:UnitAllocator(maxControlUnitNum)
 {
+	keyStates.push_back(KeyState(KeyType::W));
+	keyStates.push_back(KeyState(KeyType::A));
+	keyStates.push_back(KeyState(KeyType::S));
+	keyStates.push_back(KeyState(KeyType::D));
+	keyStates.push_back(KeyState(KeyType::M_L));	//鼠标左键
+	keyStates.push_back(KeyState(KeyType::M_R));	//鼠标右键
 }
 
 
@@ -47,9 +53,19 @@ void PlayerCommander::DetactKeyState()
 	//更新所有按键的状态。
 	for (auto& keyState : keyStates)
 	{
-		if (GetAsyncKeyState(keyState.keyType) & 0x8000)
+  		if (GetAsyncKeyState(keyState.keyType) & 0x8000)
 		{
-			keyState.ChangeState(PRESS);
+			if (keyState.keyType == KeyType::W
+				|| keyState.keyType == KeyType::A
+				|| keyState.keyType == KeyType::S
+				|| keyState.keyType == KeyType::D)
+			{
+				keyState.ChangeState(PRESS);
+			}
+			else
+			{
+				keyState.ChangeState(PRESS);
+			}
 		}
 		else
 		{
@@ -127,7 +143,14 @@ void PlayerCommander::ExecuteeCommandTeplate(
 
 void MouseState::UpdateLocation(LONG newX, LONG newY)
 {
-	THROW_UNIMPLEMENT_EXCEPTION("鼠标坐标的更新函数");
+	this->LastMousePos = this->CurrMousePos;
+	this->CurrMousePos.x = newX;
+	this->CurrMousePos.y = newY;
+}
+
+KeyState::KeyState(KeyType type)
+{
+	this->keyType = type;
 }
 
 void KeyState::ChangeState(StateChange newState)
@@ -135,5 +158,5 @@ void KeyState::ChangeState(StateChange newState)
 	ASSERT(newState == RELEASE || newState == PRESS);
 	stateChange =
 		(stateChange << 4 & 0xf0)	//原状态前移4位，保留移动后的前4位
-		& (newState & 0x0f);		//取新状态的后四位，与前面的状态与运算
+		| (newState & 0x0f);		//取新状态的后四位，与前面的状态与运算
 }

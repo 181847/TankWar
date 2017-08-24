@@ -59,6 +59,7 @@ public:
 	);
 	//注册PawnMaster，并从PawnMaster中获取一个PawnType。
 	static void RegisterPawnMaster(PawnMaster * pPawnMaster);
+	static PlayerProperty* NewProperty();
 
 	//玩家生成模板
 	friend class PlayerPawnCommandTemplate;
@@ -83,23 +84,9 @@ public:
 
 public:
 	//PlayerPawn的根控制器。
-	ControlItem *& RootControl();
+	ControlItem * RootControl();
 };
 
-//初始时静态成员。
-PawnType			PlayerPawn::m_pawnType			= PAWN_TYPE_NONE;
-//Player控制器类型。
-PlayerControlType	PlayerPawn::m_playerControlType = PLAYER_CONTROL_TYPE_NONE;
-//PawnMaster。
-PawnMaster *		PlayerPawn::m_pPawnMaster		= nullptr;
-//玩家指令官。
-PlayerCommander *	PlayerPawn::m_pPlayerCommander	= nullptr;
-//骨骼指令官。
-BoneCommander *		PlayerPawn::m_pBoneCommander	= nullptr;
-//碰撞指令官。
-//CollideCommander *	PlayerPawn::m_pCollideCommander		= nullptr;
-MyStaticAllocator<PlayerProperty>	PlayerPawn::m_propertyAllocator(	MAX_PLAYER_PAWN_NUM);
-MyStaticAllocator<PlayerPawn>		PlayerPawn::m_PlayerPawnAllocator(	MAX_PLAYER_PAWN_NUM);
 
 
 //用于PawnMaster中自动化生成Pawn的命令模板，禁止直接生成Pawn对象。
