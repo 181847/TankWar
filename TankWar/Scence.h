@@ -55,8 +55,15 @@ public:
 	ControlItem* NewControlItem(const char* NameOfGeometry, const char* NameOfSubmesh, const char* NameOfMaterial);
 	//回收ControlItem的内存。
 	void DeleteControlItem(ControlItem* pControlItem);
+	//绘制场景中的所有显示的物体。
+	void DrawScence(ID3D12GraphicsCommandList * cmdList, FrameResource * pCurrFrameResource);
+
 
 public:
+	//物体缓冲大小
+	const UINT ObjectConstantsSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+	//材质缓冲大小
+	const UINT MaterialConstantsSize = d3dUtil::CalcConstantBufferByteSize(sizeof(MaterialConstants));
 	//ControlItem分配池。
 	LinkedAllocator<ControlItem> m_controlItemAllocator;
 	//指向程序里面创建的所有材质，注意：这是个指针。

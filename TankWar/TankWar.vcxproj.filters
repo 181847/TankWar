@@ -75,9 +75,6 @@
     <ClCompile Include="..\..\..\..\Common\MathHelper.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="FrameResource.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="MyShapesApp.cpp">
       <Filter>App文件\源文件</Filter>
     </ClCompile>
@@ -100,6 +97,9 @@
       <Filter>App文件\Commander\BoneCommander</Filter>
     </ClCompile>
     <ClCompile Include="ControlItem.cpp">
+      <Filter>App文件\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameResource.cpp">
       <Filter>App文件\源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -129,9 +129,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\Common\UploadBuffer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="FrameResource.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MyShapesApp.h">
@@ -168,6 +165,9 @@
       <Filter>App文件\Commander\BoneCommander</Filter>
     </ClInclude>
     <ClInclude Include="ControlItem.h">
+      <Filter>App文件\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameResource.h">
       <Filter>App文件\头文件</Filter>
     </ClInclude>
   </ItemGroup>

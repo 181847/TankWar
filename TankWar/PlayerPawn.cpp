@@ -64,8 +64,17 @@ PlayerProperty * PlayerPawn::NewProperty()
 
 ControlItem * PlayerPawn::RootControl()
 {
-	//返回控制器数组。
 	return m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_ROOT];
+}
+
+ControlItem * PlayerPawn::Battery()
+{
+	return m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_BATTERY];
+}
+
+ControlItem * PlayerPawn::MainBody()
+{
+	return m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_MAINBODY];
 }
 
 //***************************************玩家生成模板*****************************
@@ -76,8 +85,10 @@ BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnProperty* pProperty, Scence*
 	//从场景中创建摄像机，把摄像机存储到Player中。
 	newPawn->m_pCamera = pScence->AppendCamera();
 
+	newPawn->m_pCamera->Target->Translation = { 0.0f, 2.0f, 0.0f };
+
 	//修改摄像机的局部坐标，避免再后来的更新中和摄像机的目标重合，引发异常。
-	newPawn->m_pCamera->Pos->Translation = { 3.0f, 3.0f, 3.0f };
+	newPawn->m_pCamera->Pos->Translation = { 0.0f, 0.0f, -10.0f };
 	//修改摄像机的世界矩阵中的平移，因为摄像机真正更新到世界至观察矩阵中的数据是世界矩阵的平移，
 	//而摄像机目标和位置的世界矩阵都是单位矩阵，平移相同，第一次世界至观察矩阵时会引发一场，
 	//这里临时修改一次世界平移坐标，因为在后来会从局部坐标中获得信息。
@@ -88,6 +99,18 @@ BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnProperty* pProperty, Scence*
 		//指定玩家的一个渲染网格时shapeGeo中的box网格，
 		//指定MeshGeometry、SubMesh、Material。
 		pScence->NewControlItem("shapeGeo", "box", "box");
+	//根控制器隐藏，只用来控制Pawn的位移，不控制旋转。
+	newPawn->RootControl()->Hide();
+
+	//为炮台分配一个ControlItem。
+	newPawn->m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_BATTERY] =
+		pScence->NewControlItem("shapeGeo", "box", "box");
+	//炮台先向上移动一点距离。
+	newPawn->Battery()->MoveY(1.0f);
+
+	newPawn->m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_MAINBODY] =
+		pScence->NewControlItem("shapeGeo", "box", "cylinder");
+	newPawn->MainBody()->MoveY(1.0f);
 
 	//添加玩家控制。
 	AddPlayerControl(newPawn);
@@ -135,10 +158,10 @@ void PlayerPawnCommandTemplate::AddPlayerControl(PlayerPawn * pPlayerPawn)
 
 void PlayerPawnCommandTemplate::AddBones(PlayerPawn * pPlayerPawn)
 {
-	//一个渲染网格的骨骼。
+	//一个根控制器的骨骼。
 	Bone* rootBone = 
 		pPlayerPawn->m_arr_Bones[CONTROLITEM_INDEX_PLAYER_PAWN_ROOT] =
-		PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_ROOT]);
+		PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->RootControl());
 
 	//摄像机拍摄目标的骨骼。
 	Bone* cameraTarget
@@ -146,13 +169,29 @@ void PlayerPawnCommandTemplate::AddBones(PlayerPawn * pPlayerPawn)
 		= PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->m_pCamera->Target);
 
 	//摄像机位置的骨骼。
-	Bone* cameraPos = 
-		pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_CAMERA_POS] =
-		(PlayerPawn::m_pBoneCommander)->NewBone(pPlayerPawn->m_pCamera->Pos);
+	Bone* cameraPos 
+		= pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_CAMERA_POS]
+		= (PlayerPawn::m_pBoneCommander)->NewBone(pPlayerPawn->m_pCamera->Pos);
 
+	//炮台骨骼。
+	Bone* battery
+		= pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_BATTERY]
+		= PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->Battery());
+
+	//车身骨骼。
+	Bone* mainBody
+		= pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_MAINBODY]
+		= PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->MainBody());
 
 	//创建骨骼连接。
-	cameraTarget->LinkTo(rootBone);
+
+	//车身连接根骨骼。
+	mainBody->LinkTo(rootBone);
+	//炮台连接根骨骼，注意：炮台不受车身骨骼的影响，保持炮台一直指向摄像机的位置。
+	battery->LinkTo(rootBone);
+	//摄像机目标连接炮台。
+	cameraTarget->LinkTo(battery);
+	//摄像机位置连接摄像机目标。
 	cameraPos->LinkTo(cameraTarget);
 }
 
@@ -184,19 +223,16 @@ void PlayerControlCommandTemplate::MouseMove(BasePawn* pPawn, MouseState mouseSt
 
 
 
-	//摄像机水平旋转。
-	pPlayerPawn->m_pCamera->Target->RotateYaw(1.0f * dx);
+	//炮台水平旋转，并带动摄像机水平旋转。
+	pPlayerPawn->Battery()->RotateYaw(1.0f * dx);
 
 	//摄像机垂直旋转。
 	pPlayerPawn->m_pCamera->Target->RotatePitch(1.0f * dy);
-	//限制摄像机的镜头俯仰角角度。
+	//限制摄像机的镜头俯仰角角度，上至下90度范围内。
 	pPlayerPawn->m_pCamera->Target->Rotation.x = MathHelper::Clamp(
-	pPlayerPawn->m_pCamera->Target->Rotation.x,
-	0.0f,	//限制摄像机的镜头俯仰角不低于1/6 PI，即-30度。
-	XM_PIDIV2);	//限制写相机的镜头俯仰角不高于 PI/2 - 0.001，即小于90度。
-
-	//pPlayerPawn->m_pCamera->Target->Rotation.x += 0.01f;
-	//pPlayerPawn->m_pCamera->Target->NumFramesDirty = 3;
+		pPlayerPawn->m_pCamera->Target->Rotation.x,
+		-XM_PI / 6,	
+		XM_PIDIV2 - 0.01f);	
 	
 	
 }
@@ -205,29 +241,36 @@ void PlayerControlCommandTemplate::HitKey_W(BasePawn * pPawn, const GameTimer& g
 {
 	//前进
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
-	pPlayerPawn->RootControl()->MoveX(1.0f * pPlayerPawn->m_pProperty->MoveSpeed * gt.DeltaTime());
+	//使用车身的旋转。
+	XMFLOAT3 rotation = pPlayerPawn->MainBody()->Rotation;
+
+	pPlayerPawn->RootControl()->MoveX(sinf(rotation.y) * pPlayerPawn->m_pProperty->MoveSpeed * gt.DeltaTime());
+	pPlayerPawn->RootControl()->MoveZ(cosf(rotation.y) * pPlayerPawn->m_pProperty->MoveSpeed * gt.DeltaTime());
 }
 
 void PlayerControlCommandTemplate::HitKey_A(BasePawn * pPawn, const GameTimer& gt)
 {
 	//左转
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
-	pPlayerPawn->RootControl()->RotateYaw(-1.0f * pPlayerPawn->m_pProperty->RotationSpeed * gt.DeltaTime());
+	pPlayerPawn->MainBody()->RotateYaw(-1.0f * pPlayerPawn->m_pProperty->RotationSpeed * gt.DeltaTime());
 }
 
 void PlayerControlCommandTemplate::HitKey_S(BasePawn * pPawn, const GameTimer& gt)
 {
 	//后退
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
-	float dt = gt.DeltaTime();
-	pPlayerPawn->RootControl()->MoveX(-1.0f * pPlayerPawn->m_pProperty->MoveSpeed * dt);
+	//使用车身的旋转。
+	XMFLOAT3 rotation = pPlayerPawn->MainBody()->Rotation;
+
+	pPlayerPawn->RootControl()->MoveX(-1.0f * sinf(rotation.y) * pPlayerPawn->m_pProperty->MoveSpeed * gt.DeltaTime());
+	pPlayerPawn->RootControl()->MoveZ(-1.0f * cosf(rotation.y) * pPlayerPawn->m_pProperty->MoveSpeed * gt.DeltaTime());
 }
 
 void PlayerControlCommandTemplate::HitKey_D(BasePawn * pPawn, const GameTimer& gt)
 {
 	//右转
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
-	pPlayerPawn->RootControl()->RotateYaw(1.0f * pPlayerPawn->m_pProperty->RotationSpeed * gt.DeltaTime());
+	pPlayerPawn->MainBody()->RotateYaw(1.0f * pPlayerPawn->m_pProperty->RotationSpeed * gt.DeltaTime());
 }
 
 void PlayerControlCommandTemplate::PressMouseButton_Left(BasePawn * pPawn, const GameTimer& gt)

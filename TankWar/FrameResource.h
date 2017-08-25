@@ -73,7 +73,7 @@ struct Vertex
 struct FrameResource
 {
 public:
-	FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount);
+	FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT scenceObjectCount);
 	FrameResource(const FrameResource& rhs) = delete;
 	FrameResource& operator=(const FrameResource& rhs) = delete;
 	~FrameResource();
@@ -86,6 +86,8 @@ public:
 	std::unique_ptr<UploadBuffer<ObjectConstants>> ObjectCB = nullptr;
 	//用到的所有材质资源。
 	std::unique_ptr<UploadBuffer<MaterialConstants>> MaterialCB = nullptr;
+	//专门用于场景中的渲染物体的资源。
+	std::unique_ptr<UploadBuffer<ObjectConstants>> ScenceObjectCB = nullptr;
 
 	//同步计数。
 	UINT64 Fence = 0;

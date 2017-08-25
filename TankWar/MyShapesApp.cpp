@@ -189,7 +189,7 @@ void MyShapesApp::OnResize()
 void MyShapesApp::Update(const GameTimer& gt)
 {
 	
-
+	OnKeyboardInput(gt);
 	//更新键盘输入。
 	m_pPlayerCommander->DetactKeyState();
 	//更新摄像机信息。
@@ -291,6 +291,8 @@ void MyShapesApp::Draw(const GameTimer& gt)
 		mCommandList.Get(), 
 		mOpaqueRitems);//内部包含的所有可渲染物体的指针
 
+	m_pScence->DrawScence(mCommandList.Get(), mCurrFrameResource);
+
 	mCommandList->ResourceBarrier(
 		1, 
 		&CD3DX12_RESOURCE_BARRIER::Transition(
@@ -380,7 +382,6 @@ void MyShapesApp::OnKeyboardInput(const GameTimer & gt)
 		//为了以防万一，按下方向键下也会放弃鼠标捕获。
 		mKeyLightPhi += 1.0f*dt;
 	}
-
 
 	mKeyLightPhi = MathHelper::Clamp(mKeyLightPhi, 0.1f, XM_PIDIV2);
 }
@@ -965,11 +966,10 @@ void MyShapesApp::BuildFrameResources()
 	{
 		mFrameResource.push_back(std::make_unique<FrameResource>(
 			md3dDevice.Get(),		
-			1,					//PassConstant的数量
-			1000,
-			//TODO
-			//(UINT)mAllRitems.size(),//ObjectConstants的数量。
-			(UINT)mMaterials.size()));
+			1,							//PassConstant的数量
+			(UINT)mAllRitems.size(),
+			(UINT)mMaterials.size(),	//普通渲染物体的数量。
+			totalRitemInScence));		//场景中可渲染物体的数量。
 	}
 }
 
@@ -1122,8 +1122,8 @@ void MyShapesApp::BuildInitPawn()
 	//玩家属性。
 	PlayerProperty* pPProperty;
 	pPProperty = PlayerPawn::NewProperty();
-	pPProperty->MoveSpeed = 10.0f;
-	pPProperty->RotationSpeed = 10.0f;
+	pPProperty->MoveSpeed = 5.0f;
+	pPProperty->RotationSpeed = 2.0f;
 	//记录一个玩家生成指令。
 	m_pPawnMaster->CreatePawn(PlayerPawn::m_pawnType, pPProperty);
 

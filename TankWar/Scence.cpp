@@ -39,6 +39,9 @@ Scence::~Scence()
 void Scence::UpdateData(const GameTimer & gt, FrameResource* pCurrFrameResource)
 {
 	auto* currentCB = pCurrFrameResource->ObjectCB.get();
+	auto ObjectCB = pCurrFrameResource->ScenceObjectCB.get();
+	//对应物体的寄存器数据。
+	ObjectConstants objectConstants;
 
 	DeLinkedElement<ControlItem>* pHead = m_controlItemAllocator.GetHead();
 	DeLinkedElement<ControlItem>* pNode = pHead->m_pNext;
@@ -46,8 +49,6 @@ void Scence::UpdateData(const GameTimer & gt, FrameResource* pCurrFrameResource)
 	{
 		if (pNode->element.NumFramesDirty > 0)
 		{
-			//对应物体的寄存器数据。
-			ObjectConstants objectConstants;
 
 			//获取ControlItem引用
 			ControlItem& controlItem = pNode->element;
@@ -80,6 +81,8 @@ void Scence::UpdateData(const GameTimer & gt, FrameResource* pCurrFrameResource)
 
 			//更新物体信息到ConstantsBuffer中。
 			XMStoreFloat4x4(&objectConstants.World, XMMatrixTranspose(TransformMatrix));
+
+			ObjectCB->CopyData(controlItem.ObjCBIndex, objectConstants);
 		}
 
 		//迭代
@@ -173,6 +176,64 @@ void Scence::DeleteControlItem(ControlItem * pControlItem)
 	pControlItem->Hide();
 	//清空材质。
 	pControlItem->Mat = nullptr;
+}
+
+void Scence::DrawScence(ID3D12GraphicsCommandList * cmdList, FrameResource * pCurrFrameResource)
+{
+	auto* currentCB = pCurrFrameResource->ObjectCB.get();
+	auto ObjectCB = pCurrFrameResource->ScenceObjectCB.get();
+	//对应物体的寄存器数据。
+	ObjectConstants objectConstants;
+
+	DeLinkedElement<ControlItem>* pHead = m_controlItemAllocator.GetHead();
+	DeLinkedElement<ControlItem>* pNode = pHead->m_pNext;
+
+	//缓冲起始位置。
+	D3D12_GPU_VIRTUAL_ADDRESS objectBufferAddress =
+		pCurrFrameResource
+		->ScenceObjectCB
+		->Resource()
+		->GetGPUVirtualAddress();
+	D3D12_GPU_VIRTUAL_ADDRESS materialbufferAddress =
+		pCurrFrameResource
+		->MaterialCB
+		->Resource()
+		->GetGPUVirtualAddress();
+	//单个物体需要的缓冲位置。
+	D3D12_GPU_VIRTUAL_ADDRESS perObjectBufferAddress = objectBufferAddress;
+	D3D12_GPU_VIRTUAL_ADDRESS perMaterialBufferAddress = materialbufferAddress;
+
+	while (pNode != pHead)
+	{
+		if (IS_CONTROLITEM_VISIBLE(pNode->element))
+		{
+
+			//获取ControlItem引用
+			ControlItem& controlItem = pNode->element;
+			//偏移到指定物体的缓冲位置。
+			perObjectBufferAddress = objectBufferAddress + controlItem.ObjCBIndex * ObjectConstantsSize;
+			perMaterialBufferAddress = materialbufferAddress + controlItem.Mat->MatCBIndex * MaterialConstantsSize;
+
+			//设定图元类型。
+			cmdList->IASetPrimitiveTopology(controlItem.PrimitiveType);
+			//设定物体缓冲。
+			cmdList->SetGraphicsRootConstantBufferView(
+				0, perObjectBufferAddress);
+			//设定材质缓冲。
+			cmdList->SetGraphicsRootConstantBufferView(
+				1, perMaterialBufferAddress);
+			//绘制图元。
+			cmdList->DrawIndexedInstanced(
+				controlItem.IndexCount, 
+				1, 
+				controlItem.StartIndexLocation, 
+				controlItem.BaseVertexLocation, 
+				0);
+		}
+
+		//迭代
+		pNode = pNode->m_pNext;
+	}
 }
 
 
