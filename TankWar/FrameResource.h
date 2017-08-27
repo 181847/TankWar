@@ -2,6 +2,7 @@
 #include "../../../../Common/d3dUtil.h"
 #include "../../../../Common/MathHelper.h"
 #include "../../../../Common/UploadBuffer.h"
+#include "../../../../Common/GeometryGenerator.h"
 using namespace DirectX::PackedVector;
 using namespace DirectX;
 
@@ -68,6 +69,9 @@ struct Vertex
 {
 	DirectX::XMFLOAT3 Pos;
 	DirectX::XMFLOAT3 Normal;
+public:
+	Vertex();
+	Vertex(const GeometryGenerator::Vertex& v);
 };
 
 struct FrameResource

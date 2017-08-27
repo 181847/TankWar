@@ -29,3 +29,13 @@ FrameResource::FrameResource(ID3D12Device* device, UINT passCount, UINT objectCo
 FrameResource::~FrameResource()
 {
 }
+
+Vertex::Vertex()
+{
+}
+
+Vertex::Vertex(const GeometryGenerator::Vertex & v)
+{
+	this->Pos = v.Position;
+	this->Normal = v.Normal;
+}

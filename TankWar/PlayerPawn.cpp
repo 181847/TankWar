@@ -88,7 +88,7 @@ BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnProperty* pProperty, Scence*
 	newPawn->m_pCamera->Target->Translation = { 0.0f, 2.0f, 0.0f };
 
 	//修改摄像机的局部坐标，避免再后来的更新中和摄像机的目标重合，引发异常。
-	newPawn->m_pCamera->Pos->Translation = { 0.0f, 0.0f, -10.0f };
+	newPawn->m_pCamera->Pos->Translation = { 0.0f, 0.0f, -100.0f };
 	//修改摄像机的世界矩阵中的平移，因为摄像机真正更新到世界至观察矩阵中的数据是世界矩阵的平移，
 	//而摄像机目标和位置的世界矩阵都是单位矩阵，平移相同，第一次世界至观察矩阵时会引发一场，
 	//这里临时修改一次世界平移坐标，因为在后来会从局部坐标中获得信息。
@@ -104,12 +104,12 @@ BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnProperty* pProperty, Scence*
 
 	//为炮台分配一个ControlItem。
 	newPawn->m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_BATTERY] =
-		pScence->NewControlItem("shapeGeo", "box", "box");
+		pScence->NewControlItem("Tank", "Box006", "box");
 	//炮台先向上移动一点距离。
 	newPawn->Battery()->MoveY(1.0f);
 
 	newPawn->m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_MAINBODY] =
-		pScence->NewControlItem("shapeGeo", "box", "cylinder");
+		pScence->NewControlItem("Tank", "Box005", "cylinder");
 	newPawn->MainBody()->MoveY(1.0f);
 
 	//添加玩家控制。

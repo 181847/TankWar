@@ -23,7 +23,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE preInstance, PSTR cmdLine, int
 	catch (SimpleException e)
 	{
 		char lineInfo[40];
-		sprintf_s(lineInfo, "%d", e.line, 40);
+		sprintf_s(lineInfo, "%d", e.line);
 		std::string exceptionMessage;
 		exceptionMessage += "\n文件：\n";
 		exceptionMessage += e.file;
@@ -73,6 +73,8 @@ bool MyShapesApp::Initialize()
 	BuildMaterials();
 	//创建所有要用到的网格顶点。
 	BuildShapeGeometry();
+	//创建Scence中所有需要用到的网格，这些网格全部从Obj文件中读取。
+	BuildShapeGeometry_for_Scence();
 	//创建所有渲染对象。
 	BuildRenderItems();
 	//创建FrameResource。
@@ -1104,6 +1106,14 @@ void MyShapesApp::BuildBoneCommander()
 	m_pBoneCommander = std::make_unique<BoneCommander>(COMMANDER_FOLLOW_MAX_COMMANDS);
 }
 
+void MyShapesApp::BuildShapeGeometry_for_Scence()
+{
+	//这里指定一个文件名，默认文件的扩展名为“.obj”，
+	//从指定的文件读取顶点信息，然后向mGeometries添加提取的子网格，
+	//一个文件中的子网格放到同一个Geometry中。
+	AddGeometry("Tank");
+}
+
 //void MyShapesApp::BuildCollideCommander()
 //{
 //	m_collideCommander = std::make_unique<CollideCommander>(COMMANDER_COLLIDE_MAX_NUM);
@@ -1129,6 +1139,92 @@ void MyShapesApp::BuildInitPawn()
 
 	//为了保证摄像机一定存在，现在就执行生成pawn的指令，使得Scence中生成一个摄像机。
 	m_pPawnMaster->Executee();
+}
+
+void MyShapesApp::AddGeometry(const string & fileName)
+{
+	string filePath = "objs/" + fileName + ".obj";
+	//用于存储网格信息的临时变量。
+	unique_ptr<unordered_map<
+		string, 
+		unique_ptr<GeometryGenerator::MeshData>>> shapes;
+
+	//读取文件。
+	try
+	{
+		shapes = ObjReader::ReadObjFile(filePath);
+	}
+	catch (SimpleException& e)
+	{
+		throw SimpleException(
+			("读取Obj文件失败，请检查文件路径：" + filePath).c_str(), 
+			__FILE__, 
+			__LINE__);
+	}
+
+	auto geo = std::make_unique<MeshGeometry>();
+	geo->Name = fileName;
+
+	//这个文件中的顶点定义。
+	std::vector<Vertex> totalVertices;
+	//这个文件中的所有索引。
+	std::vector<uint16_t> totalIndices;
+	//对应单独子网格的顶点偏移。
+	UINT currVertexOffset = 0;
+	//对应单独网格的索引偏移。
+	UINT currIndexOffset = 0;
+
+	//遍历每一个子网格。
+	for (auto& shape : *shapes)
+	{
+		//子网格。
+		SubmeshGeometry subMesh;
+
+		//属性设定。
+		subMesh.BaseVertexLocation = currVertexOffset;
+		subMesh.StartIndexLocation = currIndexOffset;
+		subMesh.IndexCount = static_cast<UINT>(shape.second->Indices32.size());
+
+		//追加顶点和索引值到vector中
+		totalVertices.	insert(
+			totalVertices.end(),
+			std::begin(shape.second->Vertices),
+			std::end(shape.second->Vertices));
+		totalIndices.	insert(
+			totalIndices.end(),
+			std::begin(shape.second->GetIndices16()),
+			std::end(shape.second->GetIndices16()));
+
+		//向Geometry添加这个子网格。
+		geo->DrawArgs[shape.first] = subMesh;
+
+		//为下一个子网格准备偏移值。
+		currVertexOffset += static_cast<UINT>(shape.second->Vertices.size());
+		currIndexOffset += subMesh.IndexCount;
+	}
+
+	//顶点缓冲的总大小。
+	const UINT vbByteSize = currVertexOffset	* sizeof(Vertex);
+	//索引缓冲的总大小。
+	const UINT ibByteSize = currIndexOffset		* sizeof(std::uint16_t);
+
+	geo->VertexBufferByteSize	= vbByteSize;
+	geo->IndexBufferByteSize	= ibByteSize;
+	geo->VertexByteStride		= static_cast<UINT>(sizeof(Vertex));
+	geo->IndexFormat			= DXGI_FORMAT_R16_UINT;
+
+	ThrowIfFailed(D3DCreateBlob(vbByteSize, &geo->VertexBufferCPU));
+	ThrowIfFailed(D3DCreateBlob(ibByteSize, &geo->IndexBufferCPU));
+
+	CopyMemory(geo->VertexBufferCPU->GetBufferPointer(), totalVertices.data(), vbByteSize);
+	CopyMemory(geo->IndexBufferCPU->GetBufferPointer(), totalIndices.data(), ibByteSize);
+
+	geo->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),	mCommandList.Get(),
+		totalVertices.data(),	vbByteSize, geo->VertexBufferUploader);
+	geo->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),	mCommandList.Get(),
+		totalIndices.data(),	ibByteSize, geo->IndexBufferUploader);
+
+	mGeometries[geo->Name] = std::move(geo);
 }
 
 void MyShapesApp::DrawRenderItems(ID3D12GraphicsCommandList * cmdList, const std::vector<RenderItem*>& ritems)

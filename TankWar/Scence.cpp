@@ -139,11 +139,25 @@ ControlItem * Scence::NewControlItem(
 	const char * NameOfSubmesh, 
 	const char * NameOfMaterial)
 {
-	//ControlItem此时无需设置ObjectIndex，所有的ObjectIndex都应该在Scence初始化的时候分配了序号，
-	//详情参考Scence的构造函数。
-
+	//查看是否有指定名称的几何体集合。
+	ASSERT(
+		(*m_pGeometries).find(NameOfGeometry) != (*m_pGeometries).end()
+		&& "不存在的几何体集合");
 	//获取图形集合，这个集合中包含了顶点和索引的值。
 	MeshGeometry* geo = (*m_pGeometries)[NameOfGeometry].get();
+
+	//查看是否有指定名称的子网格。
+	ASSERT(
+		geo->DrawArgs.find(NameOfSubmesh) != geo->DrawArgs.end()
+		&& "不存在的子网格");
+	//查看是否有指定名称的材质。
+	ASSERT(
+		(*m_pMaterials).find(NameOfMaterial) != (*m_pMaterials).end()
+		&& "不存在的材质");
+
+
+	//ControlItem此时无需设置ObjectIndex，所有的ObjectIndex都应该在Scence初始化的时候分配了序号，
+	//详情参考Scence的构造函数。
 	ControlItem* pNewCItem = m_controlItemAllocator.Malloc();
 	pNewCItem->Geo = geo;
 	pNewCItem->BaseVertexLocation = geo->DrawArgs[NameOfSubmesh].BaseVertexLocation;
@@ -207,9 +221,13 @@ void Scence::DrawScence(ID3D12GraphicsCommandList * cmdList, FrameResource * pCu
 	{
 		if (IS_CONTROLITEM_VISIBLE(pNode->element))
 		{
-
 			//获取ControlItem引用
 			ControlItem& controlItem = pNode->element;
+
+
+			cmdList->IASetVertexBuffers(0, 1, &controlItem.Geo->VertexBufferView());
+			cmdList->IASetIndexBuffer(&controlItem.Geo->IndexBufferView());
+
 			//偏移到指定物体的缓冲位置。
 			perObjectBufferAddress = objectBufferAddress + controlItem.ObjCBIndex * ObjectConstantsSize;
 			perMaterialBufferAddress = materialbufferAddress + controlItem.Mat->MatCBIndex * MaterialConstantsSize;

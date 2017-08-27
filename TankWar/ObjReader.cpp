@@ -120,9 +120,9 @@ unique_ptr<unordered_map<string, unique_ptr<GeometryGenerator::MeshData>>> ObjRe
 		for (int i = 0; i < geo->faceCount; ++i)
 		{
 			//各个顶点的索引。
-			UINT index_v1 = i + 0;
-			UINT index_v2 = i + 1;
-			UINT index_v3 = i + 2;
+			UINT index_v1 = i * 3 + 0;
+			UINT index_v2 = i * 3 + 1;
+			UINT index_v3 = i * 3 + 2;
 
 			//各个顶点的要求的数据索引。
 			UINT	
@@ -163,9 +163,13 @@ unique_ptr<unordered_map<string, unique_ptr<GeometryGenerator::MeshData>>> ObjRe
 				0.0f, 0.0f, 0.0f,					//切线向量。
 				GET_X_Y_ARGS(vts[index_v3_t]));		//贴图坐标。
 
-			newMesh->Vertices.push_back(v1);
-			newMesh->Vertices.push_back(v2);
-			newMesh->Vertices.push_back(v3);
+//***************** 缠 绕 方 向 改 变 ****************************************************************
+//***************** 缠 绕 方 向 改 变 ****************************************************************
+			newMesh->Vertices.push_back(v1);														//
+			newMesh->Vertices.push_back(v3);														//
+			newMesh->Vertices.push_back(v2);														//
+//***************** 缠 绕 方 向 改 变 ****************************************************************
+//***************** 缠 绕 方 向 改 变 ****************************************************************
 
 			//添加顶点索引。
 			newMesh->Indices32.push_back(static_cast<uint32>(index_v1));
@@ -187,11 +191,12 @@ void ObjReader::SaveVertexLocation(string & line, vector<XMFLOAT3>& vs)
 	//其中v后面有两个空格，这会使得分割出来的字符串有一个空的，注意跳过。
 	SplitString(line, subStrings, " ");
 
+	//X轴取负值、Z轴取Y轴的负值、Y轴取Z轴。
 	vs.push_back(
 		XMFLOAT3( 
 			INCH_TO_CM(strtof(subStrings[2].c_str(), nullptr)),
 			INCH_TO_CM(strtof(subStrings[3].c_str(), nullptr)),
-			INCH_TO_CM(strtof(subStrings[4].c_str(), nullptr))
+			-INCH_TO_CM(strtof(subStrings[4].c_str(), nullptr))
 			)
 		);
 }
@@ -219,9 +224,9 @@ void ObjReader::SaveNormal(string & line, vector<XMFLOAT3>& ns)
 
 	ns.push_back(
 		XMFLOAT3(
-			strtof(subStrings[1].c_str(), nullptr),
+			strtof(subStrings[1].c_str(), nullptr), 
 			strtof(subStrings[2].c_str(), nullptr),
-			strtof(subStrings[3].c_str(), nullptr)
+			-strtof(subStrings[3].c_str(), nullptr)
 		)
 	);
 }

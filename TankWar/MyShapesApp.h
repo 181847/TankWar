@@ -9,6 +9,7 @@
 #include "PlayerCommander.h"
 #include "BoneCommander.h"
 #include "PlayerPawn.h"
+#include "ObjReader.h"
 
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
@@ -216,6 +217,10 @@ public:
 	void BuildPlayerCommander();
 	void BuildAICommander();
 	void BuildBoneCommander();
+	//创建Scence中所有需要用到的网格，这些网格全部从Obj文件中读取，
+	//一个Obj文件作为一个单独的MeshGeometry，
+	//一个Obj文件中单独的几何体作为其对应的一个SubMesh。
+	void BuildShapeGeometry_for_Scence();
 	//void BuildCollideCommander();
 
 	//注册Pawn类到各个需要的PawnMaster和Commander中。
@@ -223,6 +228,11 @@ public:
 	//创建初始的pawn对象，可以在这里创建玩家角色，初始化场景，
 	//建议通过PawnMaster来创建。
 	void BuildInitPawn();
+	//从指定的文件中添加几何体合集，
+	//默认文件名为“.obj”，默认文件路径在项目资源的“objs”文件夹之下，
+	//所以参数只需要填入文件名字的前一部分就可以了，
+	//添加的Geometry名字将会被设定为这个fileName。
+	void AddGeometry(const string& fileName);
 
 
 public:
