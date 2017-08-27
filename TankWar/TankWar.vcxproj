@@ -158,6 +158,8 @@
     <ClCompile Include="ControlItem.cpp" />
     <ClCompile Include="FrameResource.cpp" />
     <ClCompile Include="MyShapesApp.cpp" />
+    <ClCompile Include="MyTools.cpp" />
+    <ClCompile Include="ObjReader.cpp" />
     <ClCompile Include="PawnMaster.cpp" />
     <ClCompile Include="PlayerCommander.cpp" />
     <ClCompile Include="PlayerPawn.cpp" />
@@ -181,6 +183,8 @@
     <ClInclude Include="MyAssert.h" />
     <ClInclude Include="MyShapesApp.h" />
     <ClInclude Include="MyStaticAllocator.h" />
+    <ClInclude Include="MyTools.h" />
+    <ClInclude Include="ObjReader.h" />
     <ClInclude Include="PawnMaster.h" />
     <ClInclude Include="PlayerCommander.h" />
     <ClInclude Include="PlayerPawn.h" />

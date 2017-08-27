@@ -3,18 +3,32 @@
 class  SimpleException: std::exception
 {
 public:
-	char* expr;
-	char* file;
-	int line;
+	const char* expr;
+	const char* file;
+	const int line;
 
 public:
-	SimpleException(char *e, char* f, int line)
+	SimpleException(const char *e, const char* f, const int line)
+		:expr(e), file(f), line(line)
 	{
-		expr = e;
-		file = f;
-		this->line = line;
+	}
+
+	inline std::string SimpleException::ToString()
+	{
+		char lineString[40];
+		std::string returnval;
+		_itoa_s(line, lineString, 10);
+		returnval += "\nFile:\n";
+		returnval += file;
+		returnval += "\nLine:\n";
+		returnval += lineString;
+		returnval += "\nExpression:\n";
+		return returnval;
 	}
 };
+
+
+
 
 
 #if ASSERTIONS_ENABLED
