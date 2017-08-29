@@ -153,6 +153,8 @@
     <ClCompile Include="..\..\..\..\Common\GameTimer.cpp" />
     <ClCompile Include="..\..\..\..\Common\GeometryGenerator.cpp" />
     <ClCompile Include="..\..\..\..\Common\MathHelper.cpp" />
+    <ClCompile Include="AICommander.cpp" />
+    <ClCompile Include="ArmoredCar.cpp" />
     <ClCompile Include="BasePawn.cpp" />
     <ClCompile Include="BoneCommander.cpp" />
     <ClCompile Include="ControlItem.cpp" />
@@ -175,6 +177,8 @@
     <ClInclude Include="..\..\..\..\Common\GeometryGenerator.h" />
     <ClInclude Include="..\..\..\..\Common\MathHelper.h" />
     <ClInclude Include="..\..\..\..\Common\UploadBuffer.h" />
+    <ClInclude Include="AICommander.h" />
+    <ClInclude Include="ArmoredCar.h" />
     <ClInclude Include="BasePawn.h" />
     <ClInclude Include="BoneCommander.h" />
     <ClInclude Include="DeLinkedList.h" />

@@ -54,6 +54,8 @@ class MyStaticAllocator
 
 public:
 	MyStaticAllocator(UINT initializeUnitCount);
+	MyStaticAllocator(const MyStaticAllocator&) = delete;
+	MyStaticAllocator& operator = (const MyStaticAllocator&) = delete;
 	~MyStaticAllocator();
 	//申请一个DataType类型的指针。
 	DataType* Malloc();

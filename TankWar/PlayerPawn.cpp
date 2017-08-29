@@ -78,9 +78,13 @@ ControlItem * PlayerPawn::MainBody()
 }
 
 //***************************************玩家生成模板*****************************
-BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnProperty* pProperty, Scence* pScence)
+BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnUnit * saveUnit, PawnProperty* pProperty, Scence* pScence)
 {
 	PlayerPawn* newPawn = PlayerPawn::m_PlayerPawnAllocator.Malloc();
+	//记录存储单位指针。
+	newPawn->m_pSavedUnit = saveUnit;
+
+	//记录属性。
 	newPawn->m_pProperty = reinterpret_cast<PlayerProperty*>(pProperty);
 	//从场景中创建摄像机，把摄像机存储到Player中。
 	newPawn->m_pCamera = pScence->AppendCamera();
@@ -124,7 +128,7 @@ BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnProperty* pProperty, Scence*
 	return newPawn;
 }
 
-void PlayerPawnCommandTemplate::DestoryPawn(BasePawn* pPawn, Scence* pScence)
+PawnUnit* PlayerPawnCommandTemplate::DestoryPawn(BasePawn* pPawn, Scence* pScence)
 {
 	PlayerPawn* toDeletePawn = (PlayerPawn*)pPawn;
 
@@ -146,6 +150,9 @@ void PlayerPawnCommandTemplate::DestoryPawn(BasePawn* pPawn, Scence* pScence)
 
 	//回收Pawn对象。
 	PlayerPawn::m_PlayerPawnAllocator.Free(toDeletePawn);
+
+	//返回存储单元指针。
+	return toDeletePawn->m_pSavedUnit;
 }
 
 void PlayerPawnCommandTemplate::AddPlayerControl(PlayerPawn * pPlayerPawn)

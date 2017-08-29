@@ -19,6 +19,8 @@ class DeLinkedList
 
 public:
 	DeLinkedList(UINT allocatorSize);
+	DeLinkedList(const DeLinkedList&) = delete;
+	DeLinekdList& operator = (const DeLinkedList&) = delete;
 	~DeLinkedList();
 
 protected:

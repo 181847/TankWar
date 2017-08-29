@@ -46,11 +46,11 @@
     <Filter Include="App文件\Pawn\PlayerPawn">
       <UniqueIdentifier>{e692cda5-fc92-4664-8aaf-4d9155d079e5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="App文件\Pawn\NewFilter1">
-      <UniqueIdentifier>{ba6672bc-d8d5-4d56-ab9a-c4000bb9ee6e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="App文件\Commander\BoneCommander">
       <UniqueIdentifier>{99d46180-291d-4484-b39a-7c7bdc0bb657}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Pawn\ArmoredCar">
+      <UniqueIdentifier>{ac403c70-3cf8-4ba2-b0c2-7916e1f1136d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -107,6 +107,12 @@
     </ClCompile>
     <ClCompile Include="MyTools.cpp">
       <Filter>App文件\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ArmoredCar.cpp">
+      <Filter>App文件\Pawn\ArmoredCar</Filter>
+    </ClCompile>
+    <ClCompile Include="AICommander.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +187,12 @@
     </ClInclude>
     <ClInclude Include="MyTools.h">
       <Filter>App文件\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ArmoredCar.h">
+      <Filter>App文件\Pawn\ArmoredCar</Filter>
+    </ClInclude>
+    <ClInclude Include="AICommander.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

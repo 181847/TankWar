@@ -36,11 +36,15 @@ void PawnMaster::CreatePawn(PawnType pawnType, PawnProperty* pProperty)
 	++UnExecuteeCommandNum;
 }
 
-void PawnMaster::DestroyPawn(BasePawn * pThePawn)
+void PawnMaster::DestroyPawn(PawnType pawnType, BasePawn * pThePawn)
 {
 	//命令类型。
 	CommandBuffer[UnExecuteeCommandNum].CommandType =
 		PAWN_COMMAND_TYPE_DESTORY;
+
+	//要删除的Pawn类型。
+	CommandBuffer[UnExecuteeCommandNum].DestoryCommand.pawnType =
+		pawnType;
 
 	//要删除的Pawn指针。
 	CommandBuffer[UnExecuteeCommandNum].DestoryCommand.pPawn_to_destory = 
@@ -57,10 +61,7 @@ void PawnMaster::Executee()
 		switch (CommandBuffer[i].CommandType)
 		{
 		case PAWN_COMMAND_TYPE_CREATE:
-			CommandTemplateList[CommandBuffer[i].CreateCommand.pawnType - 1]
-				->CreatePawn(
-					CommandBuffer[i].CreateCommand.pProperty, 
-					m_pScence);
+			CreatingPawn(i);
 
 			//清空当前命令信息。
 			CommandBuffer[i].CreateCommand.pawnType = PAWN_TYPE_NONE;
@@ -68,24 +69,59 @@ void PawnMaster::Executee()
 			break;
 
 		case PAWN_COMMAND_TYPE_DESTORY:
-			CommandTemplateList[CommandBuffer[i].CreateCommand.pawnType - 1]
-				->DestoryPawn(
-					CommandBuffer[i].DestoryCommand.pPawn_to_destory,
-					m_pScence);
+			DestoringPawn(i);
 
 			//清空当前命令信息。
+			CommandBuffer[i].DestoryCommand.pawnType = PAWN_TYPE_NONE;
 			CommandBuffer[i].DestoryCommand.pPawn_to_destory = nullptr;
 			break;
 
 		default:
 			ASSERT(false && "PawnMaster执行的命令类型非法");
 			break;
-		}
+		}// end switch
 
 		//清空当前命令类型。
 		CommandBuffer[i].CommandType = PAWN_COMMAND_TYPE_NONE;
-	}
+	}// end for
 
 	//重置未执行命令数量。
 	UnExecuteeCommandNum = 0;
+}
+
+void PawnMaster::CreatingPawn(UINT commandIndex)
+{
+	PawnCommand& command = 
+		CommandBuffer[commandIndex];
+
+	PawnCommandTemplate& commandTemplate = 
+		*CommandTemplateList[command.CreateCommand.pawnType];
+
+	auto pPawnUnit = commandTemplate.Manager.Malloc();
+
+	BasePawn * newPawn = 
+		commandTemplate.CreatePawn(pPawnUnit, command.CreateCommand.pProperty, m_pScence);
+
+	//存储创建的Pawn指针。
+	pPawnUnit->pSavedPawn = newPawn;
+}
+
+void PawnMaster::DestoringPawn(UINT commandIndex)
+{
+	PawnCommand& command =
+		CommandBuffer[commandIndex];
+
+	PawnCommandTemplate& commandTemplate =
+		*CommandTemplateList[command.DestoryCommand.pawnType];
+	
+	//返回原先存储这个Pawn的单元指针。
+	auto noUsedUnit = commandTemplate.DestoryPawn(
+		command.DestoryCommand.pPawn_to_destory,
+		m_pScence);
+
+	//清空存储的Pawn指针。
+	noUsedUnit->pSavedPawn = nullptr;
+
+	//回收内存。
+	commandTemplate.Manager.Free(noUsedUnit);
 }

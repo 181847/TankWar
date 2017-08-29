@@ -81,6 +81,8 @@ public:
 
 //这一部分是关于Player的非静态属性。
 protected:
+	//在PawnMaster中存储当前Pawn对象的单位指针。
+	PawnUnit* m_pSavedUnit;
 	//摄像机对象;
 	MyCamera* m_pCamera;
 	//在PlayerCommander中的控制单元指针。
@@ -109,10 +111,10 @@ public:
 class PlayerPawnCommandTemplate : public PawnCommandTemplate
 {
 public:
-	virtual BasePawn* CreatePawn(PawnProperty* pProperty, Scence* pScence);
+	virtual BasePawn* CreatePawn(PawnUnit * saveUnit, PawnProperty* pProperty, Scence* pScence);
 	//pPawn是一个动态分配的内存，在销毁对应的Pawn之后，DestoryPawn需要自行释放这个内存到m_playerAllocator，
 	//同时Pawn中的PawnProperty也需要被放回对应的内存池内。
-	virtual void DestoryPawn(BasePawn* pPawn, Scence* pScence);
+	virtual PawnUnit* DestoryPawn(BasePawn* pPawn, Scence* pScence);
 
 protected:
 	//在PlayerCommander添加一个玩家的控制器。
