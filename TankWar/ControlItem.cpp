@@ -44,6 +44,14 @@ void ControlItem::MoveZ(float d)
 	NumFramesDirty = gNumFrameResources;
 }
 
+void ControlItem::MoveXYZ(float dx, float dy, float dz)
+{
+	this->Translation.x += dx;
+	this->Translation.y += dy;
+	this->Translation.z += dz;
+	NumFramesDirty = gNumFrameResources;
+}
+
 //将ControlItemd的显示属性设为隐藏。
 void ControlItem::Hide()
 {

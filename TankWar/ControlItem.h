@@ -64,6 +64,9 @@ public:
 	//向Z轴正向移动。
 	void MoveZ(float d);
 
+	//向XYZ轴同时移动。
+	void MoveXYZ(float dx, float dy, float dz);
+
 	//将ControlItemd的显示属性设为隐藏。
 	void Hide();
 	//将ControlItemd的显示属性设为显示。

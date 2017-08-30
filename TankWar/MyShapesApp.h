@@ -8,7 +8,9 @@
 #include "PawnMaster.h"
 #include "PlayerCommander.h"
 #include "BoneCommander.h"
+#include "AICommander.h"
 #include "PlayerPawn.h"
+#include "ArmoredCar.h"
 #include "ObjReader.h"
 
 using Microsoft::WRL::ComPtr;
@@ -242,7 +244,7 @@ public:
 	std::unique_ptr<PawnMaster> m_pPawnMaster;
 	
 	std::unique_ptr<PlayerCommander> m_pPlayerCommander;
-	//std::unique_ptr<AICommander> m_AICommander;
+	std::unique_ptr<AICommander> m_pAICommander;
 	std::unique_ptr<BoneCommander> m_pBoneCommander;
 	//std::unique_ptr<CollideCommander> m_collideCommander;
 	//*******************************************游戏代码定义部分**************************************************************************************************************************************************

@@ -130,6 +130,24 @@ void PlayerCommander::ExecuteeCommandTeplate(
 				break;
 			}
 		}
+
+		//点击事件，从释放到按下的情况，目前只对应鼠标的左右键有点击事件。
+		if (keyState.stateChange == RELEASE_TO_PRESS)
+		{
+			switch (keyState.keyType)
+			{
+			case M_L:
+				pCTemplate->HitMouseButton_Left(pUnit->pControledPawn, gt);
+				break;
+			case M_R:
+				pCTemplate->HitMouseButton_Right(pUnit->pControledPawn, gt);
+				break;
+
+			default:
+				//什么也不做。
+				break;
+			}
+		}
 	}
 }
 
@@ -149,6 +167,8 @@ KeyState::KeyState(KeyType type)
 
 void KeyState::ChangeState(StateChange newState)
 {
+	//更新状态时只允许新状态是单一状态，不能用PRESS_TO_RELEASE这样子的变换状态来定义新状态，
+	//新状态只能是固定的一种状态，
 	ASSERT(newState == RELEASE || newState == PRESS);
 	stateChange =
 		(stateChange << 4 & 0xf0)	//原状态前移4位，保留移动后的前4位

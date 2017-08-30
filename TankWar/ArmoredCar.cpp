@@ -13,6 +13,12 @@ BoneCommander *	ArmoredCar::pBoneCommander	= nullptr;
 MyStaticAllocator<CarProperty> ArmoredCar::PropertyAllocator(MAX_PAWN_CAR_NUM);
 //属性分配器。
 MyStaticAllocator<ArmoredCar> ArmoredCar::PawnAllocator(MAX_PAWN_CAR_NUM);
+//AI操作单元类型
+AIControlType ArmoredCar::aiControlType = AI_CONTROL_TYPE_NONE;
+
+//初始化默认属性
+const float CarProperty_default_MoveSpeed = 2.0f;
+const float CarProperty_default_RotationSpeed = 2.0f;
 
 ArmoredCar::ArmoredCar()
 {
@@ -35,7 +41,7 @@ void ArmoredCar::RegisterAll(PawnMaster * pPawnMaster,
 	ArmoredCar::pBoneCommander = pBoneCommander;
 
 	//添加AI控制类型。
-	ArmoredCar::AIControlType = pAICommander->AddAITemplate(
+	ArmoredCar::aiControlType = pAICommander->AddAITemplate(
 		std::make_unique<CarAITemplate>());
 }
 
@@ -63,6 +69,18 @@ ControlItem * ArmoredCar::MainBody()
 	return m_arr_ControlItem[CONTROLITEM_INDEX_CAR_MAIN_BODY];
 }
 
+
+//****************************装甲车单位生成模板***********************************************
+
+CarPawnTemplate::CarPawnTemplate()
+	:PawnCommandTemplate(MAX_PAWN_CAR_NUM)
+{
+}
+
+CarPawnTemplate::~CarPawnTemplate()
+{
+}
+
 BasePawn * CarPawnTemplate::CreatePawn(PawnUnit * saveUnit, PawnProperty* pProperty, Scence* pScence)
 {
 	auto pCarProperty = reinterpret_cast<CarProperty*>(pProperty);
@@ -71,6 +89,15 @@ BasePawn * CarPawnTemplate::CreatePawn(PawnUnit * saveUnit, PawnProperty* pPrope
 
 	//记录存储单位。
 	newPawn->m_pSaveUnit = saveUnit;
+
+	if (pProperty == nullptr)
+	{
+		//没有设置属性，自动创建一个默认属性。
+		pCarProperty = ArmoredCar::NewProperty();
+		
+		pCarProperty->MoveSpeed = CarProperty_default_MoveSpeed;
+		pCarProperty->RotationSpeed = CarProperty_default_RotationSpeed;
+	}
 
 	//设置属性
 	newPawn->m_pProperty = pCarProperty;
@@ -119,7 +146,9 @@ PawnUnit* CarPawnTemplate::DestoryPawn(BasePawn * pPawn, Scence * pScence)
 
 void CarPawnTemplate::AddAIControl(ArmoredCar * pPawn)
 {
-	pPawn->m_pAIUnit = ArmoredCar::pAICommander->NewAIUnit(ArmoredCar::AIControlType, pPawn);
+	pPawn->m_pAIUnit = ArmoredCar::pAICommander->NewAIUnit(ArmoredCar::aiControlType, pPawn);
+	//设定初始状态为移动。
+	pPawn->m_pAIUnit->CurrState = STORY_FRAGMENT_CAR_MOVE;
 }
 
 void CarPawnTemplate::AddBones(ArmoredCar * pPawn)
@@ -152,6 +181,8 @@ void CarPawnTemplate::DeleteBones(ArmoredCar * pPawn)
 	}
 }
 
+//**************************装甲车AI行为模板******************************************************************
+
 CarAITemplate::CarAITemplate()
 {
 	//在父类中添加故事片段，AI将沿着设定的故事线切换状态，然后在Runing中执行具体的操作。
@@ -168,14 +199,23 @@ CarAITemplate::CarAITemplate()
 	aimFragment.State = STORY_FRAGMENT_CAR_AIM;
 	aimFragment.Posibility = 0.3f;
 	aimFragment.ConsistTime = 5.0f;
-	moveFragment.NextState = STORY_FRAGMENT_NEXT_RANDOM_OTHERS;
+	aimFragment.NextState = STORY_FRAGMENT_NEXT_RANDOM_OTHERS;
 
 	//射击状态概览
 	StoryFragment shoutFragment;
 	shoutFragment.State = STORY_FRAGMENT_CAR_SHOUT;
 	shoutFragment.Posibility = 0.1f;
 	shoutFragment.ConsistTime = 2.0f;
-	moveFragment.NextState = STORY_FRAGMENT_NEXT_RANDOM;
+	shoutFragment.NextState = STORY_FRAGMENT_NEXT_RANDOM;
+
+	/*
+	//死亡状态概览，随机死亡
+	StoryFragment shoutFragment;
+	shoutFragment.State = STORY_FRAGMENT_CAR_SHOUT;
+	shoutFragment.Posibility = 0.01f;
+	shoutFragment.ConsistTime = 0.0f;
+	shoutFragment.NextState = STORY_FRAGMENT_NEXT_NONE;
+	*/
 	
 	//添加状态
 	StoryBoard.push_back(moveFragment);
@@ -190,17 +230,17 @@ void CarAITemplate::Runing(BasePawn* pPawn, AIStatue state, float consumedTime, 
 	{
 		//移动
 	case STORY_FRAGMENT_CAR_MOVE:
-		move(pCar);
+		move(pCar, gt);
 		break;
 
 		//瞄准
 	case STORY_FRAGMENT_CAR_AIM:
-		aim(pCar);
+		aim(pCar, gt);
 		break;
 
 		//射击
 	case STORY_FRAGMENT_CAR_SHOUT:
-		shout(pCar, consumedTime);
+		shout(pCar, consumedTime, gt);
 		break;
 
 	default:
@@ -209,14 +249,16 @@ void CarAITemplate::Runing(BasePawn* pPawn, AIStatue state, float consumedTime, 
 	}
 }
 
-void CarAITemplate::move(ArmoredCar * pCar)
+void CarAITemplate::move(ArmoredCar * pCar, const GameTimer& gt)
 {
 	//目标类型
 	auto targetType = PlayerPawn::m_pawnType;
 	//目标所在的pawnMaster。
 	auto pawnMaster = PlayerPawn::m_pPawnMaster;
 	//存储目标的链表。
-	auto linkedList = &pawnMaster->CommandTemplateList[targetType]->Manager;
+	auto linkedList = 
+		&(pawnMaster->CommandTemplateList[TO_ARRAY_INDEX(targetType)]
+			->Manager);
 
 	auto pHead = linkedList->GetHead();
 	auto pNode = pHead->m_pNext;
@@ -231,22 +273,49 @@ void CarAITemplate::move(ArmoredCar * pCar)
 		//获取根控制器。
 		auto rootControl = pPlayer->RootControl();
 
-		//待实现……
+		MoveToward(pCar, rootControl, gt);
+
+		//待完善……
 		//TODO
 
 		pNode = pNode->m_pNext;
 	}
 
+
 }
 
-void CarAITemplate::aim(ArmoredCar * pCar)
+void CarAITemplate::aim(ArmoredCar * pCar, const GameTimer& gt)
 {
 	//待实现……
 	//TODO
 }
 
-void CarAITemplate::shout(ArmoredCar * pCar, float consumedTime)
+void CarAITemplate::shout(ArmoredCar * pCar, float consumedTime, const GameTimer& gt)
 {
 	//待实现……
 	//TODO
+}
+
+void CarAITemplate::MoveToward(ArmoredCar * pCar, ControlItem * pTarget, const GameTimer& gt)
+{
+	XMFLOAT4 target(pTarget->World.m[3]);
+
+	MoveToward(pCar, target, gt);
+}
+
+void CarAITemplate::MoveToward(ArmoredCar * pCar, XMFLOAT4 targetLocation, const GameTimer& gt)
+{
+	XMFLOAT4 curr(pCar->RootControl()->World.m[3]);
+
+	XMVECTOR targetV = XMLoadFloat4(&targetLocation);
+	XMVECTOR currV= XMLoadFloat4(&curr);
+
+	float speed = pCar->m_pProperty->MoveSpeed;
+
+	//生成到指定位置的位移向量。
+	targetV = gt.DeltaTime() * speed * XMVector4Normalize(targetV - currV);
+
+	XMStoreFloat4(&curr, targetV);
+	pCar->RootControl()->MoveXYZ(curr.x, curr.y, curr.z);
+
 }

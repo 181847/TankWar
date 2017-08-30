@@ -15,11 +15,12 @@ BoneCommander *		PlayerPawn::m_pBoneCommander = nullptr;
 //CollideCommander *	PlayerPawn::m_pCollideCommander		= nullptr;
 MyStaticAllocator<PlayerProperty>	PlayerPawn::m_propertyAllocator(MAX_PLAYER_PAWN_NUM);
 MyStaticAllocator<PlayerPawn>		PlayerPawn::m_PlayerPawnAllocator(MAX_PLAYER_PAWN_NUM);
+//参考装甲车类型标记，这个类型标记用来实现点击鼠标左键然后生成装甲车的效果
+PawnType			PlayerPawn::refCarType = PAWN_TYPE_NONE;
 
 PlayerPawn::PlayerPawn()
 {
 }
-
 
 PlayerPawn::~PlayerPawn()
 {
@@ -55,6 +56,9 @@ void PlayerPawn::RegisterPawnMaster(PawnMaster * pPawnMaster)
 	//注册一个CommandTempalte，并且获得一个pawnType。
 	PlayerPawn::m_pawnType = pPawnMaster->AddCommandTemplate(
 		std::make_unique<PlayerPawnCommandTemplate>());
+
+	//记录PawnMaster
+	PlayerPawn::m_pPawnMaster = pPawnMaster;
 }
 
 PlayerProperty * PlayerPawn::NewProperty()
@@ -77,7 +81,17 @@ ControlItem * PlayerPawn::MainBody()
 	return m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_MAINBODY];
 }
 
+
 //***************************************玩家生成模板*****************************
+PlayerPawnCommandTemplate::PlayerPawnCommandTemplate()
+	:PawnCommandTemplate(MAX_PLAYER_PAWN_NUM)
+{
+}
+
+PlayerPawnCommandTemplate::~PlayerPawnCommandTemplate()
+{
+}
+
 BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnUnit * saveUnit, PawnProperty* pProperty, Scence* pScence)
 {
 	PlayerPawn* newPawn = PlayerPawn::m_PlayerPawnAllocator.Malloc();
@@ -278,6 +292,20 @@ void PlayerControlCommandTemplate::HitKey_D(BasePawn * pPawn, const GameTimer& g
 	//右转
 	PlayerPawn* pPlayerPawn = reinterpret_cast<PlayerPawn*>(pPawn);
 	pPlayerPawn->MainBody()->RotateYaw(1.0f * pPlayerPawn->m_pProperty->RotationSpeed * gt.DeltaTime());
+}
+
+void PlayerControlCommandTemplate::HitMouseButton_Left(BasePawn * pPawn, const GameTimer & gt)
+{
+	ASSERT(PlayerPawn::refCarType && "未初始化装甲车的类型标记，无法创建装甲车。");
+
+	//使用装甲车的默认属性进行创建。
+	PlayerPawn::m_pPawnMaster->CreatePawn(PlayerPawn::refCarType, nullptr);
+}
+
+void PlayerControlCommandTemplate::HitMouseButton_Right(BasePawn * pPawn, const GameTimer & gt)
+{
+	//待实现……
+	//TODO
 }
 
 void PlayerControlCommandTemplate::PressMouseButton_Left(BasePawn * pPawn, const GameTimer& gt)

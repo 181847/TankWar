@@ -22,13 +22,14 @@
 #define BONE_INDEX_PLAYER_CAR_MAIN_BODY CONTROLITEM_INDEX_CAR_MAIN_BODY
 
 //车身移动状态标志。
-#define STORY_FRAGMENT_CAR_MOVE 0
+#define STORY_FRAGMENT_CAR_MOVE 1
 //装甲车瞄准状态标志。
-#define STORY_FRAGMENT_CAR_AIM 1
+#define STORY_FRAGMENT_CAR_AIM 2
 //装甲车开火状态标志。
-#define STORY_FRAGMENT_CAR_SHOUT 2
+#define STORY_FRAGMENT_CAR_SHOUT 3
 
-typedef unsigned int AIControlType;
+extern const float CarProperty_default_MoveSpeed;
+extern const float CarProperty_default_RotationSpeed;
 
 //玩家属性定义
 struct CarProperty : public PawnProperty
@@ -51,7 +52,7 @@ public:
 	//在PawnMaster中的类型标识。
 	static PawnType PawnType;
 	//玩家的控制模式。
-	static AIControlType AIControlType;
+	static AIControlType aiControlType;
 
 	//负责本类生成和销毁指令的PawnMaster。
 	static PawnMaster *			pPawnMaster;
@@ -113,6 +114,10 @@ public:
 class CarPawnTemplate : public PawnCommandTemplate
 {
 public:
+	CarPawnTemplate();
+	~CarPawnTemplate();
+
+public:
 	virtual BasePawn* CreatePawn(PawnUnit * saveUnit, PawnProperty* pProperty, Scence* pScence);
 	//pPawn是一个动态分配的内存，在销毁对应的Pawn之后，DestoryPawn需要自行释放这个内存到m_playerAllocator，
 	//同时Pawn中的PawnProperty也需要被放回对应的内存池内。
@@ -143,9 +148,17 @@ public:
 	//以下是一些针对ArmoredCar的简化操作。
 protected:
 	//移动装甲车。
-	void move(ArmoredCar * pCar);
+	void move(ArmoredCar * pCar, const GameTimer& gt);
 	//装甲车瞄准。
-	void aim(ArmoredCar * pCar);
+	void aim(ArmoredCar * pCar, const GameTimer& gt);
 	//装甲车射击。
-	void shout(ArmoredCar * pCar, float consumedTime);
+	void shout(ArmoredCar * pCar, float consumedTime, const GameTimer& gt);
+
+	//工具方法
+protected:
+	//让车子的向指定的ControlItem的世界坐标移动。
+	void MoveToward(ArmoredCar * pCar, ControlItem * pTarget, const GameTimer& gt);
+	//让车子的向指定的坐标移动。
+	void MoveToward(ArmoredCar * pCar, XMFLOAT4 targetLocation, const GameTimer& gt);
+
 };

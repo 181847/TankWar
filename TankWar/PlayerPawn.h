@@ -4,7 +4,6 @@
 #include "PlayerCommander.h"
 #include "BoneCommander.h"
 
-
 //可生成的PawnPlayer的数量
 #define MAX_PLAYER_PAWN_NUM ((unsigned int)5)
 #define CONTROLITEM_NUM_PLAYER_PAWN 3
@@ -61,6 +60,9 @@ public :
 	//类对象分配池
 	static MyStaticAllocator<PlayerPawn> m_PlayerPawnAllocator;
 
+	//特殊的静态属性，标记一个装甲车的创建类型，当用户按下鼠标左键的时候就可以创建一个ArmoredCarPawn。
+	static PawnType refCarType;
+
 public:
 	//执行所有注册方法，包括下面的注册PawnMaster。
 	static void RegisterAll(
@@ -111,6 +113,10 @@ public:
 class PlayerPawnCommandTemplate : public PawnCommandTemplate
 {
 public:
+	PlayerPawnCommandTemplate();
+	~PlayerPawnCommandTemplate();
+
+public:
 	virtual BasePawn* CreatePawn(PawnUnit * saveUnit, PawnProperty* pProperty, Scence* pScence);
 	//pPawn是一个动态分配的内存，在销毁对应的Pawn之后，DestoryPawn需要自行释放这个内存到m_playerAllocator，
 	//同时Pawn中的PawnProperty也需要被放回对应的内存池内。
@@ -140,6 +146,10 @@ public:
 	virtual void HitKey_S(BasePawn* pPawn, const GameTimer& gt);
 	//按下D键
 	virtual void HitKey_D(BasePawn* pPawn, const GameTimer& gt);
+	//点击一次鼠标左键
+	virtual void HitMouseButton_Left(BasePawn * pPawn, const GameTimer& gt);
+	//点击一次鼠标右键
+	virtual void HitMouseButton_Right(BasePawn * pPawn, const GameTimer& gt);
 	//按下鼠标左键
 	virtual void PressMouseButton_Left(BasePawn* pPawn, const GameTimer& gt);
 	//按下鼠标右键

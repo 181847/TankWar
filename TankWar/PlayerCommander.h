@@ -20,6 +20,10 @@ public:
 	virtual void HitKey_S(BasePawn* pPawn, const GameTimer& gt) = 0;
 	//按下D键
 	virtual void HitKey_D(BasePawn* pPawn, const GameTimer& gt) = 0;
+	//点击一次鼠标左键
+	virtual void HitMouseButton_Left(BasePawn * pPawn, const GameTimer& gt) = 0;
+	//点击一次鼠标右键
+	virtual void HitMouseButton_Right(BasePawn * pPawn, const GameTimer& gt) = 0;
 	//按下鼠标左键
 	virtual void PressMouseButton_Left(BasePawn* pPawn, const GameTimer& gt) = 0;
 	//按下鼠标右键

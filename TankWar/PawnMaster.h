@@ -18,6 +18,12 @@ struct PawnUnit
 class PawnCommandTemplate
 {
 public:
+	PawnCommandTemplate(UINT maxPawnNum);
+	PawnCommandTemplate(const PawnCommandTemplate&) = delete;
+	PawnCommandTemplate& operator = (const PawnCommandTemplate&) = delete;
+	~PawnCommandTemplate();
+
+public:
 	//pDesc是一个动态分配的内存，CreatePawn需要自行释放这个内存。
 	virtual BasePawn* CreatePawn(PawnUnit * saveUnit, PawnProperty* pProperty, Scence* pScence) = 0;
 	//pPawn是一个动态分配的内存，在销毁对应的Pawn之后，DestoryPawn需要自行释放这个内存。

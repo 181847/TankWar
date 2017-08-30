@@ -95,7 +95,7 @@ void PawnMaster::CreatingPawn(UINT commandIndex)
 		CommandBuffer[commandIndex];
 
 	PawnCommandTemplate& commandTemplate = 
-		*CommandTemplateList[command.CreateCommand.pawnType];
+		*CommandTemplateList[command.CreateCommand.pawnType - 1];
 
 	auto pPawnUnit = commandTemplate.Manager.Malloc();
 
@@ -112,7 +112,7 @@ void PawnMaster::DestoringPawn(UINT commandIndex)
 		CommandBuffer[commandIndex];
 
 	PawnCommandTemplate& commandTemplate =
-		*CommandTemplateList[command.DestoryCommand.pawnType];
+		*CommandTemplateList[command.DestoryCommand.pawnType - 1];
 	
 	//返回原先存储这个Pawn的单元指针。
 	auto noUsedUnit = commandTemplate.DestoryPawn(
@@ -124,4 +124,13 @@ void PawnMaster::DestoringPawn(UINT commandIndex)
 
 	//回收内存。
 	commandTemplate.Manager.Free(noUsedUnit);
+}
+
+PawnCommandTemplate::PawnCommandTemplate(UINT maxPawnNum)
+	:Manager(maxPawnNum)
+{
+}
+
+PawnCommandTemplate::~PawnCommandTemplate()
+{
 }
