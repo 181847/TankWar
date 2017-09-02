@@ -2,17 +2,17 @@
 
 
 //初始时静态成员。
-PawnType			PlayerPawn::m_pawnType = PAWN_TYPE_NONE;
+PawnType			PlayerPawn::pawnType = PAWN_TYPE_NONE;
 //Player控制器类型。
 PlayerControlType	PlayerPawn::m_playerControlType = PLAYER_CONTROL_TYPE_NONE;
 //PawnMaster。
-PawnMaster *		PlayerPawn::m_pPawnMaster = nullptr;
+PawnMaster *		PlayerPawn::pPawnMaster = nullptr;
 //玩家指令官。
-PlayerCommander *	PlayerPawn::m_pPlayerCommander = nullptr;
+PlayerCommander *	PlayerPawn::pPlayerCommander = nullptr;
 //骨骼指令官。
-BoneCommander *		PlayerPawn::m_pBoneCommander = nullptr;
+BoneCommander *		PlayerPawn::pBoneCommander = nullptr;
 //碰撞指令官。
-//CollideCommander *	PlayerPawn::m_pCollideCommander		= nullptr;
+//CollideCommander *	PlayerPawn::pCollideCommander		= nullptr;
 MyStaticAllocator<PlayerProperty>	PlayerPawn::m_propertyAllocator(MAX_PLAYER_PAWN_NUM);
 MyStaticAllocator<PlayerPawn>		PlayerPawn::m_PlayerPawnAllocator(MAX_PLAYER_PAWN_NUM);
 //参考装甲车类型标记，这个类型标记用来实现点击鼠标左键然后生成装甲车的效果
@@ -30,35 +30,35 @@ void PlayerPawn::RegisterAll(
 	PawnMaster * pPawnMaster, 
 	PlayerCommander * pPlayerCommander, 
 	BoneCommander * pBoneCommander
-	//,	CollideCommander * pCollideCommander
+	,	CollideCommander * pCollideCommander
 )
 {
-	ASSERT(PlayerPawn::m_pPlayerCommander	== nullptr	&&	"不可重复注册PlayerCommander");
-	ASSERT(PlayerPawn::m_pBoneCommander		== nullptr	&&	"不可重复注册BoneCommander");
-	//ASSERT(PlayerPawn::m_pCollideCommander	== nullptr	&&	"不可重复注册CollideCommander");
+	ASSERT(PlayerPawn::pPlayerCommander	== nullptr	&&	"不可重复注册PlayerCommander");
+	ASSERT(PlayerPawn::pBoneCommander		== nullptr	&&	"不可重复注册BoneCommander");
+	//ASSERT(PlayerPawn::pCollideCommander	== nullptr	&&	"不可重复注册CollideCommander");
 
 	//注册Master
 	RegisterPawnMaster(pPawnMaster);
 
 	//注册Commander。
-	m_pPlayerCommander = pPlayerCommander;
+	pPlayerCommander = pPlayerCommander;
 	//添加一个新的玩家控制模式
-	m_playerControlType = m_pPlayerCommander->AddCommandTemplate(
+	m_playerControlType = pPlayerCommander->AddCommandTemplate(
 		std::make_unique<PlayerControlCommandTemplate>());
 
-	m_pBoneCommander = pBoneCommander;
-	//m_pCollideCommander = pCollideCommander;
+	pBoneCommander = pBoneCommander;
+	//pCollideCommander = pCollideCommander;
 }
 
 void PlayerPawn::RegisterPawnMaster(PawnMaster * pPawnMaster)
 {
-	ASSERT(PlayerPawn::m_pPawnMaster == nullptr && "不可重复注册PawnMaster");
+	ASSERT(PlayerPawn::pPawnMaster == nullptr && "不可重复注册PawnMaster");
 	//注册一个CommandTempalte，并且获得一个pawnType。
-	PlayerPawn::m_pawnType = pPawnMaster->AddCommandTemplate(
+	PlayerPawn::pawnType = pPawnMaster->AddCommandTemplate(
 		std::make_unique<PlayerPawnCommandTemplate>());
 
 	//记录PawnMaster
-	PlayerPawn::m_pPawnMaster = pPawnMaster;
+	PlayerPawn::pPawnMaster = pPawnMaster;
 }
 
 PlayerProperty * PlayerPawn::NewProperty()
@@ -95,6 +95,9 @@ PlayerPawnCommandTemplate::~PlayerPawnCommandTemplate()
 BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnUnit * saveUnit, PawnProperty* pProperty, Scence* pScence)
 {
 	PlayerPawn* newPawn = PlayerPawn::m_PlayerPawnAllocator.Malloc();
+
+	newPawn->m_pawnType = PlayerPawn::pawnType;
+
 	//记录存储单位指针。
 	newPawn->m_pSavedUnit = saveUnit;
 
@@ -173,7 +176,7 @@ void PlayerPawnCommandTemplate::AddPlayerControl(PlayerPawn * pPlayerPawn)
 {
 	//ASSERT(pPlayerPawn->m_pPlayerControl == nullptr && "不能对PlayerPawn重复添加玩家控制");
 	pPlayerPawn->m_pPlayerControl =
-		PlayerPawn::m_pPlayerCommander->NewPlayerControl(
+		PlayerPawn::pPlayerCommander->NewPlayerControl(
 			pPlayerPawn->m_playerControlType, pPlayerPawn);
 }
 
@@ -182,27 +185,27 @@ void PlayerPawnCommandTemplate::AddBones(PlayerPawn * pPlayerPawn)
 	//一个根控制器的骨骼。
 	Bone* rootBone = 
 		pPlayerPawn->m_arr_Bones[CONTROLITEM_INDEX_PLAYER_PAWN_ROOT] =
-		PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->RootControl());
+		PlayerPawn::pBoneCommander->NewBone(pPlayerPawn->RootControl());
 
 	//摄像机拍摄目标的骨骼。
 	Bone* cameraTarget
 		= pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_CAMERA_TARGET]
-		= PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->m_pCamera->Target);
+		= PlayerPawn::pBoneCommander->NewBone(pPlayerPawn->m_pCamera->Target);
 
 	//摄像机位置的骨骼。
 	Bone* cameraPos 
 		= pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_CAMERA_POS]
-		= (PlayerPawn::m_pBoneCommander)->NewBone(pPlayerPawn->m_pCamera->Pos);
+		= (PlayerPawn::pBoneCommander)->NewBone(pPlayerPawn->m_pCamera->Pos);
 
 	//炮台骨骼。
 	Bone* battery
 		= pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_BATTERY]
-		= PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->Battery());
+		= PlayerPawn::pBoneCommander->NewBone(pPlayerPawn->Battery());
 
 	//车身骨骼。
 	Bone* mainBody
 		= pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_MAINBODY]
-		= PlayerPawn::m_pBoneCommander->NewBone(pPlayerPawn->MainBody());
+		= PlayerPawn::pBoneCommander->NewBone(pPlayerPawn->MainBody());
 
 	//创建骨骼连接。
 
@@ -219,7 +222,7 @@ void PlayerPawnCommandTemplate::AddBones(PlayerPawn * pPlayerPawn)
 void PlayerPawnCommandTemplate::DeletePlayerControl(PlayerPawn * pPlayerPawn)
 {
 	PlayerPawn* toDeletePawn = (PlayerPawn*)pPlayerPawn;
-	PlayerPawn::m_pPlayerCommander->DeletePlayerControl(toDeletePawn->m_pPlayerControl);
+	PlayerPawn::pPlayerCommander->DeletePlayerControl(toDeletePawn->m_pPlayerControl);
 	pPlayerPawn->m_pPlayerControl = nullptr;
 }
 
@@ -228,7 +231,7 @@ void PlayerPawnCommandTemplate::DeleteBones(PlayerPawn * pPlayerPawn)
 	//遍历骨骼数组，删除所有骨骼。
 	for (int i = 0; i < _countof(pPlayerPawn->m_arr_Bones); ++i) 
 	{
-		PlayerPawn::m_pBoneCommander->DeleteBone(pPlayerPawn->m_arr_Bones[i]);
+		PlayerPawn::pBoneCommander->DeleteBone(pPlayerPawn->m_arr_Bones[i]);
 		pPlayerPawn->m_arr_Bones[i] = nullptr;
 	}
 }
@@ -299,13 +302,32 @@ void PlayerControlCommandTemplate::HitMouseButton_Left(BasePawn * pPawn, const G
 	ASSERT(PlayerPawn::refCarType && "未初始化装甲车的类型标记，无法创建装甲车。");
 
 	//使用装甲车的默认属性进行创建。
-	PlayerPawn::m_pPawnMaster->CreatePawn(PlayerPawn::refCarType, nullptr);
+	PlayerPawn::pPawnMaster->CreatePawn(PlayerPawn::refCarType, nullptr);
 }
 
 void PlayerControlCommandTemplate::HitMouseButton_Right(BasePawn * pPawn, const GameTimer & gt)
 {
-	//待实现……
-	//TODO
+	//从摄像机发出射线，如果撞击到某个物体，销毁它。
+
+	//使用摄像机的目标位置以及方向作为射线的位置和起始方向。
+	auto pPlayer = reinterpret_cast<PlayerPawn*>(pPawn);
+
+	//首先申请一个射线碰撞单元。
+	auto rayDetect = PlayerPawn::pCollideCommander->NewRayDetectUnit(
+		pPlayer->m_pCamera->Target->World,	//射线的起点、以及方向使用摄像机目标的世界变换矩阵。
+		MAX_RAY_LENGTH);			//射线的长度定义。
+
+	//对类型1的碰撞体进行碰撞检测。
+	PlayerPawn::pCollideCommander->CollideDetect(rayDetect, COLLIDE_TYPE_1);
+
+	if (rayDetect.Result.CollideHappended)
+	{
+		//删除碰撞发生的Pawn。
+		PlayerPawn::pPawnMaster->DestroyPawn(PAWN_TYPE_NONE, rayDetect.result.pPawnHolder);
+	}
+
+	//回收射线碰撞单元。
+	PlayerPawn::pCollideCommander->DeleteRayDetectUnit(rayDetect);
 }
 
 void PlayerControlCommandTemplate::PressMouseButton_Left(BasePawn * pPawn, const GameTimer& gt)

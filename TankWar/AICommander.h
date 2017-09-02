@@ -52,7 +52,7 @@ public:
 //故事片段
 struct StoryFragment
 {
-	//状态标志，这个值同时作为数组的序号，-1表示状态非法。
+	//状态标志，这个值同时作为数组的序号，0表示状态非法。
 	AIStatue State = STORY_FRAGMENT_NONE;
 	//随机转到这个状态的可能性。
 	float Posibility = 0.0f;
@@ -89,7 +89,7 @@ public:
 	AICommander& operator = (const AICommander&) = delete;
 	~AICommander();
 
-	//添加控制模板，返回模板类型标志，注意这个返回的类型标志其实就是增加模板之后所有模板的大小。
+	//添加控制模板，返回模板类型标志，注意这个返回的类型标志其实就是增加模板之后所有模板的数量。
 	AIControlType AddAITemplate(std::unique_ptr<AITemplate> pTempalte);
 
 	//新的控制单位。
@@ -98,7 +98,7 @@ public:
 
 	//状态转换检测，针对当前状态执行相应的指令。
 	void AutoNavigate(const GameTimer& gt);
-	//根据对应额AI模板，自动更新指定AI单元的状态，记录AI当前状态已经经过的时间长度。
+	//根据对应的AI模板，自动更新指定AI单元的状态，记录AI当前状态已经经过的时间长度。
 	void Navigate(AIUnit * unit, const GameTimer& gt);
 
 protected:

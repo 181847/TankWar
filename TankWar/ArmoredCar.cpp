@@ -29,8 +29,11 @@ ArmoredCar::~ArmoredCar()
 {
 }
 
-void ArmoredCar::RegisterAll(PawnMaster * pPawnMaster, 
-	AICommander * pAICommander, BoneCommander * pBoneCommander)
+void ArmoredCar::RegisterAll(
+	PawnMaster * pPawnMaster, 
+	AICommander * pAICommander, 
+	BoneCommander * pBoneCommander
+	CollideCommander *	pCollideCommander)
 {
 	ASSERT(ArmoredCar::pAICommander == nullptr && "不可重复注册AICommander");
 	ASSERT(ArmoredCar::pBoneCommander == nullptr && "不可重复注册骨骼Commander");
@@ -39,6 +42,7 @@ void ArmoredCar::RegisterAll(PawnMaster * pPawnMaster,
 
 	ArmoredCar::pAICommander = pAICommander;
 	ArmoredCar::pBoneCommander = pBoneCommander;
+	ArmoredCar::pCollideCommander = pCollideCommander;
 
 	//添加AI控制类型。
 	ArmoredCar::aiControlType = pAICommander->AddAITemplate(
@@ -50,7 +54,7 @@ void ArmoredCar::RegisterPawnMaster(PawnMaster * pPawnMaster)
 	ASSERT(ArmoredCar::pPawnMaster == nullptr && "不可重复注册PawnMaster");
 	ArmoredCar::pPawnMaster = pPawnMaster;
 
-	ArmoredCar::PawnType = pPawnMaster->AddCommandTemplate(
+	ArmoredCar::pawnType = pPawnMaster->AddCommandTemplate(
 		std::make_unique<CarPawnTemplate>());
 }
 
@@ -87,6 +91,8 @@ BasePawn * CarPawnTemplate::CreatePawn(PawnUnit * saveUnit, PawnProperty* pPrope
 
 	ArmoredCar* newPawn = ArmoredCar::PawnAllocator.Malloc();
 
+	newPawn->m_pawnType = ArmoredCar::pawnType;
+
 	//记录存储单位。
 	newPawn->m_pSaveUnit = saveUnit;
 
@@ -116,6 +122,7 @@ BasePawn * CarPawnTemplate::CreatePawn(PawnUnit * saveUnit, PawnProperty* pPrope
 	//添加其他控件
 	AddAIControl(newPawn);
 	AddBones(newPawn);
+	AddCollideRect(newPawn);
 
 	return newPawn;
 }
@@ -163,6 +170,16 @@ void CarPawnTemplate::AddBones(ArmoredCar * pPawn)
 	mainBody->LinkTo(root);
 }
 
+void CarPawnTemplate::AddCollideRect(ArmoredCar * pPawn)
+{
+	//为车身主体创建碰撞盒。
+	pPawn->m_arr_CRects[ COLLIDE_RECT_INDEX_CAR_ROOT ] =
+		ArmoredCar::pCollideCommander->NewCollideRect(
+			COLLIDE_RECT_TYPE_1,		//碰撞体类型标记
+			pPawn->MainBody(),	//拥有碰撞体的ControlItem。
+			pPawn);				//拥有碰撞体的Pawn对象。
+}
+
 void CarPawnTemplate::DeleteAIControl(ArmoredCar * pPawn)
 {
 	ArmoredCar::pAICommander->DeleteAIUnit(pPawn->m_pAIUnit);
@@ -179,6 +196,13 @@ void CarPawnTemplate::DeleteBones(ArmoredCar * pPawn)
 		//指针置空。
 		pPawn->m_arr_Bones[i] = nullptr;
 	}
+}
+
+void CarPawnTemplate::DeleteCollideRect(ArmoredCar * pPawn)
+{
+	ArmoredCar::pCollideCommander->DeleteCollideRect(pPawn->m_arr_CRects[COLLIDE_RECT_INDEX_CAR_ROOT]);
+
+	pPawn->m_arr_CRects[COLLIDE_RECT_INDEX_CAR_ROOT] = nullptr;
 }
 
 //**************************装甲车AI行为模板******************************************************************
@@ -252,9 +276,9 @@ void CarAITemplate::Runing(BasePawn* pPawn, AIStatue state, float consumedTime, 
 void CarAITemplate::move(ArmoredCar * pCar, const GameTimer& gt)
 {
 	//目标类型
-	auto targetType = PlayerPawn::m_pawnType;
+	auto targetType = PlayerPawn::pawnType;
 	//目标所在的pawnMaster。
-	auto pawnMaster = PlayerPawn::m_pPawnMaster;
+	auto pawnMaster = PlayerPawn::pPawnMaster;
 	//存储目标的链表。
 	auto linkedList = 
 		&(pawnMaster->CommandTemplateList[TO_ARRAY_INDEX(targetType)]

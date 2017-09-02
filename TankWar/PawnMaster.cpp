@@ -22,7 +22,7 @@ PawnType PawnMaster::AddCommandTemplate(std::unique_ptr<PawnCommandTemplate> pCo
 
 void PawnMaster::CreatePawn(PawnType pawnType, PawnProperty* pProperty)
 {
-	//命令类型。
+	//记录命令类型。
 	CommandBuffer[UnExecuteeCommandNum].CommandType = 
 		PAWN_COMMAND_TYPE_CREATE;
 	//生成Pawn的类型。
@@ -38,15 +38,15 @@ void PawnMaster::CreatePawn(PawnType pawnType, PawnProperty* pProperty)
 
 void PawnMaster::DestroyPawn(PawnType pawnType, BasePawn * pThePawn)
 {
-	//命令类型。
+	//记录命令类型。
 	CommandBuffer[UnExecuteeCommandNum].CommandType =
 		PAWN_COMMAND_TYPE_DESTORY;
 
-	//要删除的Pawn类型。
+	//记录要删除的Pawn类型。
 	CommandBuffer[UnExecuteeCommandNum].DestoryCommand.pawnType =
-		pawnType;
+		pThePawn->m_pawnType;
 
-	//要删除的Pawn指针。
+	//记录要删除的Pawn指针。
 	CommandBuffer[UnExecuteeCommandNum].DestoryCommand.pPawn_to_destory = 
 		pThePawn;
 
@@ -61,6 +61,8 @@ void PawnMaster::Executee()
 		switch (CommandBuffer[i].CommandType)
 		{
 		case PAWN_COMMAND_TYPE_CREATE:
+
+			ASSERT(CommandBuffer[i].CreateCommand.pawnType);
 			CreatingPawn(i);
 
 			//清空当前命令信息。
@@ -69,6 +71,8 @@ void PawnMaster::Executee()
 			break;
 
 		case PAWN_COMMAND_TYPE_DESTORY:
+
+			ASSERT(CommandBuffer[i].DestoryCommand.pPawn_to_destory);
 			DestoringPawn(i);
 
 			//清空当前命令信息。

@@ -52,6 +52,9 @@
     <Filter Include="App文件\Pawn\ArmoredCar">
       <UniqueIdentifier>{ac403c70-3cf8-4ba2-b0c2-7916e1f1136d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="App文件\Commander\PerFrameCommander">
+      <UniqueIdentifier>{eb8f5029-ee40-4819-8456-b9cd6d332ad3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\Camera.cpp">
@@ -113,6 +116,12 @@
     </ClCompile>
     <ClCompile Include="AICommander.cpp">
       <Filter>App文件\Commander\AICommander</Filter>
+    </ClCompile>
+    <ClCompile Include="PerFrameCommander.cpp">
+      <Filter>App文件\Commander\PerFrameCommander</Filter>
+    </ClCompile>
+    <ClCompile Include="Collidecommander.cpp">
+      <Filter>App文件\Commander\CollideCommander</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -193,6 +202,12 @@
     </ClInclude>
     <ClInclude Include="AICommander.h">
       <Filter>App文件\Commander\AICommander</Filter>
+    </ClInclude>
+    <ClInclude Include="PerFrameCommander.h">
+      <Filter>App文件\Commander\PerFrameCommander</Filter>
+    </ClInclude>
+    <ClInclude Include="Collidecommander.h">
+      <Filter>App文件\Commander\CollideCommander</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

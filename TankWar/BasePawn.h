@@ -27,4 +27,7 @@ public:
 	//如果在BasePawn中设置这个静态属性，将会使得子类的所有Type都是一样的。
 	//所以必须子类自己声明一个静态属性，表示Type。
 	static PawnType GetType();
+
+public:
+	PawnType m_pawnType;
 };

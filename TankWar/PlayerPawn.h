@@ -26,6 +26,9 @@
 //车身
 #define BONE_INDEX_PLAYER_PAWN_MAINBODY 4
 
+//射线最大长度
+#define MAX_RAY_LENGTH 500
+
 
 //玩家属性定义
 struct PlayerProperty : public PawnProperty
@@ -45,15 +48,15 @@ public:
 //这一部分负责关于PlayerPawn类的静态属性
 public :
 	//在PawnMaster中的类型标识。
-	static PawnType m_pawnType;
+	static PawnType pawnType;
 	//玩家的控制模式。
 	static PlayerControlType m_playerControlType;
 
 	//负责本类生成和销毁指令的PawnMaster。
-	static PawnMaster *			m_pPawnMaster;
-	static PlayerCommander *	m_pPlayerCommander;
-	static BoneCommander *		m_pBoneCommander;
-	//static CollideCommander *	m_pCollideCommander;
+	static PawnMaster *			pPawnMaster;
+	static PlayerCommander *	pPlayerCommander;
+	static BoneCommander *		pBoneCommander;
+	static CollideCommander *	pCollideCommander;
 
 	//属性分配池
 	static MyStaticAllocator<PlayerProperty> m_propertyAllocator;
@@ -67,9 +70,9 @@ public:
 	//执行所有注册方法，包括下面的注册PawnMaster。
 	static void RegisterAll(
 		PawnMaster *		pPawnMaster, 
-		PlayerCommander *	m_pPlayerCommander, 
+		PlayerCommander *	pPlayerCommander, 
 		BoneCommander *		pBoneCommander
-	//	, CollideCommander *	pCollideCommander
+		, CollideCommander *	pCollideCommander
 	);
 	//注册PawnMaster，并从PawnMaster中获取一个PawnType。
 	static void RegisterPawnMaster(PawnMaster * pPawnMaster);
