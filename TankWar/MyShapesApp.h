@@ -9,6 +9,8 @@
 #include "PlayerCommander.h"
 #include "BoneCommander.h"
 #include "AICommander.h"
+#include "CollideCommander.h"
+
 #include "PlayerPawn.h"
 #include "ArmoredCar.h"
 #include "ObjReader.h"
@@ -207,6 +209,8 @@ private:
 #define COMMANDER_FOLLOW_MAX_COMMANDS 1000
 //AICommander最多可控制多少个AI对象。
 #define COMMANDER_AI_UNIT_MAX_NUM 100
+//碰撞区域中最多有多少个射线
+#define COMMANDER_COLLIDE_MAX_RAY_NUM 200
 //最多有多少个碰撞体。
 #define COMMANDER_COLLIDE_MAX_NUM 2000
 
@@ -219,11 +223,11 @@ public:
 	void BuildPlayerCommander();
 	void BuildAICommander();
 	void BuildBoneCommander();
+	void BuildCollideCommander();
 	//创建Scence中所有需要用到的网格，这些网格全部从Obj文件中读取，
 	//一个Obj文件作为一个单独的MeshGeometry，
 	//一个Obj文件中单独的几何体作为其对应的一个SubMesh。
 	void BuildShapeGeometry_for_Scence();
-	//void BuildCollideCommander();
 
 	//注册Pawn类到各个需要的PawnMaster和Commander中。
 	void RegisterPawnClass();
@@ -246,6 +250,6 @@ public:
 	std::unique_ptr<PlayerCommander> m_pPlayerCommander;
 	std::unique_ptr<AICommander> m_pAICommander;
 	std::unique_ptr<BoneCommander> m_pBoneCommander;
-	//std::unique_ptr<CollideCommander> m_collideCommander;
+	std::unique_ptr<CollideCommander> m_pCollideCommander;
 	//*******************************************游戏代码定义部分**************************************************************************************************************************************************
 };

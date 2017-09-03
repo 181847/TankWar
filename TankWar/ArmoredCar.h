@@ -4,7 +4,7 @@
 #include "BoneCommander.h"
 #include "PlayerPawn.h"
 #include "AICommander.h"
-#include "Collidecommander.h"
+#include "CollideCommander.h"
 
 //最大的装甲车数量
 #define MAX_PAWN_CAR_NUM 60
@@ -24,7 +24,7 @@
 //碰撞体的数量。
 #define COLLIDE_RECT_NUM_ARMORED_CAR 1
 //根碰撞体序号
-#define COLLIDE_RECT_INDEX_CAR_ROOT 1
+#define COLLIDE_RECT_INDEX_CAR_ROOT 0
 
 //车身移动状态标志。
 #define STORY_FRAGMENT_CAR_MOVE 1
@@ -103,7 +103,7 @@ protected:
 	//所有骨骼，骨骼对应ControlItem。
 	Bone*			m_arr_Bones[CONTROLITEM_NUM_ARMORED_CAR];
 	//所有碰撞体。
-	CollideRect*	m_arr_CRects[COLLIDE_RECT_NUM_ARMORED_CAR];
+	CollideBox*	m_arr_CBoxes[COLLIDE_RECT_NUM_ARMORED_CAR];
 
 public:
 	//指向这个PlayerPawn对象的相关游戏属性，比如前进速度，车身旋转速度，炮弹冷却时间……
@@ -115,6 +115,9 @@ public:
 	ControlItem * RootControl();
 	//车身控制器，控制车身方向。
 	ControlItem * MainBody();
+
+	//根部的碰撞盒。
+	CollideBox * RootBox();
 };
 
 
@@ -138,11 +141,11 @@ protected:
 	//在BoneCommander中添加骨骼。
 	void AddBones			(ArmoredCar* pPawn);
 	//申请碰撞单元。
-	void AddCollideRect		(ArmoredCar* pPawn);
+	void AddCollideBoxes	(ArmoredCar* pPawn);
 
 	void DeleteAIControl	(ArmoredCar* pPawn);
 	void DeleteBones		(ArmoredCar* pPawn);
-	void DeleteCollideRect(ArmoredCar* pPawn);
+	void DeleteCollideBoxes(ArmoredCar* pPawn);
 };
 
 //AI控制模板。

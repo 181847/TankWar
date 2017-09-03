@@ -120,7 +120,7 @@
     <ClCompile Include="PerFrameCommander.cpp">
       <Filter>App文件\Commander\PerFrameCommander</Filter>
     </ClCompile>
-    <ClCompile Include="Collidecommander.cpp">
+    <ClCompile Include="CollideCommander.cpp">
       <Filter>App文件\Commander\CollideCommander</Filter>
     </ClCompile>
   </ItemGroup>
@@ -206,7 +206,7 @@
     <ClInclude Include="PerFrameCommander.h">
       <Filter>App文件\Commander\PerFrameCommander</Filter>
     </ClInclude>
-    <ClInclude Include="Collidecommander.h">
+    <ClInclude Include="CollideCommander.h">
       <Filter>App文件\Commander\CollideCommander</Filter>
     </ClInclude>
   </ItemGroup>

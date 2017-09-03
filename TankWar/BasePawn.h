@@ -1,7 +1,6 @@
 #pragma once
 #include "Scence.h"
 
-
 //用一个整数来标记一个Pawn的类型，
 //PawnType必须从PawnMaster中获得。
 typedef unsigned int PawnType;

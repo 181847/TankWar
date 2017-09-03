@@ -3,6 +3,7 @@
 #include "PawnMaster.h"
 #include "PlayerCommander.h"
 #include "BoneCommander.h"
+#include "CollideCommander.h"
 
 //可生成的PawnPlayer的数量
 #define MAX_PLAYER_PAWN_NUM ((unsigned int)5)

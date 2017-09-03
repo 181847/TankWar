@@ -157,7 +157,7 @@
     <ClCompile Include="ArmoredCar.cpp" />
     <ClCompile Include="BasePawn.cpp" />
     <ClCompile Include="BoneCommander.cpp" />
-    <ClCompile Include="Collidecommander.cpp" />
+    <ClCompile Include="CollideCommander.cpp" />
     <ClCompile Include="ControlItem.cpp" />
     <ClCompile Include="FrameResource.cpp" />
     <ClCompile Include="MyShapesApp.cpp" />
@@ -183,7 +183,7 @@
     <ClInclude Include="ArmoredCar.h" />
     <ClInclude Include="BasePawn.h" />
     <ClInclude Include="BoneCommander.h" />
-    <ClInclude Include="Collidecommander.h" />
+    <ClInclude Include="CollideCommander.h" />
     <ClInclude Include="DeLinkedList.h" />
     <ClInclude Include="FrameResource.h" />
     <ClInclude Include="LinkedAllocator.h" />

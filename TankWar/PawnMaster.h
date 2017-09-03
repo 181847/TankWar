@@ -19,6 +19,7 @@ class PawnCommandTemplate
 {
 public:
 	PawnCommandTemplate(UINT maxPawnNum);
+	PawnCommandTemplate() = delete;
 	PawnCommandTemplate(const PawnCommandTemplate&) = delete;
 	PawnCommandTemplate& operator = (const PawnCommandTemplate&) = delete;
 	~PawnCommandTemplate();

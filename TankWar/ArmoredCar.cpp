@@ -2,23 +2,25 @@
 
 //初始化静态成员
 //Pawn类型
-PawnType		ArmoredCar::PawnType = PAWN_TYPE_NONE;
-//负责生成PawnMaster。
-PawnMaster *	ArmoredCar::pPawnMaster		= nullptr;
-//AI指令官。
-AICommander *	ArmoredCar::pAICommander	= nullptr;
-//骨骼指令官。
-BoneCommander *	ArmoredCar::pBoneCommander	= nullptr;
-//Pawn分配器。
-MyStaticAllocator<CarProperty> ArmoredCar::PropertyAllocator(MAX_PAWN_CAR_NUM);
-//属性分配器。
-MyStaticAllocator<ArmoredCar> ArmoredCar::PawnAllocator(MAX_PAWN_CAR_NUM);
+PawnType						ArmoredCar::pawnType			= PAWN_TYPE_NONE;
 //AI操作单元类型
-AIControlType ArmoredCar::aiControlType = AI_CONTROL_TYPE_NONE;
+AIControlType					ArmoredCar::aiControlType		= AI_CONTROL_TYPE_NONE;
+//负责生成PawnMaster。
+PawnMaster *					ArmoredCar::pPawnMaster			= nullptr;
+//AI指令官。
+AICommander *					ArmoredCar::pAICommander		= nullptr;
+//骨骼指令官。
+BoneCommander *					ArmoredCar::pBoneCommander		= nullptr;
+//碰撞指令官。
+CollideCommander *				ArmoredCar::pCollideCommander	= nullptr;
+//Pawn分配器。
+MyStaticAllocator<CarProperty>	ArmoredCar::PropertyAllocator	(MAX_PAWN_CAR_NUM);
+//属性分配器。
+MyStaticAllocator<ArmoredCar>	ArmoredCar::PawnAllocator		(MAX_PAWN_CAR_NUM);
 
 //初始化默认属性
-const float CarProperty_default_MoveSpeed = 2.0f;
-const float CarProperty_default_RotationSpeed = 2.0f;
+const float CarProperty_default_MoveSpeed		= 2.0f;
+const float CarProperty_default_RotationSpeed	= 2.0f;
 
 ArmoredCar::ArmoredCar()
 {
@@ -32,7 +34,7 @@ ArmoredCar::~ArmoredCar()
 void ArmoredCar::RegisterAll(
 	PawnMaster * pPawnMaster, 
 	AICommander * pAICommander, 
-	BoneCommander * pBoneCommander
+	BoneCommander * pBoneCommander,
 	CollideCommander *	pCollideCommander)
 {
 	ASSERT(ArmoredCar::pAICommander == nullptr && "不可重复注册AICommander");
@@ -71,6 +73,11 @@ ControlItem * ArmoredCar::RootControl()
 ControlItem * ArmoredCar::MainBody()
 {
 	return m_arr_ControlItem[CONTROLITEM_INDEX_CAR_MAIN_BODY];
+}
+
+CollideBox * ArmoredCar::RootBox()
+{
+	return m_arr_CBoxes[COLLIDE_RECT_INDEX_CAR_ROOT];
 }
 
 
@@ -122,7 +129,7 @@ BasePawn * CarPawnTemplate::CreatePawn(PawnUnit * saveUnit, PawnProperty* pPrope
 	//添加其他控件
 	AddAIControl(newPawn);
 	AddBones(newPawn);
-	AddCollideRect(newPawn);
+	AddCollideBoxes(newPawn);
 
 	return newPawn;
 }
@@ -170,14 +177,23 @@ void CarPawnTemplate::AddBones(ArmoredCar * pPawn)
 	mainBody->LinkTo(root);
 }
 
-void CarPawnTemplate::AddCollideRect(ArmoredCar * pPawn)
+void CarPawnTemplate::AddCollideBoxes(ArmoredCar * pPawn)
 {
 	//为车身主体创建碰撞盒。
-	pPawn->m_arr_CRects[ COLLIDE_RECT_INDEX_CAR_ROOT ] =
-		ArmoredCar::pCollideCommander->NewCollideRect(
-			COLLIDE_RECT_TYPE_1,		//碰撞体类型标记
-			pPawn->MainBody(),	//拥有碰撞体的ControlItem。
-			pPawn);				//拥有碰撞体的Pawn对象。
+	CollideBox* pRootBox 
+		=	pPawn->m_arr_CBoxes[ COLLIDE_RECT_INDEX_CAR_ROOT ] 
+		=	ArmoredCar::pCollideCommander->NewCollideBox(
+				COLLIDE_TYPE_BOX_1,		//碰撞体类型标记
+				pPawn->MainBody(),	//拥有碰撞体的ControlItem。
+				pPawn);				//拥有碰撞体的Pawn对象。
+
+	//修改碰撞盒的大小。
+	pRootBox->Size.Xmin = -5;	pRootBox->Size.Xmax = 5;
+	pRootBox->Size.Ymin = -1;	pRootBox->Size.Ymax = 1;
+	pRootBox->Size.Zmin = -5;	pRootBox->Size.Zmax = 5;
+
+	//重新计算包围盒的球体半径。
+	pRootBox->CaculateRadius();
 }
 
 void CarPawnTemplate::DeleteAIControl(ArmoredCar * pPawn)
@@ -198,11 +214,11 @@ void CarPawnTemplate::DeleteBones(ArmoredCar * pPawn)
 	}
 }
 
-void CarPawnTemplate::DeleteCollideRect(ArmoredCar * pPawn)
+void CarPawnTemplate::DeleteCollideBoxes(ArmoredCar * pPawn)
 {
-	ArmoredCar::pCollideCommander->DeleteCollideRect(pPawn->m_arr_CRects[COLLIDE_RECT_INDEX_CAR_ROOT]);
+	ArmoredCar::pCollideCommander->DeleteCollideBox(pPawn->m_arr_CBoxes[COLLIDE_RECT_INDEX_CAR_ROOT]);
 
-	pPawn->m_arr_CRects[COLLIDE_RECT_INDEX_CAR_ROOT] = nullptr;
+	pPawn->m_arr_CBoxes[COLLIDE_RECT_INDEX_CAR_ROOT] = nullptr;
 }
 
 //**************************装甲车AI行为模板******************************************************************
@@ -331,15 +347,20 @@ void CarAITemplate::MoveToward(ArmoredCar * pCar, XMFLOAT4 targetLocation, const
 {
 	XMFLOAT4 curr(pCar->RootControl()->World.m[3]);
 
-	XMVECTOR targetV = XMLoadFloat4(&targetLocation);
-	XMVECTOR currV= XMLoadFloat4(&curr);
+	XMVECTOR targetV	= XMLoadFloat4(&targetLocation);
+	XMVECTOR currV		= XMLoadFloat4(&curr);
 
-	float speed = pCar->m_pProperty->MoveSpeed;
+	float speed = 
+		pCar->m_pProperty->MoveSpeed;
 
 	//生成到指定位置的位移向量。
-	targetV = gt.DeltaTime() * speed * XMVector4Normalize(targetV - currV);
+	targetV = gt.DeltaTime() 
+		* speed 
+		* XMVector4Normalize(targetV - currV);
 
 	XMStoreFloat4(&curr, targetV);
-	pCar->RootControl()->MoveXYZ(curr.x, curr.y, curr.z);
+	pCar
+		->RootControl()
+		->MoveXYZ(curr.x, curr.y, curr.z);
 
 }

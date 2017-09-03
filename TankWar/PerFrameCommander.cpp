@@ -1,11 +1,10 @@
 #include "PerFrameCommander.h"
 
 
-
-PerFrameCommander::PerFrameCommander()
+PerFrameCommander::PerFrameCommander(UINT MaxUnitCount)
+	:UnitAllocator(MaxUnitCount)
 {
 }
-
 
 PerFrameCommander::~PerFrameCommander()
 {

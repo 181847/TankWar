@@ -24,7 +24,7 @@ public:
 class PerFrameCommander
 {
 public:
-	PerFrameCommander();
+	PerFrameCommander(UINT MaxUnitCount);
 	PerFrameCommander(const PerFrameCommander&) = delete;
 	PerFrameCommander& operator = (const PerFrameCommander&) = delete;
 	~PerFrameCommander();
