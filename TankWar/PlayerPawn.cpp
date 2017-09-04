@@ -14,7 +14,7 @@ BoneCommander *						PlayerPawn::pBoneCommander			= nullptr;
 //碰撞指令官。
 CollideCommander *					PlayerPawn::pCollideCommander		= nullptr;
 MyStaticAllocator<PlayerProperty>	PlayerPawn::m_propertyAllocator		(MAX_PLAYER_PAWN_NUM);
-MyStaticAllocator<PlayerPawn>		PlayerPawn::m_PlayerPawnAllocator	(MAX_PLAYER_PAWN_NUM);
+LinkedAllocator<PlayerPawn>			PlayerPawn::m_PlayerPawnAllocator	(MAX_PLAYER_PAWN_NUM);
 //参考装甲车类型标记，这个类型标记用来实现点击鼠标左键然后生成装甲车的效果
 PawnType							PlayerPawn::refCarType				= PAWN_TYPE_NONE;
 
@@ -47,7 +47,7 @@ void PlayerPawn::RegisterAll(
 		std::make_unique<PlayerControlCommandTemplate>());
 
 	PlayerPawn::pBoneCommander = pBoneCommander;
-	//pCollideCommander = pCollideCommander;
+	PlayerPawn::pCollideCommander = pCollideCommander;
 }
 
 void PlayerPawn::RegisterPawnMaster(PawnMaster * pPawnMaster)
@@ -92,28 +92,29 @@ PlayerPawnCommandTemplate::~PlayerPawnCommandTemplate()
 {
 }
 
-BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnUnit * saveUnit, PawnProperty* pProperty, Scence* pScence)
+BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnProperty* pProperty, Scence* pScence)
 {
 	PlayerPawn* newPawn = PlayerPawn::m_PlayerPawnAllocator.Malloc();
 
 	newPawn->m_pawnType = PlayerPawn::pawnType;
-
-	//记录存储单位指针。
-	newPawn->m_pSavedUnit = saveUnit;
 
 	//记录属性。
 	newPawn->m_pProperty = reinterpret_cast<PlayerProperty*>(pProperty);
 	//从场景中创建摄像机，把摄像机存储到Player中。
 	newPawn->m_pCamera = pScence->AppendCamera();
 
-	newPawn->m_pCamera->Target->Translation = { 0.0f, 2.0f, 0.0f };
+	newPawn->m_pCamera->Target->Translation = { 0.0f, 3.0f, 0.0f };
 
 	//修改摄像机的局部坐标，避免再后来的更新中和摄像机的目标重合，引发异常。
-	newPawn->m_pCamera->Pos->Translation = { 0.0f, 0.0f, -5.0f };
+	newPawn->m_pCamera->Pos->Translation = { 0.0f, 0.0f, -10.0f };
 	//修改摄像机的世界矩阵中的平移，因为摄像机真正更新到世界至观察矩阵中的数据是世界矩阵的平移，
 	//而摄像机目标和位置的世界矩阵都是单位矩阵，平移相同，第一次世界至观察矩阵时会引发一场，
 	//这里临时修改一次世界平移坐标，因为在后来会从局部坐标中获得信息。
 	newPawn->m_pCamera->Pos->World._41 = 1.0f;
+	//显示摄像机目标的十字形定位器。
+	newPawn->m_pCamera->Target->Show();
+	//隐藏摄像机位置的定位器。
+	newPawn->m_pCamera->Pos->Hide();
 
 	//根节点控制器分配一个可控制的额网格物体。
 	newPawn->m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_ROOT] =
@@ -125,13 +126,13 @@ BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnUnit * saveUnit, PawnPropert
 
 	//为炮台分配一个ControlItem。
 	newPawn->m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_BATTERY] =
-		pScence->NewControlItem("Tank", "Box006", "box");
+		pScence->NewControlItem("Tank_2", "Battery", "box");
 	//炮台先向上移动一点距离。
-	newPawn->Battery()->MoveY(1.0f);
+	//newPawn->Battery()->MoveY(1.0f);
 
 	newPawn->m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_MAINBODY] =
-		pScence->NewControlItem("Tank", "Box005", "cylinder");
-	newPawn->MainBody()->MoveY(1.0f);
+		pScence->NewControlItem("Tank_2", "MainBody", "cylinder");
+	//newPawn->MainBody()->MoveY(1.0f);
 
 	//添加玩家控制。
 	AddPlayerControl(newPawn);
@@ -145,7 +146,7 @@ BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnUnit * saveUnit, PawnPropert
 	return newPawn;
 }
 
-PawnUnit* PlayerPawnCommandTemplate::DestoryPawn(BasePawn* pPawn, Scence* pScence)
+void PlayerPawnCommandTemplate::DestoryPawn(BasePawn* pPawn, Scence* pScence)
 {
 	PlayerPawn* toDeletePawn = (PlayerPawn*)pPawn;
 
@@ -168,8 +169,6 @@ PawnUnit* PlayerPawnCommandTemplate::DestoryPawn(BasePawn* pPawn, Scence* pScenc
 	//回收Pawn对象。
 	PlayerPawn::m_PlayerPawnAllocator.Free(toDeletePawn);
 
-	//返回存储单元指针。
-	return toDeletePawn->m_pSavedUnit;
 }
 
 void PlayerPawnCommandTemplate::AddPlayerControl(PlayerPawn * pPlayerPawn)

@@ -88,35 +88,32 @@ void CollideCommander::CollideDetect(RayDetect * ray_input_and_output, CollideTy
 		//的时候才进行检查。
 		if (pNode->element.Type != detectType || detectType != COLLIDE_TYPE_ALL)
 		{
-			//跳过本次循环。
-			continue;
-		}
+			RayCheckWithSphere(
+				ray_input_and_output,
+				&pNode->element,
+				ic,				//获取是否发生了碰撞。
+				loc,					//获取碰撞的坐标。
+				tmin);					//碰撞到射线的距离。
 
-		RayCheckWithSphere(
-			ray_input_and_output, 
-			&pNode->element, 
-			isCollided,				//获取是否发生了碰撞。
-			loc,					//获取碰撞的坐标。
-			tmin);					//碰撞到射线的距离。
-
-		if (ic && isCollided && tl < tmin)
-		{
-			//本次发生碰撞。
-			//曾经发生过一次碰撞。
-			//此次的碰撞相比于上一次的距离更近。
-			//更新碰撞结果。
-			ray_input_and_output->Result.CollideLocation = loc;
-			tmin = tl;
-			ray_input_and_output->Result.pCollideBox = &pNode->element;
-		}
-		else if(ic && !isCollided)
-		{
-			//本次发生碰撞。
-			//过去没有发生过碰撞。
-			ray_input_and_output->Result.CollideLocation = loc;
-			tmin = tl;
-			ray_input_and_output->Result.pCollideBox = &pNode->element;
-			isCollided = true;
+			if (ic && isCollided && tl < tmin)
+			{
+				//本次发生碰撞。
+				//曾经发生过一次碰撞。
+				//此次的碰撞相比于上一次的距离更近。
+				//更新碰撞结果。
+				ray_input_and_output->Result.CollideLocation = loc;
+				tmin = tl;
+				ray_input_and_output->Result.pCollideBox = &pNode->element;
+			}
+			else if (ic && !isCollided)
+			{
+				//本次发生碰撞。
+				//过去没有发生过碰撞。
+				ray_input_and_output->Result.CollideLocation = loc;
+				tmin = tl;
+				ray_input_and_output->Result.pCollideBox = &pNode->element;
+				isCollided = true;
+			}
 		}
 
 		pNode = pNode->m_pNext;
@@ -130,7 +127,7 @@ void CollideCommander::CollideDetect(RayDetect * ray_input_and_output, CollideTy
 }
 
 void CollideCommander::RayCheckWithSphere(RayDetect * rayDetect, CollideBox * pBox,
-	bool & isCollided, XMFLOAT3 & location, float tl)
+	bool & isCollided, XMFLOAT3 & location, float& tl)
 {
 	//射线的世界矩阵。
 	XMMATRIX ray = XMLoadFloat4x4(&rayDetect->controlPD->World);
@@ -148,7 +145,7 @@ void CollideCommander::RayCheckWithSphere(RayDetect * rayDetect, CollideBox * pB
 	//计算射线向量，默认Z轴正向是射线的起始方向
 	XMFLOAT4 rayVectorFloat4 = { 0, 0, 1, 0 };
 	XMVECTOR rayVector = XMLoadFloat4(&rayVectorFloat4);
-	rayVector = XMVector3Transform(rayVector, ray);
+	rayVector = XMVector4Transform(rayVector, ray);
 
 	//计算包围球中心到射线线段的垂直距离的平方。
 	locVector = XMVector3Cross(locVector, rayVector);
@@ -171,7 +168,7 @@ void CollideCommander::RayCheckWithSphere(RayDetect * rayDetect, CollideBox * pB
 }
 
 void CollideCommander::RayCollideCheck(RayDetect * rayDetect, CollideBox * pBox, 
-	bool & isCollided, XMFLOAT3 & location, float tl)
+	bool & isCollided, XMFLOAT3 & location, float& tl)
 {
 	//射线的世界矩阵。
 	XMMATRIX ray = XMLoadFloat4x4(&rayDetect->controlPD->World);

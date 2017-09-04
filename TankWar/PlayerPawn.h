@@ -62,7 +62,7 @@ public :
 	//属性分配池
 	static MyStaticAllocator<PlayerProperty> m_propertyAllocator;
 	//类对象分配池
-	static MyStaticAllocator<PlayerPawn> m_PlayerPawnAllocator;
+	static LinkedAllocator<PlayerPawn> m_PlayerPawnAllocator;
 
 	//特殊的静态属性，标记一个装甲车的创建类型，当用户按下鼠标左键的时候就可以创建一个ArmoredCarPawn。
 	static PawnType refCarType;
@@ -121,10 +121,10 @@ public:
 	~PlayerPawnCommandTemplate();
 
 public:
-	virtual BasePawn* CreatePawn(PawnUnit * saveUnit, PawnProperty* pProperty, Scence* pScence);
+	virtual BasePawn* CreatePawn(PawnProperty* pProperty, Scence* pScence);
 	//pPawn是一个动态分配的内存，在销毁对应的Pawn之后，DestoryPawn需要自行释放这个内存到m_playerAllocator，
 	//同时Pawn中的PawnProperty也需要被放回对应的内存池内。
-	virtual PawnUnit* DestoryPawn(BasePawn* pPawn, Scence* pScence);
+	virtual void DestoryPawn(BasePawn* pPawn, Scence* pScence);
 
 protected:
 	//在PlayerCommander添加一个玩家的控制器。

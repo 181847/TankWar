@@ -26,14 +26,14 @@ public:
 
 public:
 	//pDesc是一个动态分配的内存，CreatePawn需要自行释放这个内存。
-	virtual BasePawn* CreatePawn(PawnUnit * saveUnit, PawnProperty* pProperty, Scence* pScence) = 0;
+	virtual BasePawn* CreatePawn(PawnProperty* pProperty, Scence* pScence) = 0;
 	//pPawn是一个动态分配的内存，在销毁对应的Pawn之后，DestoryPawn需要自行释放这个内存。
 	//返回这个Pawn对应的存储单位。
-	virtual PawnUnit* DestoryPawn(BasePawn* pPawn, Scence* pScence) = 0;
+	virtual void DestoryPawn(BasePawn* pPawn, Scence* pScence) = 0;
 
 public:
 	//存储所有从这个commandTemplate生成的pawn对象。
-	LinkedAllocator<PawnUnit> Manager;
+	//LinkedAllocator<PawnUnit> Manager;
 };
 
 struct PawnCommand 

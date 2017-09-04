@@ -1119,6 +1119,12 @@ void MyShapesApp::BuildShapeGeometry_for_Scence()
 	//从指定的文件读取顶点信息，然后向mGeometries添加提取的子网格，
 	//一个文件中的子网格放到同一个Geometry中。
 	AddGeometry("Tank");
+
+	//主要的坦克网格。
+	AddGeometry("Tank_2");
+
+	//十字形的定位器网格。
+	AddGeometry("Allocator");
 }
 
 //void MyShapesApp::BuildCollideCommander()

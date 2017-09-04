@@ -92,7 +92,7 @@ CarPawnTemplate::~CarPawnTemplate()
 {
 }
 
-BasePawn * CarPawnTemplate::CreatePawn(PawnUnit * saveUnit, PawnProperty* pProperty, Scence* pScence)
+BasePawn * CarPawnTemplate::CreatePawn(PawnProperty* pProperty, Scence* pScence)
 {
 	auto pCarProperty = reinterpret_cast<CarProperty*>(pProperty);
 
@@ -100,8 +100,10 @@ BasePawn * CarPawnTemplate::CreatePawn(PawnUnit * saveUnit, PawnProperty* pPrope
 
 	newPawn->m_pawnType = ArmoredCar::pawnType;
 
-	//记录存储单位。
-	newPawn->m_pSaveUnit = saveUnit;
+	if (newPawn->m_pawnType > 50)
+	{
+		newPawn->m_pawnType = ArmoredCar::pawnType;
+	}
 
 	if (pProperty == nullptr)
 	{
@@ -134,7 +136,7 @@ BasePawn * CarPawnTemplate::CreatePawn(PawnUnit * saveUnit, PawnProperty* pPrope
 	return newPawn;
 }
 
-PawnUnit* CarPawnTemplate::DestoryPawn(BasePawn * pPawn, Scence * pScence)
+void CarPawnTemplate::DestoryPawn(BasePawn * pPawn, Scence * pScence)
 {
 	ArmoredCar* pCar = reinterpret_cast<ArmoredCar*>(pPawn);
 
@@ -151,11 +153,10 @@ PawnUnit* CarPawnTemplate::DestoryPawn(BasePawn * pPawn, Scence * pScence)
 	//删除其他控件
 	DeleteAIControl(pCar);
 	DeleteBones(pCar);
+	DeleteCollideBoxes(pCar);
 
 	//回收Pawn空间
 	ArmoredCar::PawnAllocator.Free(pCar);
-
-	return pCar->m_pSaveUnit;
 }
 
 void CarPawnTemplate::AddAIControl(ArmoredCar * pPawn)
@@ -179,6 +180,9 @@ void CarPawnTemplate::AddBones(ArmoredCar * pPawn)
 
 void CarPawnTemplate::AddCollideBoxes(ArmoredCar * pPawn)
 {
+	//TODO
+	PawnType pre = pPawn->m_pawnType;
+
 	//为车身主体创建碰撞盒。
 	CollideBox* pRootBox 
 		=	pPawn->m_arr_CBoxes[ COLLIDE_RECT_INDEX_CAR_ROOT ] 
@@ -187,10 +191,17 @@ void CarPawnTemplate::AddCollideBoxes(ArmoredCar * pPawn)
 				pPawn->MainBody(),	//拥有碰撞体的ControlItem。
 				pPawn);				//拥有碰撞体的Pawn对象。
 
+	PawnType aft = pPawn->m_pawnType;
+
+	if (pre != aft)
+	{
+		pPawn->m_pawnType = pre;
+	}
+
 	//修改碰撞盒的大小。
-	pRootBox->Size.Xmin = -5;	pRootBox->Size.Xmax = 5;
-	pRootBox->Size.Ymin = -1;	pRootBox->Size.Ymax = 1;
-	pRootBox->Size.Zmin = -5;	pRootBox->Size.Zmax = 5;
+	pRootBox->Size.Xmin = -0.5f;	pRootBox->Size.Xmax = 0.5f;
+	pRootBox->Size.Ymin = -0.2f;	pRootBox->Size.Ymax = 0.2f;
+	pRootBox->Size.Zmin = -0.5f;	pRootBox->Size.Zmax = 0.5f;
 
 	//重新计算包围盒的球体半径。
 	pRootBox->CaculateRadius();
@@ -295,17 +306,14 @@ void CarAITemplate::move(ArmoredCar * pCar, const GameTimer& gt)
 	auto targetType = PlayerPawn::pawnType;
 	//目标所在的pawnMaster。
 	auto pawnMaster = PlayerPawn::pPawnMaster;
-	//存储目标的链表。
-	auto linkedList = 
-		&(pawnMaster->CommandTemplateList[TO_ARRAY_INDEX(targetType)]
-			->Manager);
+	;
 
-	auto pHead = linkedList->GetHead();
+	auto pHead = PlayerPawn::m_PlayerPawnAllocator.GetHead();
 	auto pNode = pHead->m_pNext;
 	while (pNode != pHead)
 	{
 		//获取BasePawn指针。
-		auto pPawn = pNode->element.pSavedPawn;
+		auto pPawn = &pNode->element;
 
 		//转换为指定的类型。
 		PlayerPawn* pPlayer = reinterpret_cast<PlayerPawn*>(pPawn);

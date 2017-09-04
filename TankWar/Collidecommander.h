@@ -128,14 +128,14 @@ public:
 		//input
 		RayDetect* ray, CollideBox* pBox, 
 		//output
-		bool& isCollided, XMFLOAT3& location, float tl);
+		bool& isCollided, XMFLOAT3& location, float& tl);
 
 	//检查射线是否和碰撞盒碰撞。
 	void RayCollideCheck(
 		//input
 		RayDetect* ray, CollideBox* pBox,
 		//output
-		bool& isCollided, XMFLOAT3& location, float tl);
+		bool& isCollided, XMFLOAT3& location, float& tl);
 
 	//对只含有旋转和平移的矩阵取逆。
 	void inv(XMFLOAT4X4& matrixWith_R_T);

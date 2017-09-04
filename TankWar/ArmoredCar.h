@@ -130,10 +130,10 @@ public:
 	~CarPawnTemplate();
 
 public:
-	virtual BasePawn* CreatePawn(PawnUnit * saveUnit, PawnProperty* pProperty, Scence* pScence);
+	virtual BasePawn* CreatePawn(PawnProperty* pProperty, Scence* pScence);
 	//pPawn是一个动态分配的内存，在销毁对应的Pawn之后，DestoryPawn需要自行释放这个内存到pPlayerAllocator，
 	//同时Pawn中的PawnProperty也需要被放回对应的内存池内。
-	virtual PawnUnit* DestoryPawn(BasePawn* pPawn, Scence* pScence);
+	virtual void DestoryPawn(BasePawn* pPawn, Scence* pScence);
 
 protected:
 	//在AICommander添加一个自动控制单元。

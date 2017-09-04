@@ -103,8 +103,10 @@ MyCamera * Scence::AppendCamera()
 	ASSERT(m_pCamera == nullptr);
 	m_pCamera = new MyCamera();
 	m_pCamera->Id = 0;
-	m_pCamera->Pos = m_controlItemAllocator.Malloc();
-	m_pCamera->Target = m_controlItemAllocator.Malloc();
+	//m_pCamera->Pos = m_controlItemAllocator.Malloc();
+	//m_pCamera->Target = m_controlItemAllocator.Malloc();
+	m_pCamera->Pos = NewControlItem("Allocator", "Allocator", "box");
+	m_pCamera->Target = NewControlItem("Allocator", "Allocator", "box");
 
 	//初始化旋转和移动。
 	m_pCamera->Pos->Rotation
