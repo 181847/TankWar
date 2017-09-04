@@ -109,7 +109,7 @@ BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnUnit * saveUnit, PawnPropert
 	newPawn->m_pCamera->Target->Translation = { 0.0f, 2.0f, 0.0f };
 
 	//修改摄像机的局部坐标，避免再后来的更新中和摄像机的目标重合，引发异常。
-	newPawn->m_pCamera->Pos->Translation = { 0.0f, 0.0f, -100.0f };
+	newPawn->m_pCamera->Pos->Translation = { 0.0f, 0.0f, -5.0f };
 	//修改摄像机的世界矩阵中的平移，因为摄像机真正更新到世界至观察矩阵中的数据是世界矩阵的平移，
 	//而摄像机目标和位置的世界矩阵都是单位矩阵，平移相同，第一次世界至观察矩阵时会引发一场，
 	//这里临时修改一次世界平移坐标，因为在后来会从局部坐标中获得信息。

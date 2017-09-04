@@ -194,9 +194,9 @@ void ObjReader::SaveVertexLocation(string & line, vector<XMFLOAT3>& vs)
 	//X轴取负值、Z轴取Y轴的负值、Y轴取Z轴。
 	vs.push_back(
 		XMFLOAT3( 
-			INCH_TO_CM(strtof(subStrings[2].c_str(), nullptr)),
-			INCH_TO_CM(strtof(subStrings[3].c_str(), nullptr)),
-			-INCH_TO_CM(strtof(subStrings[4].c_str(), nullptr))
+				UNIT_CONVERT(strtof(subStrings[2].c_str(), nullptr)),
+				UNIT_CONVERT(strtof(subStrings[3].c_str(), nullptr)),
+			   -UNIT_CONVERT(strtof(subStrings[4].c_str(), nullptr))	//这里要取负值
 			)
 		);
 }

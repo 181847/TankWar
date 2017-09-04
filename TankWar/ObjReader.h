@@ -12,6 +12,24 @@ typedef unsigned int UINT;
 //将英寸单位转换为厘米单位，乘以2.54。
 #define INCH_TO_CM(floatNumberInInch) (floatNumberInInch * 2.54f)
 
+//将英寸单位转换为米单位，乘以0.0254。
+#define INCH_TO_M(floatNumberInInch) (floatNumberInInch * 0.0254f)
+
+//使用哪一种单位。
+//厘米
+#define USE_CM_AS_UNIT false
+//米
+#define USE_M_AS_UNIT true
+
+//选择进制转换。
+#if(USE_CM_AS_UNIT)
+	#define UNIT_CONVERT INCH_TO_CM
+#elif(USE_M_AS_UNIT)
+	#define UNIT_CONVERT INCH_TO_M
+#else
+	#define UNIT_CONVERT ASSERT(false && "Complie Error! Please select one Unit standard to read file.obj");
+#endif
+
 class ObjReader
 {
 public:
