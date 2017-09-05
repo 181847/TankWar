@@ -14,6 +14,7 @@ struct PerFrameUnit
 	BasePawn* pPawn;
 };
 
+//每一帧都可以执行的功能。
 class PerFrameTemplate
 {
 public:

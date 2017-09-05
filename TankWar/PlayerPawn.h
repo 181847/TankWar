@@ -7,7 +7,7 @@
 
 //可生成的PawnPlayer的数量
 #define MAX_PLAYER_PAWN_NUM ((unsigned int)5)
-#define CONTROLITEM_NUM_PLAYER_PAWN 3
+#define CONTROLITEM_NUM_PLAYER_PAWN 4
 
 //玩家的可控制ControlItem的根节点序号，注意玩家当中的摄像机和可渲染根节点是分开的。
 #define CONTROLITEM_INDEX_PLAYER_PAWN_ROOT 0
@@ -15,6 +15,8 @@
 #define CONTROLITEM_INDEX_PLAYER_PAWN_BATTERY 1
 //车身的控制器
 #define CONTROLITEM_INDEX_PLAYER_PAWN_MAINBODY 2
+//炮管控制器
+#define CONTROLITEM_INDEX_PLAYER_PAWN_BARREL 3
 
 //骨骼数组序号
 #define BONE_INDEX_PLAYER_PAWN_ROOT 0
@@ -26,6 +28,8 @@
 #define BONE_INDEX_PLAYER_PAWN_BATTERY 3
 //车身
 #define BONE_INDEX_PLAYER_PAWN_MAINBODY 4
+//炮管
+#define BONE_INDEX_PLAYER_PAWN_BARREL 5
 
 //射线最大长度
 #define MAX_RAY_LENGTH 500
@@ -109,6 +113,8 @@ public:
 	ControlItem * Battery();
 	//车身控制器，控制车身方向。
 	ControlItem * MainBody();
+	//炮管控制器。
+	ControlItem * Barrel();
 };
 
 

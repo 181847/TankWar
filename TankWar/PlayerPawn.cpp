@@ -81,6 +81,11 @@ ControlItem * PlayerPawn::MainBody()
 	return m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_MAINBODY];
 }
 
+ControlItem * PlayerPawn::Barrel()
+{
+	return m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_BARREL];
+}
+
 
 //***************************************玩家生成模板*****************************
 PlayerPawnCommandTemplate::PlayerPawnCommandTemplate()
@@ -127,12 +132,16 @@ BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnProperty* pProperty, Scence*
 	//为炮台分配一个ControlItem。
 	newPawn->m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_BATTERY] =
 		pScence->NewControlItem("Tank_2", "Battery", "box");
-	//炮台先向上移动一点距离。
-	//newPawn->Battery()->MoveY(1.0f);
+	//炮台移动一点距离。
+	newPawn->Battery()->MoveXYZ(0.0f, 1.032f, -0.036f);
 
 	newPawn->m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_MAINBODY] =
 		pScence->NewControlItem("Tank_2", "MainBody", "cylinder");
 	//newPawn->MainBody()->MoveY(1.0f);
+
+	newPawn->m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_BARREL] =
+		pScence->NewControlItem("Tank_2", "Barrel", "grid");
+	newPawn->Barrel()->MoveXYZ(0.0f, 0.26f, .88f);
 
 	//添加玩家控制。
 	AddPlayerControl(newPawn);
@@ -206,12 +215,18 @@ void PlayerPawnCommandTemplate::AddBones(PlayerPawn * pPlayerPawn)
 		= pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_MAINBODY]
 		= PlayerPawn::pBoneCommander->NewBone(pPlayerPawn->MainBody());
 
+	Bone* barrel
+		= pPlayerPawn->m_arr_Bones[BONE_INDEX_PLAYER_PAWN_BARREL]
+		= PlayerPawn::pBoneCommander->NewBone(pPlayerPawn->Barrel());
+
 	//创建骨骼连接。
 
 	//车身连接根骨骼。
 	mainBody->LinkTo(rootBone);
 	//炮台连接根骨骼，注意：炮台不受车身骨骼的影响，保持炮台一直指向摄像机的位置。
 	battery->LinkTo(rootBone);
+	//炮管连接炮台。
+	barrel->LinkTo(battery);
 	//摄像机目标连接炮台。
 	cameraTarget->LinkTo(battery);
 	//摄像机位置连接摄像机目标。

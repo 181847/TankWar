@@ -160,6 +160,7 @@
     <ClCompile Include="CollideCommander.cpp" />
     <ClCompile Include="ControlItem.cpp" />
     <ClCompile Include="FrameResource.cpp" />
+    <ClCompile Include="GCommanders.cpp" />
     <ClCompile Include="MyShapesApp.cpp" />
     <ClCompile Include="MyTools.cpp" />
     <ClCompile Include="ObjReader.cpp" />
@@ -168,6 +169,8 @@
     <ClCompile Include="PlayerCommander.cpp" />
     <ClCompile Include="PlayerPawn.cpp" />
     <ClCompile Include="Scence.cpp" />
+    <ClCompile Include="ShellPawn.cpp" />
+    <ClCompile Include="ShellProperty.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Common\Camera.h" />
@@ -186,6 +189,7 @@
     <ClInclude Include="CollideCommander.h" />
     <ClInclude Include="DeLinkedList.h" />
     <ClInclude Include="FrameResource.h" />
+    <ClInclude Include="GCommanders.h" />
     <ClInclude Include="LinkedAllocator.h" />
     <ClInclude Include="MyAssert.h" />
     <ClInclude Include="MyShapesApp.h" />
@@ -198,6 +202,8 @@
     <ClInclude Include="PlayerPawn.h" />
     <ClInclude Include="Scence.h" />
     <ClInclude Include="ControlItem.h" />
+    <ClInclude Include="ShellPawn.h" />
+    <ClInclude Include="ShellProperty.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

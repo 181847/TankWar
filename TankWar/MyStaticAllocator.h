@@ -104,7 +104,7 @@ MyStaticAllocator<DataType>::~MyStaticAllocator()
 template<typename DataType>
 inline DataType * MyStaticAllocator<DataType>::Malloc()
 {
-	ASSERT(remainCount && "分配池可用空间为0");
+	ASSERT(remainCount >1 && "分配池可用空间为0");
 	--remainCount;
 
 	LinkableUnit* returnPointer = memoryLocation[HEAD].next;

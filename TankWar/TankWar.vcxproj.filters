@@ -55,6 +55,9 @@
     <Filter Include="App文件\Commander\PerFrameCommander">
       <UniqueIdentifier>{eb8f5029-ee40-4819-8456-b9cd6d332ad3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="App文件\Pawn\ShellPawn">
+      <UniqueIdentifier>{bfcd6404-c65a-420a-a38c-a7de53bb6ed9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\Camera.cpp">
@@ -122,6 +125,15 @@
     </ClCompile>
     <ClCompile Include="CollideCommander.cpp">
       <Filter>App文件\Commander\CollideCommander</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellPawn.cpp">
+      <Filter>App文件\Pawn\ShellPawn</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellProperty.cpp">
+      <Filter>App文件\Pawn\ShellPawn</Filter>
+    </ClCompile>
+    <ClCompile Include="GCommanders.cpp">
+      <Filter>App文件\Commander</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -208,6 +220,15 @@
     </ClInclude>
     <ClInclude Include="CollideCommander.h">
       <Filter>App文件\Commander\CollideCommander</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellPawn.h">
+      <Filter>App文件\Pawn\ShellPawn</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellProperty.h">
+      <Filter>App文件\Pawn\ShellPawn</Filter>
+    </ClInclude>
+    <ClInclude Include="GCommanders.h">
+      <Filter>App文件\Commander</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
