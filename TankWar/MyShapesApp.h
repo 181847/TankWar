@@ -13,7 +13,10 @@
 
 #include "PlayerPawn.h"
 #include "ArmoredCar.h"
+#include "ShellPawn.h"
 #include "ObjReader.h"
+
+#include "GCommanders.h"
 
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;

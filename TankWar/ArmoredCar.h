@@ -56,13 +56,13 @@ public:
 	//这一部分负责关于ArmoredCar类的静态属性
 public:
 	//在PawnMaster中的类型标识。
-	static PawnType pawnType;
+	static PawnType				pawnType;
 	//玩家的控制模式。
-	static AIControlType aiControlType;
+	static AIControlType		aiControlType;
 
 	//负责本类生成和销毁指令的PawnMaster。
 	static PawnMaster *			pPawnMaster;
-	static AICommander *	pAICommander;
+	static AICommander *		pAICommander;
 	static BoneCommander *		pBoneCommander;
 	static CollideCommander *	pCollideCommander;
 
@@ -103,7 +103,7 @@ protected:
 	//所有骨骼，骨骼对应ControlItem。
 	Bone*			m_arr_Bones[CONTROLITEM_NUM_ARMORED_CAR];
 	//所有碰撞体。
-	CollideBox*	m_arr_CBoxes[COLLIDE_RECT_NUM_ARMORED_CAR];
+	CollideBox*		m_arr_CBoxes[COLLIDE_RECT_NUM_ARMORED_CAR];
 
 public:
 	//指向这个PlayerPawn对象的相关游戏属性，比如前进速度，车身旋转速度，炮弹冷却时间……
@@ -112,12 +112,12 @@ public:
 	//一下是一些方便的工具方法。
 public:
 	//PlayerPawn的根控制器，控制整体的位移，这个网格默认不显示。
-	ControlItem * RootControl();
+	ControlItem *	RootControl();
 	//车身控制器，控制车身方向。
-	ControlItem * MainBody();
+	ControlItem *	MainBody();
 
 	//根部的碰撞盒。
-	CollideBox * RootBox();
+	CollideBox *	RootBox();
 };
 
 
@@ -145,7 +145,7 @@ protected:
 
 	void DeleteAIControl	(ArmoredCar* pPawn);
 	void DeleteBones		(ArmoredCar* pPawn);
-	void DeleteCollideBoxes(ArmoredCar* pPawn);
+	void DeleteCollideBoxes	(ArmoredCar* pPawn);
 };
 
 //AI控制模板。
@@ -163,11 +163,11 @@ public:
 	//以下是一些针对ArmoredCar的简化操作。
 protected:
 	//移动装甲车。
-	void move(ArmoredCar * pCar, const GameTimer& gt);
+	void move	(ArmoredCar * pCar, const GameTimer& gt);
 	//装甲车瞄准。
-	void aim(ArmoredCar * pCar, const GameTimer& gt);
+	void aim	(ArmoredCar * pCar, const GameTimer& gt);
 	//装甲车射击。
-	void shout(ArmoredCar * pCar, float consumedTime, const GameTimer& gt);
+	void shout	(ArmoredCar * pCar, float consumedTime, const GameTimer& gt);
 
 	//工具方法
 protected:

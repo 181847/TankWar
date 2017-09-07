@@ -129,7 +129,7 @@ void PawnMaster::DestoringPawn(UINT commandIndex)
 		m_pScence);
 }
 
-PawnCommandTemplate::PawnCommandTemplate(UINT maxPawnNum)
+PawnCommandTemplate::PawnCommandTemplate()
 {
 }
 

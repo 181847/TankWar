@@ -1,4 +1,5 @@
 #pragma once
+#include "MyTools.h"
 #include "MyAssert.h"
 //将零号元素的序号起一个别名HEAD。
 #define HEAD 0

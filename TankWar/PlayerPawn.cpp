@@ -18,6 +18,12 @@ LinkedAllocator<PlayerPawn>			PlayerPawn::m_PlayerPawnAllocator	(MAX_PLAYER_PAWN
 //参考装甲车类型标记，这个类型标记用来实现点击鼠标左键然后生成装甲车的效果
 PawnType							PlayerPawn::refCarType				= PAWN_TYPE_NONE;
 
+
+//炮管的最大上扬角。
+const float Radian_Pitch_Barrel_Max = XM_PIDIV4;
+//炮管的最小上扬角。
+const float Radian_Pitch_Barrel_Min = - XM_PI / 6;
+
 PlayerPawn::PlayerPawn()
 {
 }
@@ -35,7 +41,7 @@ void PlayerPawn::RegisterAll(
 {
 	ASSERT(PlayerPawn::pPlayerCommander	== nullptr	&&	"不可重复注册PlayerCommander");
 	ASSERT(PlayerPawn::pBoneCommander		== nullptr	&&	"不可重复注册BoneCommander");
-	//ASSERT(PlayerPawn::pCollideCommander	== nullptr	&&	"不可重复注册CollideCommander");
+	ASSERT(PlayerPawn::pCollideCommander	== nullptr	&&	"不可重复注册CollideCommander");
 
 	//注册Master
 	RegisterPawnMaster(pPawnMaster);
@@ -89,7 +95,6 @@ ControlItem * PlayerPawn::Barrel()
 
 //***************************************玩家生成模板*****************************
 PlayerPawnCommandTemplate::PlayerPawnCommandTemplate()
-	:PawnCommandTemplate(MAX_PLAYER_PAWN_NUM)
 {
 }
 
@@ -228,7 +233,7 @@ void PlayerPawnCommandTemplate::AddBones(PlayerPawn * pPlayerPawn)
 	//炮管连接炮台。
 	barrel->LinkTo(battery);
 	//摄像机目标连接炮台。
-	cameraTarget->LinkTo(battery);
+	cameraTarget->LinkTo(rootBone);
 	//摄像机位置连接摄像机目标。
 	cameraPos->LinkTo(cameraTarget);
 }
@@ -261,9 +266,11 @@ void PlayerControlCommandTemplate::MouseMove(BasePawn* pPawn, MouseState mouseSt
 
 
 
-	//炮台水平旋转，并带动摄像机水平旋转。
-	pPlayerPawn->Battery()->RotateYaw(1.0f * dx);
+	//炮台水平旋转
+	//pPlayerPawn->Battery()->RotateYaw(1.0f * dx);
 
+	//摄像机水平旋转。
+	pPlayerPawn->m_pCamera->Target->RotateYaw(1.0f * dx);
 	//摄像机垂直旋转。
 	pPlayerPawn->m_pCamera->Target->RotatePitch(1.0f * dy);
 	//限制摄像机的镜头俯仰角角度，上至下90度范围内。
@@ -271,7 +278,22 @@ void PlayerControlCommandTemplate::MouseMove(BasePawn* pPawn, MouseState mouseSt
 		pPlayerPawn->m_pCamera->Target->Rotation.x,
 		-XM_PI / 6,	
 		XM_PIDIV2 - 0.01f);	
-	
+
+	//从摄像机的方向检查射线碰撞，
+	//将炮管barrel的方向对准发生碰撞的方向。
+	auto ray = PlayerPawn::pCollideCommander->NewRay(pPlayerPawn->m_pCamera->Target, 200.0f);
+	PlayerPawn::pCollideCommander->CollideDetect(ray, COLLIDE_TYPE_ALL);
+	if (ray->Result.CollideHappended)
+	{
+		//旋转定位炮台的方向，使得炮台的水平方向尝试对准发生碰撞的位置。
+		//注意不是直接指向，而是慢慢的旋转炮台到指定的位置。
+		rotateBattery(pPlayerPawn, ray->Result.CollideLocation, gt);
+		//垂直旋转炮管，使得炮管对阵发生碰撞的位置。
+		//注意不是直接指向，而是慢慢的旋转炮管到指定的位置。
+		rotateBarrel(pPlayerPawn, ray->Result.CollideLocation, gt);
+	}
+
+	PlayerPawn::pCollideCommander->DeleteRay(ray);
 	
 }
 
@@ -335,9 +357,10 @@ void PlayerControlCommandTemplate::HitMouseButton_Right(BasePawn * pPawn, const 
 {
 	//从摄像机发出射线，如果撞击到某个物体，销毁它。
 
+	
 	//使用摄像机的目标位置以及方向作为射线的位置和起始方向。
 	auto pPlayer = reinterpret_cast<PlayerPawn*>(pPawn);
-
+	/*
 	//首先申请一个射线碰撞单元。
 	auto rayDetect = PlayerPawn::pCollideCommander->NewRay(
 		pPlayer->m_pCamera->Target,	//射线的起点、以及方向使用摄像机目标的世界变换矩阵。
@@ -356,6 +379,18 @@ void PlayerControlCommandTemplate::HitMouseButton_Right(BasePawn * pPawn, const 
 
 	//回收射线碰撞单元。
 	PlayerPawn::pCollideCommander->DeleteRay(rayDetect);
+	*/
+
+
+	auto pShellProperty = gShellPropertyAllocator.Malloc();
+	pShellProperty->CurrState = ShellState::Move;
+	pShellProperty->DeltaDist = 0.0f;	//这个初始的帧运动距离只是暂时的，之后每一帧都会被Shell自动更新。
+	pShellProperty->StartPos = pPlayer->m_pCamera->Target->World;
+	pShellProperty->RestDist = 200.0f;
+	pShellProperty->MoveSpeed = 200.0f;
+
+	//记录一个创建弹药Pawn的指令。
+	gPawnMaster->CreatePawn(gShellPawnType, pShellProperty);
 }
 
 void PlayerControlCommandTemplate::PressMouseButton_Left(BasePawn * pPawn, const GameTimer& gt)
@@ -366,4 +401,77 @@ void PlayerControlCommandTemplate::PressMouseButton_Left(BasePawn * pPawn, const
 void PlayerControlCommandTemplate::PressMouseButton_Right(BasePawn * pPawn, const GameTimer& gt)
 {
 	//发射炮弹。
+}
+
+void PlayerControlCommandTemplate::rotateBattery(
+	PlayerPawn * pPlayerPawn,
+	XMFLOAT3 targetFloat3,
+	const GameTimer& gt)
+{
+	float rx, ry;
+	auto world = XMLoadFloat4x4(&pPlayerPawn->Battery()->World);
+	auto target = XMVectorSet(
+		targetFloat3.x,
+		targetFloat3.y, 
+		targetFloat3.z,
+		1.0f);
+
+	//找到需要旋转的额水平角度，注意只需要绕局部y轴（水平）的旋转，
+	//这里将needRx设为false，表示不需要rx，这能够节省一点开根号的计算量。
+	OffsetInLocal(world, target, false, rx, ry);
+	
+	//将没有用的rx用来存储旋转弧度。
+	rx = pPlayerPawn->m_pProperty->RotationSpeed * gt.DeltaTime();
+
+	if (FloatEqual(ry, 0.0f, FLT_EPSILON))
+	{
+		//什么也不做。
+	}
+	else if (ry > XM_PIDIV2)
+	{
+		//大于于pi/2，左转最快。
+		pPlayerPawn->Battery()->RotateYaw(
+			( - rx)
+		);
+	}
+	else
+	{
+		//小于于pi/2，右转最快。
+		pPlayerPawn->Battery()->RotateYaw(
+			rx
+		);
+	}
+}
+
+void PlayerControlCommandTemplate::rotateBarrel(PlayerPawn * pPlayerPawn, XMFLOAT3 targetFloat3, const GameTimer & gt)
+{
+	float rx, ry;
+	auto world = XMLoadFloat4x4(&pPlayerPawn->Barrel()->World);
+	auto target = XMVectorSet(
+		targetFloat3.x,
+		targetFloat3.y,
+		targetFloat3.z,
+		1.0f);
+
+	OffsetInLocal(world, target, true, rx, ry);
+
+	//将没有用的ry用来存储旋转弧度。
+	ry = pPlayerPawn->m_pProperty->RotationSpeed * gt.DeltaTime();
+
+	if (FloatEqual(rx, 0.0f, FLT_EPSILON))
+	{
+		//什么也不做。
+	}
+	else
+	{
+		//直接旋转。
+		pPlayerPawn->Barrel()->RotatePitch(ry);
+
+
+		//限制炮管的俯仰角角度，上至下90度范围内。
+		pPlayerPawn->Barrel()->Rotation.x = MathHelper::Clamp(
+			pPlayerPawn->Barrel()->Rotation.x,
+			Radian_Pitch_Barrel_Min,
+			Radian_Pitch_Barrel_Max);
+	}
 }

@@ -4,6 +4,7 @@
 #include "PlayerCommander.h"
 #include "BoneCommander.h"
 #include "CollideCommander.h"
+#include "ShellProperty.h"
 
 //可生成的PawnPlayer的数量
 #define MAX_PLAYER_PAWN_NUM ((unsigned int)5)
@@ -70,6 +71,11 @@ public :
 
 	//特殊的静态属性，标记一个装甲车的创建类型，当用户按下鼠标左键的时候就可以创建一个ArmoredCarPawn。
 	static PawnType refCarType;
+
+	//炮管的最大上扬角。
+	static const float Radian_Pitch_Barrel_Max;
+	//炮管的最小上扬角。
+	static const float Radian_Pitch_Barrel_Min;
 
 public:
 	//执行所有注册方法，包括下面的注册PawnMaster。
@@ -164,4 +170,21 @@ public:
 	virtual void PressMouseButton_Left(BasePawn* pPawn, const GameTimer& gt);
 	//按下鼠标右键
 	virtual void PressMouseButton_Right(BasePawn* pPawn, const GameTimer& gt);
+
+public:
+	//便捷方法。
+
+	//旋转定位炮台的方向，使得炮台的水平方向尝试对准发生碰撞的位置。
+	//注意不是直接指向，而是慢慢的旋转炮台到指定的位置。
+	static void rotateBattery(
+		PlayerPawn * pPlayerPawn, 
+		XMFLOAT3 targetFloat3,
+		const GameTimer& gt);
+
+	//垂直旋转炮管，使得炮管对阵发生碰撞的位置。
+	//注意不是直接指向，而是慢慢的旋转炮管到指定的位置。
+	static void rotateBarrel(
+		PlayerPawn * pPlayerPawn,
+		XMFLOAT3 targetFloat3, 
+		const GameTimer& gt);
 };

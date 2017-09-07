@@ -84,7 +84,6 @@ CollideBox * ArmoredCar::RootBox()
 //****************************装甲车单位生成模板***********************************************
 
 CarPawnTemplate::CarPawnTemplate()
-	:PawnCommandTemplate(MAX_PAWN_CAR_NUM)
 {
 }
 
@@ -99,11 +98,6 @@ BasePawn * CarPawnTemplate::CreatePawn(PawnProperty* pProperty, Scence* pScence)
 	ArmoredCar* newPawn = ArmoredCar::PawnAllocator.Malloc();
 
 	newPawn->m_pawnType = ArmoredCar::pawnType;
-
-	if (newPawn->m_pawnType > 50)
-	{
-		newPawn->m_pawnType = ArmoredCar::pawnType;
-	}
 
 	if (pProperty == nullptr)
 	{
@@ -200,7 +194,7 @@ void CarPawnTemplate::AddCollideBoxes(ArmoredCar * pPawn)
 
 	//修改碰撞盒的大小。
 	pRootBox->Size.Xmin = -0.5f;	pRootBox->Size.Xmax = 0.5f;
-	pRootBox->Size.Ymin = -0.2f;	pRootBox->Size.Ymax = 0.2f;
+	pRootBox->Size.Ymin = -0.0f;	pRootBox->Size.Ymax = 0.3f;
 	pRootBox->Size.Zmin = -0.5f;	pRootBox->Size.Zmax = 0.5f;
 
 	//重新计算包围盒的球体半径。

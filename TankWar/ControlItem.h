@@ -51,18 +51,18 @@ struct ControlItem
 	int BaseVertexLocation = 0;
 
 public:
-	//增加偏航角
-	void RotateYaw(float d);
 	//增加俯仰角
-	void RotatePitch(float d);
+	void RotatePitch(float dx);
+	//增加偏航角
+	void RotateYaw(float dy);
 	//增加滚动角
-	void RotateRoll(float d);
+	void RotateRoll(float dz);
 	//向X轴正向移动。
-	void MoveX(float d);
+	void MoveX(float dx);
 	//向Y轴正向移动。
-	void MoveY(float d);
+	void MoveY(float dy);
 	//向Z轴正向移动。
-	void MoveZ(float d);
+	void MoveZ(float dz);
 
 	//向XYZ轴同时移动。
 	void MoveXYZ(float dx, float dy, float dz);

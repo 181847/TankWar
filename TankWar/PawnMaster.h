@@ -18,8 +18,7 @@ struct PawnUnit
 class PawnCommandTemplate
 {
 public:
-	PawnCommandTemplate(UINT maxPawnNum);
-	PawnCommandTemplate() = delete;
+	PawnCommandTemplate();
 	PawnCommandTemplate(const PawnCommandTemplate&) = delete;
 	PawnCommandTemplate& operator = (const PawnCommandTemplate&) = delete;
 	~PawnCommandTemplate();

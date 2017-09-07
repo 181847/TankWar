@@ -14,6 +14,7 @@ RayDetect * CollideCommander::NewRay(ControlItem * pCItem, float rayLength)
 {
 	auto pNewRay = RayAllocator.Malloc();
 	pNewRay->RayLength					= rayLength;
+	pNewRay->MinusLength				= 0.0f;
 	pNewRay->controlPD					= pCItem;
 	pNewRay->Result.CollideHappended	= false;
 	pNewRay->Result.CollideLocation		= { 0.0f, 0.0f, 0.0f };
@@ -25,6 +26,7 @@ void CollideCommander::DeleteRay(RayDetect * pDeleteRay)
 {
 	//Çå¿ÕÊý¾Ý¡£
 	pDeleteRay->RayLength				= 0.0f;
+	pDeleteRay->MinusLength				= 0.0f;
 	pDeleteRay->controlPD				= nullptr;
 	pDeleteRay->Result.CollideHappended = false;
 	pDeleteRay->Result.pCollideBox		= nullptr;
@@ -198,7 +200,7 @@ void CollideCommander::RayCollideCheck(RayDetect * rayDetect, CollideBox * pBox,
 	float maxt, mint;
 	Caculate_MaxT_MinT(pBox->Size, rDirectionFloat4, rPositionFloat4, maxt, mint);
 
-	if (maxt < mint && maxt >= 0 && maxt < rayDetect->RayLength)
+	if (maxt < mint && maxt >= rayDetect->MinusLength && maxt < rayDetect->RayLength)
 	{
 		isCollided = true;
 
@@ -224,7 +226,7 @@ void CollideCommander::RayCollideCheck(RayDetect * rayDetect, CollideBox * pBox,
 	} 
 	else
 	{
-		isCollided = true;
+		isCollided = false;
 		location.x = location.y = location.z = 0.0f;
 		tl = 0.0f;
 	}

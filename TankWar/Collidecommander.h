@@ -42,6 +42,8 @@ struct RayDetect
 	ControlItem* controlPD;
 	//射线的长度。
 	float RayLength;
+	//射线能够检测的负方向距离。
+	float MinusLength;
 
 	//碰撞发生的结果
 	struct

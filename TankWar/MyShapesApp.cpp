@@ -1147,8 +1147,17 @@ void MyShapesApp::RegisterPawnClass()
 		m_pBoneCommander		.get(), 
 		m_pCollideCommander		.get());
 
+	RegisterGlobalCommanders(
+		m_pPawnMaster.get(),
+		m_pBoneCommander.get(),
+		m_pCollideCommander.get(),
+		m_pAICommander.get(),
+		m_pPlayerCommander.get());
+
 	//玩家Pawn记录装甲车的类型标记，因为玩家点击鼠标左键就能在场景中创建这个对象。
 	PlayerPawn::refCarType = ArmoredCar::pawnType;
+	ShellPawn::Register();
+
 }
 
 void MyShapesApp::BuildInitPawn()
