@@ -204,8 +204,8 @@ CarAITemplate::CarAITemplate()
 	//Ãé×¼×´Ì¬¸ÅÀÀ
 	StoryFragment aimFragment;
 	aimFragment.State = STORY_FRAGMENT_CAR_AIM;
-	aimFragment.Posibility = 0.3f;
-	aimFragment.ConsistTime = 5.0f;
+	aimFragment.Posibility = 0.9f;
+	aimFragment.ConsistTime = 20000.0f;
 	aimFragment.NextState = STORY_FRAGMENT_NEXT_RANDOM_OTHERS;
 
 	//Éä»÷×´Ì¬¸ÅÀÀ

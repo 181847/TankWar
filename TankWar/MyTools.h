@@ -40,3 +40,6 @@ DirectX::XMMATRIX XM_CALLCONV InvOnlyWithRT(
 
 //比较两个float是否相等，M_EPSINON为精度。
 bool FloatEqual(float target, float compare, float M_EPSINON);
+
+DirectX::XMVECTOR XM_CALLCONV ConvertFromWorldToLocal(
+	DirectX::FXMMATRIX worldTransformation, DirectX::CXMVECTOR worldPosition);

@@ -343,7 +343,7 @@ void PlayerControlCommandTemplate::HitMouseButton_Right(BasePawn * pPawn, const 
 	auto pShellProperty = gShellPropertyAllocator.Malloc();
 	pShellProperty->CurrState = ShellState::Move;
 	pShellProperty->DeltaDist = 0.0f;	//这个初始的帧运动距离只是暂时的，之后每一帧都会被Shell自动更新。
-	pShellProperty->StartPos = pPlayer->m_pCamera->Target->World;
+	pShellProperty->StartPos = pPlayer->Barrel()->World;
 	pShellProperty->RestDist = 200.0f;
 	pShellProperty->MoveSpeed = 200.0f;
 
@@ -397,6 +397,9 @@ void PlayerAITemplate::aim(PlayerPawn * pPlayer, const GameTimer& gt)
 	//将炮管barrel的方向对准发生碰撞的方向。
 	auto ray = gCollideCommander->NewRay(pPlayer->m_pCamera->Target, 200.0f);
 	gCollideCommander->CollideDetect(ray, COLLIDE_TYPE_ALL);
+
+	XMFLOAT3 dummyLocation = { 0.0f, 0.0f, 0.0f };
+
 	if (ray->Result.CollideHappended)
 	{
 		//旋转定位炮台的方向，使得炮台的水平方向尝试对准发生碰撞的位置。
@@ -409,8 +412,8 @@ void PlayerAITemplate::aim(PlayerPawn * pPlayer, const GameTimer& gt)
 	else
 	{
 		//没有发生碰撞，将物体的位置强制归零。
-		pPlayer->Barrel()->ClearRotation();
-		pPlayer->Battery()->ClearRotation();
+		//pPlayer->Barrel()->ClearRotation();
+		//pPlayer->Battery()->ClearRotation();
 	}
 
 	gCollideCommander->DeleteRay(ray);
@@ -477,16 +480,20 @@ void PlayerAITemplate::rotateBarrel(PlayerPawn * pPlayerPawn, XMFLOAT3 targetFlo
 	{
 		//什么也不做。
 	}
+	else if (rx > 0.0f)
+	{
+		//向下旋转
+		pPlayerPawn->Barrel()->RotatePitch(ry);
+	}
 	else
 	{
-		//直接旋转。
-		pPlayerPawn->Barrel()->RotatePitch(ry);
-
-
-		//限制炮管的俯仰角角度
-		pPlayerPawn->Barrel()->Rotation.x = MathHelper::Clamp(
-			pPlayerPawn->Barrel()->Rotation.x,
-			Radian_Pitch_Barrel_Max,
-			Radian_Pitch_Barrel_Min);
+		//向上旋转
+		pPlayerPawn->Barrel()->RotatePitch(-ry);
 	}
+
+	//限制炮管的俯仰角角度
+	pPlayerPawn->Barrel()->Rotation.x = MathHelper::Clamp(
+		pPlayerPawn->Barrel()->Rotation.x,
+		Radian_Pitch_Barrel_Min,
+		Radian_Pitch_Barrel_Max);
 }
