@@ -1,6 +1,6 @@
 #pragma once
 #include "BasePawn.h"
-#include "ShellProperty.h"
+#include "ShellPawnProperty.h"
 
 class ShellPawn :
 	public BasePawn

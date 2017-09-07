@@ -129,11 +129,17 @@
     <ClCompile Include="ShellPawn.cpp">
       <Filter>App文件\Pawn\ShellPawn</Filter>
     </ClCompile>
-    <ClCompile Include="ShellProperty.cpp">
-      <Filter>App文件\Pawn\ShellPawn</Filter>
-    </ClCompile>
     <ClCompile Include="GCommanders.cpp">
       <Filter>App文件\Commander</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerPawnProperty.cpp">
+      <Filter>App文件\Pawn\PlayerPawn</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellPawnProperty.cpp">
+      <Filter>App文件\Pawn\ShellPawn</Filter>
+    </ClCompile>
+    <ClCompile Include="ArmoredCarPawnProperty.cpp">
+      <Filter>App文件\Pawn\ArmoredCar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -224,11 +230,25 @@
     <ClInclude Include="ShellPawn.h">
       <Filter>App文件\Pawn\ShellPawn</Filter>
     </ClInclude>
-    <ClInclude Include="ShellProperty.h">
-      <Filter>App文件\Pawn\ShellPawn</Filter>
-    </ClInclude>
     <ClInclude Include="GCommanders.h">
       <Filter>App文件\Commander</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerPawnProperty.h">
+      <Filter>App文件\Pawn\PlayerPawn</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellPawnProperty.h">
+      <Filter>App文件\Pawn\ShellPawn</Filter>
+    </ClInclude>
+    <ClInclude Include="ArmoredCarPawnProperty.h">
+      <Filter>App文件\Pawn\ArmoredCar</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TankWar.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

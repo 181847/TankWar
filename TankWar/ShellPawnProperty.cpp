@@ -1,4 +1,4 @@
-#include "ShellProperty.h"
+#include "ShellPawnProperty.h"
 
 PawnType gShellPawnType = PAWN_TYPE_NONE;
 

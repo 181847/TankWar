@@ -155,6 +155,7 @@
     <ClCompile Include="..\..\..\..\Common\MathHelper.cpp" />
     <ClCompile Include="AICommander.cpp" />
     <ClCompile Include="ArmoredCar.cpp" />
+    <ClCompile Include="ArmoredCarPawnProperty.cpp" />
     <ClCompile Include="BasePawn.cpp" />
     <ClCompile Include="BoneCommander.cpp" />
     <ClCompile Include="CollideCommander.cpp" />
@@ -168,9 +169,10 @@
     <ClCompile Include="PerFrameCommander.cpp" />
     <ClCompile Include="PlayerCommander.cpp" />
     <ClCompile Include="PlayerPawn.cpp" />
+    <ClCompile Include="PlayerPawnProperty.cpp" />
     <ClCompile Include="Scence.cpp" />
     <ClCompile Include="ShellPawn.cpp" />
-    <ClCompile Include="ShellProperty.cpp" />
+    <ClCompile Include="ShellPawnProperty.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Common\Camera.h" />
@@ -184,6 +186,7 @@
     <ClInclude Include="..\..\..\..\Common\UploadBuffer.h" />
     <ClInclude Include="AICommander.h" />
     <ClInclude Include="ArmoredCar.h" />
+    <ClInclude Include="ArmoredCarPawnProperty.h" />
     <ClInclude Include="BasePawn.h" />
     <ClInclude Include="BoneCommander.h" />
     <ClInclude Include="CollideCommander.h" />
@@ -200,10 +203,15 @@
     <ClInclude Include="PerFrameCommander.h" />
     <ClInclude Include="PlayerCommander.h" />
     <ClInclude Include="PlayerPawn.h" />
+    <ClInclude Include="PlayerPawnProperty.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Scence.h" />
     <ClInclude Include="ControlItem.h" />
     <ClInclude Include="ShellPawn.h" />
-    <ClInclude Include="ShellProperty.h" />
+    <ClInclude Include="ShellPawnProperty.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TankWar.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

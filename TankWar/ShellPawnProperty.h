@@ -1,5 +1,5 @@
 #pragma once
-#include "ShellProperty.h"
+#include "ShellPawnProperty.h"
 #include "MyStaticAllocator.h"
 #include "GCommanders.h"
 

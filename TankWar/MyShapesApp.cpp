@@ -1134,18 +1134,6 @@ void MyShapesApp::BuildShapeGeometry_for_Scence()
 
 void MyShapesApp::RegisterPawnClass()
 {
-	//PlayerPawn注册所有要用到的Master和Commander。
-	PlayerPawn::RegisterAll(
-		m_pPawnMaster			.get(), 
-		m_pPlayerCommander		.get(), 
-		m_pBoneCommander		.get(), 
-		m_pCollideCommander		.get());
-
-	ArmoredCar::RegisterAll(
-		m_pPawnMaster			.get(), 
-		m_pAICommander			.get(), 
-		m_pBoneCommander		.get(), 
-		m_pCollideCommander		.get());
 
 	RegisterGlobalCommanders(
 		m_pPawnMaster.get(),
@@ -1154,27 +1142,31 @@ void MyShapesApp::RegisterPawnClass()
 		m_pAICommander.get(),
 		m_pPlayerCommander.get());
 
-	//玩家Pawn记录装甲车的类型标记，因为玩家点击鼠标左键就能在场景中创建这个对象。
-	PlayerPawn::refCarType = ArmoredCar::pawnType;
+	//游戏中所有的Pawn注册要用到的Master和Commander。
+	PlayerPawn::Register();
+	ArmoredCar::Register();
 	ShellPawn::Register();
+
+	ASSERT(gPlayerPawnType);
+	ASSERT(gArmoredCarPawnType);
+	ASSERT(gShellPawnType);
 
 }
 
 void MyShapesApp::BuildInitPawn()
 {
-	ASSERT(PlayerPawn::pawnType);
 	//玩家属性。
 	auto pPlayerProperty = PlayerPawn::NewProperty();
 	pPlayerProperty		->MoveSpeed = 5.0f;
 	pPlayerProperty		->RotationSpeed = 2.0f;
 	//记录一个玩家生成指令。
-	m_pPawnMaster->CreatePawn(PlayerPawn::pawnType, pPlayerProperty);
+	m_pPawnMaster->CreatePawn(gPlayerPawnType, pPlayerProperty);
 
 	//第一个装甲车的属性
 	auto pCarProperty = ArmoredCar::NewProperty();
 	pCarProperty		->MoveSpeed = 2.0f;
 	pCarProperty		->RotationSpeed = 2.0f;
-	m_pPawnMaster->CreatePawn(ArmoredCar::pawnType, nullptr);
+	m_pPawnMaster->CreatePawn(gArmoredCarPawnType, nullptr);
 
 
 	//为了保证摄像机一定存在，现在就执行生成pawn的指令，使得Scence中生成一个摄像机。

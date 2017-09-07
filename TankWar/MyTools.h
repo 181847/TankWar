@@ -27,7 +27,7 @@ void XM_CALLCONV RadianOfRotationMatrix(DirectX::FXMMATRIX RM_in, float& rx_out,
 //worldTarget :处于世界坐标中的目标平移坐标。
 //needRx : 如果这个参数为true，表明需要计算rx，rx的计算涉及开根号，如果非必要，将这个参数设为false，rx将默认为0。
 //-(pi / 2) < rx < (pi / 2)。
-//0 < ry < pi。
+//-pi < ry < pi。
 void XM_CALLCONV OffsetInLocal(
 	DirectX::FXMMATRIX	_In_ worldTransform,
 	DirectX::FXMVECTOR	_In_ worldTarget,

@@ -52,6 +52,16 @@ void ControlItem::MoveXYZ(float dx, float dy, float dz)
 	NumFramesDirty = gNumFrameResources;
 }
 
+void ControlItem::ClearRotation()
+{
+	Rotation = { 0.0f, 0.0f, 0.0f };
+}
+
+void ControlItem::ClearTranslation()
+{
+	Translation = { 0.0f, 0.0f, 0.0f };
+}
+
 //将ControlItemd的显示属性设为隐藏。
 void ControlItem::Hide()
 {

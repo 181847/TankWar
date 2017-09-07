@@ -45,10 +45,15 @@ void XM_CALLCONV OffsetInLocal(DirectX::FXMMATRIX worldTransform, DirectX::FXMVE
 
 	rx = 0;
 	ry = atan(targetFloat3.x / targetFloat3.z);
+	//注：这里ry的结果在(-pi/2, pi/2)
 
-	if (targetFloat3.z < 0)
+	//修正ry的范围到(-pi, pi)
+	if (targetFloat3.x > 0 && targetFloat3.z < 0)
 	{
-		//Z小于0，绕Y轴的旋转要大于pi。
+		ry -= DirectX::XM_PI;
+	}
+	else if (targetFloat3.x < 0 && targetFloat3.z < 0)
+	{
 		ry += DirectX::XM_PI;
 	}
 

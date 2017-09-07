@@ -67,6 +67,11 @@ public:
 	//向XYZ轴同时移动。
 	void MoveXYZ(float dx, float dy, float dz);
 
+	//清空局部旋转数据。
+	void ClearRotation();
+	//清空局部位移数据。
+	void ClearTranslation();
+
 	//将ControlItemd的显示属性设为隐藏。
 	void Hide();
 	//将ControlItemd的显示属性设为显示。

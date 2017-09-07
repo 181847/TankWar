@@ -1,49 +1,6 @@
 #pragma once
-#include "BasePawn.h"
-#include "PawnMaster.h"
-#include "BoneCommander.h"
+#include "ArmoredCarPawnProperty.h"
 #include "PlayerPawn.h"
-#include "AICommander.h"
-#include "CollideCommander.h"
-
-//最大的装甲车数量
-#define MAX_PAWN_CAR_NUM 60
-
-//装甲车单位的可控制网格数量，默认两个，一个根控制器控制位移，另一个控制旋转。
-#define CONTROLITEM_NUM_ARMORED_CAR 2
-//装甲车的根控制器序号
-#define CONTROLITEM_INDEX_CAR_ROOT 0
-//装甲车车身控制器
-#define CONTROLITEM_INDEX_CAR_MAIN_BODY 1
-
-//根骨骼数组序号
-#define BONE_INDEX_PLAYER_CAR_ROOT CONTROLITEM_INDEX_CAR_ROOT
-//车身骨骼序号
-#define BONE_INDEX_PLAYER_CAR_MAIN_BODY CONTROLITEM_INDEX_CAR_MAIN_BODY
-
-//碰撞体的数量。
-#define COLLIDE_RECT_NUM_ARMORED_CAR 1
-//根碰撞体序号
-#define COLLIDE_RECT_INDEX_CAR_ROOT 0
-
-//车身移动状态标志。
-#define STORY_FRAGMENT_CAR_MOVE 1
-//装甲车瞄准状态标志。
-#define STORY_FRAGMENT_CAR_AIM 2
-//装甲车开火状态标志。
-#define STORY_FRAGMENT_CAR_SHOUT 3
-
-extern const float CarProperty_default_MoveSpeed;
-extern const float CarProperty_default_RotationSpeed;
-
-//玩家属性定义
-struct CarProperty : public PawnProperty
-{
-	//直线速度
-	float MoveSpeed;
-	//车身旋转速度
-	float RotationSpeed;
-};
 
 //装甲车Pawn。
 class ArmoredCar :
@@ -55,32 +12,14 @@ public:
 
 	//这一部分负责关于ArmoredCar类的静态属性
 public:
-	//在PawnMaster中的类型标识。
-	static PawnType				pawnType;
-	//玩家的控制模式。
-	static AIControlType		aiControlType;
 
-	//负责本类生成和销毁指令的PawnMaster。
-	static PawnMaster *			pPawnMaster;
-	static AICommander *		pAICommander;
-	static BoneCommander *		pBoneCommander;
-	static CollideCommander *	pCollideCommander;
-
-	//属性分配池
-	static MyStaticAllocator<CarProperty>	PropertyAllocator;
 	//类对象分配池
 	static MyStaticAllocator<ArmoredCar>	PawnAllocator;
 
 public:
-	//执行所有注册方法，包括下面的注册PawnMaster。
-	static void RegisterAll(
-		PawnMaster *		pPawnMaster,
-		AICommander *		pAICommander,
-		BoneCommander *		pBoneCommander,
-		CollideCommander *	pCollideCommander
-	);
-	//注册PawnMaster，并从PawnMaster中获取一个PawnType。
-	static void RegisterPawnMaster(PawnMaster * pPawnMaster);
+	//执行所有注册方法。
+	static void Register();
+
 	//申请一个装甲车属性指针。
 	static CarProperty* NewProperty();
 
