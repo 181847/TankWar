@@ -25,14 +25,41 @@ void XM_CALLCONV RadianOfRotationMatrix(DirectX::FXMMATRIX RM_in, float& rx_out,
 	DirectX::XMFLOAT4 unitFloat4;
 	DirectX::XMStoreFloat4(&unitFloat4, unitVector);
 
-	rx_out = asin(unitFloat4.y);
-	ry_out = DirectX::XM_PI + atan(unitFloat4.x / unitFloat4.z);
+	rx_out = -asin(unitFloat4.y);
 
-	if (unitFloat4.z < 0)
+	if (unitFloat4.z == 0.0f)
 	{
-		//如果Z小于0，表明y轴的旋转角度在(0, -pi)之间，直接加一个pi，修正角度。
+		//正切为无穷的情况。
+		if (unitFloat4.x > 0.0f)
+		{
+			ry_out = DirectX::XM_PIDIV2;
+		}
+		else
+		{
+			ry_out = -DirectX::XM_PIDIV2;
+		}
+	}
+	else
+	{
+		ry_out = atan(unitFloat4.x / unitFloat4.z);
+	}
+
+
+	//修正ry的范围到(-pi, pi)
+	if (unitFloat4.x > 0 && unitFloat4.z < 0)
+	{
 		ry_out += DirectX::XM_PI;
 	}
+	else if (unitFloat4.x < 0 && unitFloat4.z < 0)
+	{
+		ry_out = -DirectX::XM_PI + ry_out;
+	}
+	//
+	//if (unitFloat4.z < 0)
+	//{
+		//如果Z小于0，表明y轴的旋转角度在(0, -pi)之间，直接加一个pi，修正角度。
+	//	ry_out += DirectX::XM_PI;
+	//}
 }
 
 void XM_CALLCONV OffsetInLocal(DirectX::FXMMATRIX worldTransform, DirectX::FXMVECTOR worldTarget, bool needRx, float & rx, float & ry)

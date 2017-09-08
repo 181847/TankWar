@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../../Common/d3dUtil.h"
+#include "Common/d3dUtil.h"
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
@@ -66,6 +66,8 @@ public:
 
 	//向XYZ轴同时移动。
 	void MoveXYZ(float dx, float dy, float dz);
+	//同时旋转XYZ。
+	void RotateXYZ(float dx, float dy, float dz);
 
 	//清空局部旋转数据。
 	void ClearRotation();

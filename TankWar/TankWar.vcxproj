@@ -173,6 +173,8 @@
     <ClCompile Include="Scence.cpp" />
     <ClCompile Include="ShellPawn.cpp" />
     <ClCompile Include="ShellPawnProperty.cpp" />
+    <ClCompile Include="StaticPawn.cpp" />
+    <ClCompile Include="StaticPawnProperty.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Common\Camera.h" />
@@ -209,6 +211,8 @@
     <ClInclude Include="ControlItem.h" />
     <ClInclude Include="ShellPawn.h" />
     <ClInclude Include="ShellPawnProperty.h" />
+    <ClInclude Include="StaticPawn.h" />
+    <ClInclude Include="StaticPawnProperty.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TankWar.rc" />

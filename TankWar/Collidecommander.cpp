@@ -88,7 +88,7 @@ void CollideCommander::CollideDetect(RayDetect * ray_input_and_output, CollideTy
 		//只有当碰撞体的类型相同，
 		//或者指定碰撞所有类型，
 		//的时候才进行检查。
-		if (pNode->element.Type != detectType || detectType != COLLIDE_TYPE_ALL)
+		if (pNode->element.Type == detectType || detectType == COLLIDE_TYPE_ALL)
 		{
 			RayCheckWithSphere(
 				ray_input_and_output,
@@ -310,10 +310,28 @@ float CollideCommander::My_Minus_And_Divide(float dist, float rp, float rd)
 	return dist / rd;
 }
 
+CollideBox::CollideBox()
+{
+}
+
 void CollideBox::CaculateRadius()
 {
 	float x = MAX(this->Size.Xmax, this->Size.Xmin);
 	float y = MAX(this->Size.Ymax, this->Size.Ymin);
 	float z = MAX(this->Size.Zmax, this->Size.Zmin);
 	this->SquareSphereRadius = x * x + y * y + z * z;
+}
+
+void CollideBox::Resize(XMFLOAT3 minXYZ, XMFLOAT3 maxXYZ)
+{
+	this->Size.XM_MinXYZ = minXYZ;
+	this->Size.XM_MaxXYZ = maxXYZ;
+
+	//根据设定的碰撞盒大小计算最小包围球半径平方。
+	this->CaculateRadius();
+}
+
+//显式定义BosSize的构造函数。
+BoxSize::BoxSize()
+{
 }

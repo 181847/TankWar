@@ -29,15 +29,11 @@ public:
 	friend class AICommandTemplate;
 
 
-	//这一部分是关于Player的非静态属性。
+	//这一部分是关于Car的非静态属性。
 protected:
-	//Pawn存储指针。
-	PawnUnit*		m_pSaveUnit;
-	//摄像机对象;
-	MyCamera*		m_pCamera;
-	//在PlayerCommander中的控制单元指针。
+	//在Car中的控制单元指针。
 	AIUnit *		m_pAIUnit;
-	//PlayerPawn可控制的ControlItem数量，注意保存的都是指针。
+	//Car可控制的ControlItem数量，注意保存的都是指针。
 	ControlItem*	m_arr_ControlItem[CONTROLITEM_NUM_ARMORED_CAR];
 	//所有骨骼，骨骼对应ControlItem。
 	Bone*			m_arr_Bones[CONTROLITEM_NUM_ARMORED_CAR];

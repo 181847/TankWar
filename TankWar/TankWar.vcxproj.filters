@@ -58,6 +58,9 @@
     <Filter Include="App文件\Pawn\ShellPawn">
       <UniqueIdentifier>{bfcd6404-c65a-420a-a38c-a7de53bb6ed9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="App文件\Pawn\StaticPawn">
+      <UniqueIdentifier>{57a70ae5-a52c-45e8-beef-b3b1b7455a54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\Camera.cpp">
@@ -140,6 +143,12 @@
     </ClCompile>
     <ClCompile Include="ArmoredCarPawnProperty.cpp">
       <Filter>App文件\Pawn\ArmoredCar</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticPawnProperty.cpp">
+      <Filter>App文件\Pawn\StaticPawn</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticPawn.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -244,6 +253,12 @@
     </ClInclude>
     <ClInclude Include="ArmoredCarPawnProperty.h">
       <Filter>App文件\Pawn\ArmoredCar</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticPawnProperty.h">
+      <Filter>App文件\Pawn\StaticPawn</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticPawn.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

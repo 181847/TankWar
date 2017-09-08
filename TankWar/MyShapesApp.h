@@ -1,8 +1,8 @@
 #pragma once
-#include "../../../../Common/d3dApp.h"
-#include "../../../../Common/MathHelper.h"
-#include "../../../../Common/UploadBuffer.h"
-#include "../../../../Common/GeometryGenerator.h"
+#include "Common/d3dApp.h"
+#include "Common/MathHelper.h"
+#include "Common/UploadBuffer.h"
+#include "Common/GeometryGenerator.h"
 #include "FrameResource.h"
 #include "Scence.h"
 #include "PawnMaster.h"
@@ -14,6 +14,7 @@
 #include "PlayerPawn.h"
 #include "ArmoredCar.h"
 #include "ShellPawn.h"
+#include "StaticPawn.h"
 #include "ObjReader.h"
 
 #include "GCommanders.h"
@@ -211,11 +212,11 @@ private:
 //FollowCommander一次最多能够记录的跟随指令数量。
 #define COMMANDER_FOLLOW_MAX_COMMANDS 1000
 //AICommander最多可控制多少个AI对象。
-#define COMMANDER_AI_UNIT_MAX_NUM 100
+#define COMMANDER_AI_UNIT_MAX_NUM 10000
 //碰撞区域中最多有多少个射线
-#define COMMANDER_COLLIDE_MAX_RAY_NUM 200
+#define COMMANDER_COLLIDE_MAX_RAY_NUM 20000
 //最多有多少个碰撞体。
-#define COMMANDER_COLLIDE_MAX_NUM 2000
+#define COMMANDER_COLLIDE_MAX_NUM 2000000
 
 public:
 	//创建场景对象。

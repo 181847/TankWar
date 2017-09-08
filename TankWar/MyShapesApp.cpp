@@ -1125,6 +1125,12 @@ void MyShapesApp::BuildShapeGeometry_for_Scence()
 
 	//十字形的定位器网格。
 	AddGeometry("Allocator");
+
+	//弹药网格。
+	AddGeometry("Shell");
+
+	//地形网格。
+	AddGeometry("Land");
 }
 
 //void MyShapesApp::BuildCollideCommander()
@@ -1146,10 +1152,12 @@ void MyShapesApp::RegisterPawnClass()
 	PlayerPawn::Register();
 	ArmoredCar::Register();
 	ShellPawn::Register();
+	StaticPawn::Register();
 
 	ASSERT(gPlayerPawnType);
 	ASSERT(gArmoredCarPawnType);
 	ASSERT(gShellPawnType);
+	ASSERT(gStaticPawnType);
 
 }
 
@@ -1167,6 +1175,68 @@ void MyShapesApp::BuildInitPawn()
 	pCarProperty		->MoveSpeed = 2.0f;
 	pCarProperty		->RotationSpeed = 2.0f;
 	m_pPawnMaster->CreatePawn(gArmoredCarPawnType, nullptr);
+
+	//地形
+	auto pStaticPawnProperty = StaticPawn::NewProperty();
+	pStaticPawnProperty->CBoxType = COLLIDE_TYPE_BOX_2;
+	pStaticPawnProperty->GeometryName = "Land";
+	pStaticPawnProperty->ShapeName = "Land";
+	pStaticPawnProperty->MaterialName = "grid";
+	pStaticPawnProperty->InitRotation = { 0.0f, 0.0f, 0.0f };
+	pStaticPawnProperty->InitTranslation = { 0.0f, 0.0f, 0.0f };
+	pStaticPawnProperty->CBoxSize.XM_MinXYZ = { -1.0f,	-1.0f,	-1.0f };
+	pStaticPawnProperty->CBoxSize.XM_MaxXYZ = { +1.0f,	+1.0f,	+1.0f };
+	m_pPawnMaster->CreatePawn(gStaticPawnType, pStaticPawnProperty);
+
+	//下面是四个空气墙，用于瞄准的碰撞检测。
+	//X轴负向
+	pStaticPawnProperty = StaticPawn::NewProperty();
+	pStaticPawnProperty->CBoxType = COLLIDE_TYPE_BOX_2;
+	pStaticPawnProperty->GeometryName = "shapeGeo";
+	pStaticPawnProperty->ShapeName = "box";
+	pStaticPawnProperty->MaterialName = "box";
+	pStaticPawnProperty->InitRotation = { 0.0f, 0.0f, 0.0f };
+	pStaticPawnProperty->InitTranslation =		{ -800.0f,	0.0f,		0.0f };			//向X轴负向移动
+	pStaticPawnProperty->CBoxSize.XM_MinXYZ =	{ -1.0f,	-800.0f,	-800.0f };	//设置包围盒的大小
+	pStaticPawnProperty->CBoxSize.XM_MaxXYZ =	{ +1.0f,	+800.0f,	+800.0f };		//设置包围盒的大小
+	m_pPawnMaster->CreatePawn(gStaticPawnType, pStaticPawnProperty);
+
+	//X轴正向
+	pStaticPawnProperty = StaticPawn::NewProperty();
+	pStaticPawnProperty->CBoxType = COLLIDE_TYPE_BOX_2;
+	pStaticPawnProperty->GeometryName = "shapeGeo";
+	pStaticPawnProperty->ShapeName = "box";
+	pStaticPawnProperty->MaterialName = "box";
+	pStaticPawnProperty->InitRotation = { 0.0f, 0.0f, 0.0f };
+	pStaticPawnProperty->InitTranslation =		{ 800.0f,	0.0f,		0.0f };			//向X轴正向移动
+	pStaticPawnProperty->CBoxSize.XM_MinXYZ =	{ -1.0f,	-800.0f,	-800.0f };	//设置包围盒的大小
+	pStaticPawnProperty->CBoxSize.XM_MaxXYZ =	{ +1.0f,	+800.0f,	+800.0f };		//设置包围盒的大小
+	m_pPawnMaster->CreatePawn(gStaticPawnType, pStaticPawnProperty);
+
+	//Z轴负向
+	pStaticPawnProperty = StaticPawn::NewProperty();
+	pStaticPawnProperty->CBoxType = COLLIDE_TYPE_BOX_2;
+	pStaticPawnProperty->GeometryName = "shapeGeo";
+	pStaticPawnProperty->ShapeName = "box";
+	pStaticPawnProperty->MaterialName = "box";
+	pStaticPawnProperty->InitRotation = { 0.0f, 0.0f, 0.0f };
+	pStaticPawnProperty->InitTranslation =		{ 0.0f,		0.0f,		-800.0f };			//向Z轴负向移动
+	pStaticPawnProperty->CBoxSize.XM_MinXYZ =	{ -800.0f,	-800.0f,	-1.0f };	//设置包围盒的大小
+	pStaticPawnProperty->CBoxSize.XM_MaxXYZ =	{ +800.0f,	+800.0f,	+1.0f };		//设置包围盒的大小
+	m_pPawnMaster->CreatePawn(gStaticPawnType, pStaticPawnProperty);
+
+	//Z轴正向
+	pStaticPawnProperty = StaticPawn::NewProperty();
+	pStaticPawnProperty->CBoxType = COLLIDE_TYPE_BOX_2;
+	pStaticPawnProperty->GeometryName = "shapeGeo";
+	pStaticPawnProperty->ShapeName = "box";
+	pStaticPawnProperty->MaterialName = "box";
+	pStaticPawnProperty->InitRotation = { 0.0f, 0.0f, 0.0f };
+	pStaticPawnProperty->InitTranslation =		{ 0.0f,		0.0f,		800.0f };			//向Z轴正向移动
+	pStaticPawnProperty->CBoxSize.XM_MinXYZ =	{ -800.0f,	-800.0f,	-1.0f };	//设置包围盒的大小
+	pStaticPawnProperty->CBoxSize.XM_MaxXYZ =	{ +800.0f,	+800.0f,	+1.0f };		//设置包围盒的大小
+	m_pPawnMaster->CreatePawn(gStaticPawnType, pStaticPawnProperty);
+	
 
 
 	//为了保证摄像机一定存在，现在就执行生成pawn的指令，使得Scence中生成一个摄像机。

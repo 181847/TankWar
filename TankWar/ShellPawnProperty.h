@@ -4,7 +4,7 @@
 #include "GCommanders.h"
 
 //最大的弹药数量。
-#define MAX_SHELL_PAWN_NUM 900
+#define MAX_SHELL_PAWN_NUM 90000
 
 //炮弹单位的可控制网格数量，只有一个。
 #define CONTROLITEM_NUM_SHELL 1

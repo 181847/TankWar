@@ -69,7 +69,7 @@ BasePawn * ShellPawnTemplate::CreatePawn(PawnProperty* pProperty, Scence* pScenc
 
 	//创建一个根控制器。
 	pNewPawn->m_arr_ControlItem[CONTROLITEM_INDEX_SHELL_ROOT] =
-		pScence->NewControlItem("shapeGeo", "box", "box");
+		pScence->NewControlItem("Shell", "Shell", "box");
 	pNewPawn->RootControl()->Show();
 	//根据属性中设定的位置，调整子弹的方向
 	ReLocateShell(pNewPawn);
@@ -243,7 +243,7 @@ void ShellAITemplate::collideDetect(ShellPawn * pShell, const GameTimer & gt)
 	}
 
 	auto rayDetect = pShell->m_pRayDetect;
-	gCollideCommander->CollideDetect(rayDetect, COLLIDE_TYPE_ALL);
+	gCollideCommander->CollideDetect(rayDetect, COLLIDE_TYPE_BOX_1);
 
 	if (rayDetect->Result.CollideHappended)
 	{

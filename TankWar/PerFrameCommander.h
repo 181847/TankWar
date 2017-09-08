@@ -1,6 +1,6 @@
 #pragma once
 #include "BasePawn.h"
-#include "../../../../Common/GameTimer.h"
+#include "Common/GameTimer.h"
 
 //控制模板类型
 typedef unsigned int TemplateType;

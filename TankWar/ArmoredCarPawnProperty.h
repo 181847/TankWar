@@ -3,7 +3,7 @@
 
 
 //最大的装甲车数量
-#define MAX_PAWN_CAR_NUM 60
+#define MAX_PAWN_CAR_NUM 20000
 
 //装甲车单位的可控制网格数量，默认两个，一个根控制器控制位移，另一个控制旋转。
 #define CONTROLITEM_NUM_ARMORED_CAR 2

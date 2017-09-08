@@ -1,8 +1,8 @@
 #pragma once
-#include "../../../../Common/MathHelper.h"
-#include "../../../../Common/UploadBuffer.h"
-#include "../../../../Common/GeometryGenerator.h"
-#include "../../../../Common/GameTimer.h"
+#include "Common/MathHelper.h"
+#include "Common/UploadBuffer.h"
+#include "Common/GeometryGenerator.h"
+#include "Common/GameTimer.h"
 #include <memory>
 #include <vector>
 #include "FrameResource.h"

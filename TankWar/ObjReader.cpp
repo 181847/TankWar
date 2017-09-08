@@ -62,6 +62,12 @@ void ObjReader::ReadKeyInfo(ifstream & openedFile, vector<XMFLOAT3>& vs,
 		//读取一行。
 		getline(openedFile, lineBuffer);
 
+		//开始分析行，这个标记的主要作用是因为添加面定义的时候回跳到另一个函数中执行，
+		//解释面定义的时候回多读取一行字符串，
+		//为了防止这个多的一行字符串包含的有用信息被忽略，
+		//跳出面定义读取之后立马跳转到这个语句重新分析字符串。
+		startAnalyzeLine:
+
 		//查看第一个字符。
 		switch (lineBuffer[0])
 		{
@@ -93,8 +99,10 @@ void ObjReader::ReadKeyInfo(ifstream & openedFile, vector<XMFLOAT3>& vs,
 
 			//单个几何体。
 		case 'g':
-			//读取一个几何体的面信息。
+			//读取一个几何体的面信息，
+			//当读取完毕之后，返回下一行的字符串到lineBuffer中。
 			ReadKeyInfo_For_OneGeometry(openedFile, lineBuffer, geos);
+			goto startAnalyzeLine;
 			break;
 
 		default:
@@ -191,12 +199,16 @@ void ObjReader::SaveVertexLocation(string & line, vector<XMFLOAT3>& vs)
 	//其中v后面有两个空格，这会使得分割出来的字符串有一个空的，注意跳过。
 	SplitString(line, subStrings, " ");
 
+	//有的obj文件，v后面之后一个空格，为了避免这种情况，
+	//固定从子字符串的后三个开始提取。
+	int size = subStrings.size();
+
 	//X轴取负值、Z轴取Y轴的负值、Y轴取Z轴。
 	vs.push_back(
 		XMFLOAT3( 
-				UNIT_CONVERT(strtof(subStrings[2].c_str(), nullptr)),
-				UNIT_CONVERT(strtof(subStrings[3].c_str(), nullptr)),
-			   -UNIT_CONVERT(strtof(subStrings[4].c_str(), nullptr))	//这里要取负值
+				UNIT_CONVERT(strtof(subStrings[size - 3].c_str(), nullptr)),
+				UNIT_CONVERT(strtof(subStrings[size - 2].c_str(), nullptr)),
+			   -UNIT_CONVERT(strtof(subStrings[size - 1].c_str(), nullptr))	//这里要取负值
 			)
 		);
 }
@@ -211,7 +223,7 @@ void ObjReader::SaveTextureLocation(string & line, vector<XMFLOAT3>& vts)
 		XMFLOAT3(
 			strtof(subStrings[1].c_str(), nullptr),
 			strtof(subStrings[2].c_str(), nullptr),
-			strtof(subStrings[3].c_str(), nullptr)
+			1.0f	//有的obj文件vt后面有三个数（第三个固定为1），而有的只有两个数，
 		)
 	);
 }
@@ -250,11 +262,21 @@ void ObjReader::ReadKeyInfo_For_OneGeometry(ifstream & openedFile, string & line
 			//添加一个三角面的定义。
 			newGeo->AddFaceDefination(lineBuffer);
 		}
+		else
+		{
+			break;
+		}
 
-	} while (lineBuffer[0] != '#' && !openedFile.eof());
+	} while (lineBuffer[0] == 'f' && !openedFile.eof());
 
 	//添加新几何体。
 	geos.push_back(std::move(newGeo));
+
+
+	//跳出循环，为了防止最后读取的一个不是三角面定义的字符串是有用信息，
+	//将引用参数line设为最后读取的一个字符串，方便上层调用者对这一行信息重新分析，
+	//防止遗漏有用信息。
+	line = lineBuffer;
 }
 
 ObjReader::ObjectGeometry::ObjectGeometry(const string & _name)
@@ -289,7 +311,7 @@ void ObjReader::ObjectGeometry::AddVertexDefination(const string & vertextDefina
 	TextureList.push_back(static_cast<UINT>(
 		_strtoui64(subNumber[1].c_str(), nullptr, 10)));
 
-	//顶点贴图坐标索引。
+	//顶点法线坐标索引。
 	NormalList.push_back(static_cast<UINT>(
 		_strtoui64(subNumber[2].c_str(), nullptr, 10)));
 }

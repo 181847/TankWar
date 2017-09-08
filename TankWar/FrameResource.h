@@ -1,8 +1,8 @@
 #pragma once
-#include "../../../../Common/d3dUtil.h"
-#include "../../../../Common/MathHelper.h"
-#include "../../../../Common/UploadBuffer.h"
-#include "../../../../Common/GeometryGenerator.h"
+#include "Common/d3dUtil.h"
+#include "Common/MathHelper.h"
+#include "Common/UploadBuffer.h"
+#include "Common/GeometryGenerator.h"
 using namespace DirectX::PackedVector;
 using namespace DirectX;
 

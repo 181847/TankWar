@@ -110,7 +110,7 @@ BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnProperty* pProperty, Scence*
 	//newPawn->MainBody()->MoveY(1.0f);
 
 	newPawn->m_arr_ControlItem[CONTROLITEM_INDEX_PLAYER_PAWN_BARREL] =
-		pScence->NewControlItem("Tank_2", "Barrel", "grid");
+		pScence->NewControlItem("Tank_2", "Barrel", "cylinder");
 	newPawn->Barrel()->MoveXYZ(0.0f, 0.26f, .88f);
 
 	//添加玩家控制。
@@ -395,7 +395,7 @@ void PlayerAITemplate::aim(PlayerPawn * pPlayer, const GameTimer& gt)
 {
 	//从摄像机的方向检查射线碰撞，
 	//将炮管barrel的方向对准发生碰撞的方向。
-	auto ray = gCollideCommander->NewRay(pPlayer->m_pCamera->Target, 200.0f);
+	auto ray = gCollideCommander->NewRay(pPlayer->m_pCamera->Target, 10e7f);
 	gCollideCommander->CollideDetect(ray, COLLIDE_TYPE_ALL);
 
 	XMFLOAT3 dummyLocation = { 0.0f, 0.0f, 0.0f };

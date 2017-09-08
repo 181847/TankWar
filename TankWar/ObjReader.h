@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../../Common/GeometryGenerator.h"
+#include "Common/GeometryGenerator.h"
 #include "MyTools.h"
 using namespace DirectX; 
 using namespace std;

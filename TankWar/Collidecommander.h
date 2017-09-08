@@ -9,6 +9,9 @@ typedef int CollideType;
 #define COLLIDE_RECT_TYPE_NONE 0
 //碰撞体类型1
 #define COLLIDE_TYPE_BOX_1 1
+#define COLLIDE_TYPE_BOX_2 2
+#define COLLIDE_TYPE_BOX_3 3
+#define COLLIDE_TYPE_BOX_4 4
 
 #define MAX(X, Y) (X > Y ? X : Y)
 #define MIN(X, Y) (X < Y ? X : Y)
@@ -63,6 +66,11 @@ struct BoxSize
 {
 	union
 	{
+		struct
+		{
+			XMFLOAT3 XM_MinXYZ;
+			XMFLOAT3 XM_MaxXYZ;
+		};
 		struct 
 		{
 			float MinXYZ[3];
@@ -80,6 +88,9 @@ struct BoxSize
 			float Zmax;
 		};
 	};
+
+public:
+	BoxSize();
 };
 
 //长方形碰撞体。
@@ -97,8 +108,12 @@ struct CollideBox
 	BasePawn* pPawn;
 
 public:
+	CollideBox();
 	//根据碰撞盒的尺寸，计算包围球的半径平方。
 	void CaculateRadius();
+
+	//设置碰撞盒的刀削。
+	void Resize(XMFLOAT3 minXYZ, XMFLOAT3 maxXYZ);
 };
 
 

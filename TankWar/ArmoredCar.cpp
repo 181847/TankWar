@@ -155,9 +155,9 @@ void CarPawnTemplate::AddCollideBoxes(ArmoredCar * pPawn)
 	}
 
 	//修改碰撞盒的大小。
-	pRootBox->Size.Xmin = -0.5f;	pRootBox->Size.Xmax = 0.5f;
-	pRootBox->Size.Ymin = -0.0f;	pRootBox->Size.Ymax = 0.3f;
-	pRootBox->Size.Zmin = -0.5f;	pRootBox->Size.Zmax = 0.5f;
+	pRootBox->Size.Xmin = -1.0f;	pRootBox->Size.Xmax = 1.0f;
+	pRootBox->Size.Ymin = -0.8f;	pRootBox->Size.Ymax = 0.8f;
+	pRootBox->Size.Zmin = -1.0f;	pRootBox->Size.Zmax = 1.0f;
 
 	//重新计算包围盒的球体半径。
 	pRootBox->CaculateRadius();
@@ -204,8 +204,8 @@ CarAITemplate::CarAITemplate()
 	//瞄准状态概览
 	StoryFragment aimFragment;
 	aimFragment.State = STORY_FRAGMENT_CAR_AIM;
-	aimFragment.Posibility = 0.9f;
-	aimFragment.ConsistTime = 20000.0f;
+	aimFragment.Posibility = 0.3f;
+	aimFragment.ConsistTime = 1.0f;
 	aimFragment.NextState = STORY_FRAGMENT_NEXT_RANDOM_OTHERS;
 
 	//射击状态概览
