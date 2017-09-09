@@ -79,7 +79,7 @@ BasePawn * CarPawnTemplate::CreatePawn(PawnProperty* pProperty, Scence* pScence)
 		pScence->NewControlItem("shapeGeo", "box", "box");
 	//车身控制器。
 	newPawn->m_arr_ControlItem[CONTROLITEM_INDEX_CAR_MAIN_BODY] =
-		pScence->NewControlItem("shapeGeo", "box", "box");
+		pScence->NewControlItem("ArmoredCar", "ArmoredCar", "box");
 
 	//隐藏根控制器的网格。
 	newPawn->RootControl()->Hide();
@@ -156,7 +156,7 @@ void CarPawnTemplate::AddCollideBoxes(ArmoredCar * pPawn)
 
 	//修改碰撞盒的大小。
 	pRootBox->Size.Xmin = -1.0f;	pRootBox->Size.Xmax = 1.0f;
-	pRootBox->Size.Ymin = -0.8f;	pRootBox->Size.Ymax = 0.8f;
+	pRootBox->Size.Ymin = 0.0f;	pRootBox->Size.Ymax = 0.8f;
 	pRootBox->Size.Zmin = -1.0f;	pRootBox->Size.Zmax = 1.0f;
 
 	//重新计算包围盒的球体半径。

@@ -1131,6 +1131,9 @@ void MyShapesApp::BuildShapeGeometry_for_Scence()
 
 	//地形网格。
 	AddGeometry("Land");
+
+	//ArmoredCar网格
+	AddGeometry("ArmoredCar");
 }
 
 //void MyShapesApp::BuildCollideCommander()
@@ -1170,11 +1173,9 @@ void MyShapesApp::BuildInitPawn()
 	//记录一个玩家生成指令。
 	m_pPawnMaster->CreatePawn(gPlayerPawnType, pPlayerProperty);
 
-	//第一个装甲车的属性
-	auto pCarProperty = ArmoredCar::NewProperty();
-	pCarProperty		->MoveSpeed = 2.0f;
-	pCarProperty		->RotationSpeed = 2.0f;
-	m_pPawnMaster->CreatePawn(gArmoredCarPawnType, nullptr);
+
+	//使用装甲车的默认属性进行创建。
+	gPawnMaster->CreatePawn(gArmoredCarPawnType, nullptr);
 
 	//地形
 	auto pStaticPawnProperty = StaticPawn::NewProperty();

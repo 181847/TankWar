@@ -78,7 +78,7 @@ BasePawn* PlayerPawnCommandTemplate::CreatePawn(PawnProperty* pProperty, Scence*
 	//从场景中创建摄像机，把摄像机存储到Player中。
 	newPawn->m_pCamera = pScence->AppendCamera();
 
-	newPawn->m_pCamera->Target->Translation = { 0.0f, 3.0f, 0.0f };
+	newPawn->m_pCamera->Target->Translation = { 0.0f, 5.0f, 0.0f };
 
 	//修改摄像机的局部坐标，避免再后来的更新中和摄像机的目标重合，引发异常。
 	newPawn->m_pCamera->Pos->Translation = { 0.0f, 0.0f, -10.0f };
@@ -249,8 +249,8 @@ void PlayerControlCommandTemplate::MouseMove(BasePawn* pPawn, MouseState mouseSt
 	//限制摄像机的镜头俯仰角角度，上至下90度范围内。
 	pPlayerPawn->m_pCamera->Target->Rotation.x = MathHelper::Clamp(
 		pPlayerPawn->m_pCamera->Target->Rotation.x,
-		-XM_PI / 6,	
-		XM_PIDIV2 - 0.01f);	
+		-XM_PIDIV2,	
+		XM_PI / 6 - 0.01f);	
 
 	
 }
