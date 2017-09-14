@@ -19,13 +19,15 @@ class DeLinkedList
 
 public:
 	DeLinkedList(UINT allocatorSize);
+	DeLinkedList(const DeLinkedList<ELEMENT>&) = delete;
+	DeLinkedList<ELEMENT>& operator = (const DeLinkedList<ELEMENT>&) = delete;
 	~DeLinkedList();
 
 protected:
 	//头结点。
 	DeLinkedElement<ELEMENT> m_root;
 	//结点分配器，当空间不足时，抛出SimpleException。
-	std::unique_ptr<MyStaticAllocator<DeLinkedElement<ELEMENT>>> m_pAllocator;
+	MyStaticAllocator<DeLinkedElement<ELEMENT>> m_pAllocator;
 
 public:
 	//申请新的结点。
@@ -42,9 +44,8 @@ public:
 
 template<typename ELEMENT>
 DeLinkedList<ELEMENT>::DeLinkedList(UINT allocatorSize)
+	:m_pAllocator(allocatorSize)
 {
-	m_pAllocator =
-		std::make_unique<MyStaticAllocator<DeLinkedElement<ELEMENT>>>(allocatorSize);
 	//自身头尾相连。
 	m_root.m_pPrev = m_root.m_pNext = &m_root;
 }
@@ -58,7 +59,7 @@ DeLinkedList<ELEMENT>::~DeLinkedList()
 template<typename ELEMENT>
 DeLinkedElement<ELEMENT> * DeLinkedList<ELEMENT>::NewNodeAtHead()
 {
-	DeLinkedElement<ELEMENT>* pNewNode = m_pAllocator->Malloc();
+	DeLinkedElement<ELEMENT>* pNewNode = m_pAllocator.Malloc();
 	pNewNode->m_pNext = m_root.m_pNext;
 	m_root.m_pNext = pNewNode;
 
@@ -78,7 +79,7 @@ inline void DeLinkedList<ELEMENT>::Remove(DeLinkedElement<ELEMENT>* link)
 
 	link->m_pNext = link->m_pPrev = nullptr;
 
-	m_pAllocator->Free(link);
+	m_pAllocator.Free(link);
 }
 
 template<typename ELEMENT>
@@ -90,12 +91,12 @@ inline DeLinkedElement<ELEMENT>* DeLinkedList<ELEMENT>::GetHead()
 template<typename ELEMENT>
 inline UINT DeLinkedList<ELEMENT>::GetTotalCount()
 {
-	return m_pAllocator->GetTotalCount();
+	return m_pAllocator.GetTotalCount();
 }
 
 template<typename ELEMENT>
 inline UINT DeLinkedList<ELEMENT>::GetRemainCount()
 {
-	return m_pAllocator->GetRemainCount();
+	return m_pAllocator.GetRemainCount();
 }
 

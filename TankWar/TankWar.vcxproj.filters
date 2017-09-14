@@ -31,26 +31,35 @@
     <Filter Include="App文件\Commander\AICommander">
       <UniqueIdentifier>{8db8e83d-8d66-424a-a8b5-d0aedcae4d8c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="App文件\Commander\FollowCommander">
-      <UniqueIdentifier>{b69122c3-96aa-4164-9849-8166b6765784}</UniqueIdentifier>
-    </Filter>
     <Filter Include="App文件\Commander\CollideCommander">
       <UniqueIdentifier>{01e6bf7e-e5b7-4900-a144-88f575188d44}</UniqueIdentifier>
     </Filter>
     <Filter Include="App文件\Commander\PawnMaster">
       <UniqueIdentifier>{a88cd3cc-1fc8-4832-be32-b72ec01371f2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="App文件\Commander\ControlItemMaster">
-      <UniqueIdentifier>{4a4f4801-23ea-469d-9a68-96a5c575f581}</UniqueIdentifier>
-    </Filter>
     <Filter Include="App文件\Pawn">
       <UniqueIdentifier>{c98a1eaa-e54b-4f46-9ed1-95df4028122d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="App文件\Pawn\Player">
-      <UniqueIdentifier>{e692cda5-fc92-4664-8aaf-4d9155d079e5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="App文件\Pawn\BasePawn">
       <UniqueIdentifier>{d0cfbe4a-e759-4ef4-8ad8-06cda17a6810}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Pawn\PlayerPawn">
+      <UniqueIdentifier>{e692cda5-fc92-4664-8aaf-4d9155d079e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Commander\BoneCommander">
+      <UniqueIdentifier>{99d46180-291d-4484-b39a-7c7bdc0bb657}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Pawn\ArmoredCar">
+      <UniqueIdentifier>{ac403c70-3cf8-4ba2-b0c2-7916e1f1136d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Commander\PerFrameCommander">
+      <UniqueIdentifier>{eb8f5029-ee40-4819-8456-b9cd6d332ad3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Pawn\ShellPawn">
+      <UniqueIdentifier>{bfcd6404-c65a-420a-a38c-a7de53bb6ed9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App文件\Pawn\StaticPawn">
+      <UniqueIdentifier>{57a70ae5-a52c-45e8-beef-b3b1b7455a54}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -75,9 +84,6 @@
     <ClCompile Include="..\..\..\..\Common\MathHelper.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="FrameResource.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="MyShapesApp.cpp">
       <Filter>App文件\源文件</Filter>
     </ClCompile>
@@ -86,6 +92,63 @@
     </ClCompile>
     <ClCompile Include="BasePawn.cpp">
       <Filter>App文件\Pawn\BasePawn</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerPawn.cpp">
+      <Filter>App文件\Pawn\PlayerPawn</Filter>
+    </ClCompile>
+    <ClCompile Include="PawnMaster.cpp">
+      <Filter>App文件\Commander\PawnMaster</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerCommander.cpp">
+      <Filter>App文件\Commander\PlayerCommander</Filter>
+    </ClCompile>
+    <ClCompile Include="BoneCommander.cpp">
+      <Filter>App文件\Commander\BoneCommander</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlItem.cpp">
+      <Filter>App文件\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameResource.cpp">
+      <Filter>App文件\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjReader.cpp">
+      <Filter>App文件\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MyTools.cpp">
+      <Filter>App文件\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ArmoredCar.cpp">
+      <Filter>App文件\Pawn\ArmoredCar</Filter>
+    </ClCompile>
+    <ClCompile Include="AICommander.cpp">
+      <Filter>App文件\Commander\AICommander</Filter>
+    </ClCompile>
+    <ClCompile Include="PerFrameCommander.cpp">
+      <Filter>App文件\Commander\PerFrameCommander</Filter>
+    </ClCompile>
+    <ClCompile Include="CollideCommander.cpp">
+      <Filter>App文件\Commander\CollideCommander</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellPawn.cpp">
+      <Filter>App文件\Pawn\ShellPawn</Filter>
+    </ClCompile>
+    <ClCompile Include="GCommanders.cpp">
+      <Filter>App文件\Commander</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerPawnProperty.cpp">
+      <Filter>App文件\Pawn\PlayerPawn</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellPawnProperty.cpp">
+      <Filter>App文件\Pawn\ShellPawn</Filter>
+    </ClCompile>
+    <ClCompile Include="ArmoredCarPawnProperty.cpp">
+      <Filter>App文件\Pawn\ArmoredCar</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticPawnProperty.cpp">
+      <Filter>App文件\Pawn\StaticPawn</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticPawn.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -116,9 +179,6 @@
     <ClInclude Include="..\..\..\..\Common\UploadBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="FrameResource.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="MyShapesApp.h">
       <Filter>App文件\头文件</Filter>
     </ClInclude>
@@ -137,5 +197,73 @@
     <ClInclude Include="BasePawn.h">
       <Filter>App文件\Pawn\BasePawn</Filter>
     </ClInclude>
+    <ClInclude Include="LinkedAllocator.h">
+      <Filter>App文件\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerPawn.h">
+      <Filter>App文件\Pawn\PlayerPawn</Filter>
+    </ClInclude>
+    <ClInclude Include="PawnMaster.h">
+      <Filter>App文件\Commander\PawnMaster</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerCommander.h">
+      <Filter>App文件\Commander\PlayerCommander</Filter>
+    </ClInclude>
+    <ClInclude Include="BoneCommander.h">
+      <Filter>App文件\Commander\BoneCommander</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlItem.h">
+      <Filter>App文件\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameResource.h">
+      <Filter>App文件\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjReader.h">
+      <Filter>App文件\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyTools.h">
+      <Filter>App文件\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ArmoredCar.h">
+      <Filter>App文件\Pawn\ArmoredCar</Filter>
+    </ClInclude>
+    <ClInclude Include="AICommander.h">
+      <Filter>App文件\Commander\AICommander</Filter>
+    </ClInclude>
+    <ClInclude Include="PerFrameCommander.h">
+      <Filter>App文件\Commander\PerFrameCommander</Filter>
+    </ClInclude>
+    <ClInclude Include="CollideCommander.h">
+      <Filter>App文件\Commander\CollideCommander</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellPawn.h">
+      <Filter>App文件\Pawn\ShellPawn</Filter>
+    </ClInclude>
+    <ClInclude Include="GCommanders.h">
+      <Filter>App文件\Commander</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerPawnProperty.h">
+      <Filter>App文件\Pawn\PlayerPawn</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellPawnProperty.h">
+      <Filter>App文件\Pawn\ShellPawn</Filter>
+    </ClInclude>
+    <ClInclude Include="ArmoredCarPawnProperty.h">
+      <Filter>App文件\Pawn\ArmoredCar</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticPawnProperty.h">
+      <Filter>App文件\Pawn\StaticPawn</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticPawn.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TankWar.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

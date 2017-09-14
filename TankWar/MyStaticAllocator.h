@@ -1,22 +1,62 @@
 #pragma once
+#include "MyTools.h"
 #include "MyAssert.h"
 //将零号元素的序号起一个别名HEAD。
 #define HEAD 0
 
 typedef unsigned int UINT;
 
+
+/*
+template<typename DataType>
+struct LinkableUnit
+{
+union
+{
+LinkableUnit<DataType>* next;
+DataType data;
+};
+
+public:
+LinkableUnit();
+~LinkableUnit();
+};
+
+template<typename DataType>
+inline LinkableUnit<DataType>::LinkableUnit()
+{
+}
+
+template<typename DataType>
+inline LinkableUnit<DataType>::~LinkableUnit()
+{
+}
+*/
+
+
+
+
+
 template<typename DataType>
 class MyStaticAllocator
 {
-	//作为可分配空间的结点。
-	union LinkableUnit
+	
+	struct LinkableUnit 
 	{
-		DataType data;
-		LinkableUnit* next;
+		union 
+		{
+			LinkableUnit* next;
+			DataType data;
+		};
+	public:
+		LinkableUnit() {}
+		~LinkableUnit() {}
 	};
 
 public:
 	MyStaticAllocator(UINT initializeUnitCount);
+	MyStaticAllocator(const MyStaticAllocator&) = delete;
+	MyStaticAllocator& operator = (const MyStaticAllocator&) = delete;
 	~MyStaticAllocator();
 	//申请一个DataType类型的指针。
 	DataType* Malloc();
@@ -43,7 +83,9 @@ MyStaticAllocator<DataType>::MyStaticAllocator(UINT initializeUnitCount)
 	remainCount = totalCount = initializeUnitCount;
 
 	//申请初始空间的时候多申请一个，用来表示头结点。
-	memoryLocation = new LinkableUnit[totalCount + 1];
+	memoryLocation = 
+		new LinkableUnit[totalCount + 1];
+
 	//内存池链接为一个链表。
 	for (UINT i = 0; i < totalCount; ++i) 
 	{
@@ -63,7 +105,7 @@ MyStaticAllocator<DataType>::~MyStaticAllocator()
 template<typename DataType>
 inline DataType * MyStaticAllocator<DataType>::Malloc()
 {
-	ASSERT(remainCount && "分配池可用空间为0");
+	ASSERT(remainCount >1 && "分配池可用空间为0");
 	--remainCount;
 
 	LinkableUnit* returnPointer = memoryLocation[HEAD].next;

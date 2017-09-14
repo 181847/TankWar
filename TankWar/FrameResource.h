@@ -1,7 +1,8 @@
 #pragma once
-#include "../../../../Common/d3dUtil.h"
-#include "../../../../Common/MathHelper.h"
-#include "../../../../Common/UploadBuffer.h"
+#include "Common/d3dUtil.h"
+#include "Common/MathHelper.h"
+#include "Common/UploadBuffer.h"
+#include "Common/GeometryGenerator.h"
 using namespace DirectX::PackedVector;
 using namespace DirectX;
 
@@ -68,12 +69,15 @@ struct Vertex
 {
 	DirectX::XMFLOAT3 Pos;
 	DirectX::XMFLOAT3 Normal;
+public:
+	Vertex();
+	Vertex(const GeometryGenerator::Vertex& v);
 };
 
 struct FrameResource
 {
 public:
-	FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount);
+	FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT scenceObjectCount);
 	FrameResource(const FrameResource& rhs) = delete;
 	FrameResource& operator=(const FrameResource& rhs) = delete;
 	~FrameResource();
@@ -86,6 +90,8 @@ public:
 	std::unique_ptr<UploadBuffer<ObjectConstants>> ObjectCB = nullptr;
 	//用到的所有材质资源。
 	std::unique_ptr<UploadBuffer<MaterialConstants>> MaterialCB = nullptr;
+	//专门用于场景中的渲染物体的资源。
+	std::unique_ptr<UploadBuffer<ObjectConstants>> ScenceObjectCB = nullptr;
 
 	//同步计数。
 	UINT64 Fence = 0;

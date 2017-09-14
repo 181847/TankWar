@@ -20,6 +20,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE preInstance, PSTR cmdLine, int
 		MessageBox(nullptr, e.ToString().c_str(), L"HR Failed", MB_OK);
 		return 0;
 	}
+	catch (SimpleException e)
+	{
+		char lineInfo[40];
+		sprintf_s(lineInfo, "%d", e.line);
+		std::string exceptionMessage;
+		exceptionMessage += "\n文件：\n";
+		exceptionMessage += e.file;
+		exceptionMessage += "\n行数：\n";
+		exceptionMessage += lineInfo;
+		exceptionMessage += "\n表达式：\n";
+		exceptionMessage += e.expr;
+		MessageBox(nullptr, AnsiToWString(exceptionMessage).c_str(), L"HR Failed", MB_OK);
+		return 0;
+	}
 }
 
 MyShapesApp::MyShapesApp(HINSTANCE hInstance)
@@ -49,55 +63,6 @@ bool MyShapesApp::Initialize()
 	//程序运行的过程中这个Allocator基本上就没有什么用了。
 	ThrowIfFailed(mCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
-	/*
-	//创建场景。
-	m_scence = std::make_unique<Scence>(5000, 5000);
-	//创建Pawn制造机。
-	m_pawnMaster = std::make_unique<PawnMaster>(m_scence.get());
-	//创建PlayerCommander。 
-	m_playerCommander = std::make_unique<PlayerCommander>();
-	//创建AICommander。
-	m_AICommander = std::make_unique<AICommander>();
-	//创建FollowCommander。
-	m_FollowCommander = std::make_unique<FollowCommander>();
-	//创建CollideCommander。
-	m_CollideCommander = std::make_unique<CollideCommander>();
-
-	//设置角色创建在对应的Commander上。
-	PlayerPawn.SetCommanders(m_playerCommander, m_FollowCommander, m_CollideCommander);
-	MechanicalSpiderPawn.SetAICommanders(m_AICommander, m_FollowCommander, m_CollideCommander);
-	ArmoredCarPawn.SetAICommanders(m_AICommander, m_FollowCommander, m_CollideCommander);
-	ScatterPawn.SetCommanders(m_AICommander, m_FollowCommander, m_CollideCommander);
-	FrozenPlanePawn.SetCommanders(m_AICommander. m_FollowCommander, m_CollideCommander);
-	AmmoPawn.SetCommanders(m_AICommander. m_FollowCommander, m_CollideCommander);
-
-
-	//PawnMaster记录创建、删除玩家的命令模板。
-	m_pawnMaster.RememberCommandTemplate(
-		PlayerPawn.GeneratePawnCommandTemplate());
-
-	//PawnMaster记录创建、删除机械蜘蛛的命令模板。
-	m_pawnMaster.RememberCommandTemplate(
-		MechanicalSpiderPawn.GeneratePawnCommandTemplate());
-
-	//PawnMaster记录创建、删除装甲车的命令模板。
-	m_pawnMaster.RememberCommandTemplate(
-		ArmoredCarPawn.GeneratePawnCommandTemplate());
-
-	//PawnMaster记录创建、删除散射器的命令模板。
-	m_pawnMaster.RememberCommandTemplate(
-		ScatterPawn.GeneratePawnCommandTemplate());
-
-	//PawnMaster记录创建、删除冰冻平面的命令模板。
-	m_pawnMaster.RememberCommandTemplate(
-		FrozenPlanePawn.GeneratePawnCommandTemplate());
-
-	//PawnMaster记录创建、删除弹药的命令模板。
-	m_pawnMaster.RememberCommandTemplate(
-		AmmoPawn.GeneratePawnCommandTemplate());
-		
-	*/
-
 	//创建Shader参数定义。
 	BuildRootSignature();
 	//创建Shader的顶点参数和编译Shader。
@@ -108,6 +73,8 @@ bool MyShapesApp::Initialize()
 	BuildMaterials();
 	//创建所有要用到的网格顶点。
 	BuildShapeGeometry();
+	//创建Scence中所有需要用到的网格，这些网格全部从Obj文件中读取。
+	BuildShapeGeometry_for_Scence();
 	//创建所有渲染对象。
 	BuildRenderItems();
 	//创建FrameResource。
@@ -118,6 +85,9 @@ bool MyShapesApp::Initialize()
 	BuildConstantsBufferView();
 	//创建PipelineState。
 	BuildPSOs();
+
+	//创建场景。
+	BuildScence();
 
 	//强制执行相关Command。
 	ThrowIfFailed(mCommandList->Close());
@@ -220,9 +190,14 @@ void MyShapesApp::OnResize()
 
 void MyShapesApp::Update(const GameTimer& gt)
 {
+	
 	OnKeyboardInput(gt);
+	//更新键盘输入。
+	m_pPlayerCommander->DetactKeyState();
 	//更新摄像机信息。
-	UpdateCamera(gt);
+	//UpdateCamera(gt);
+	//从场景中的0号摄像机位置更新摄像机镜头。
+	UpdateCameraFromScence(gt, 0);
 	//更新灯光位置。
 	UpdateLights(gt);
 
@@ -243,8 +218,15 @@ void MyShapesApp::Update(const GameTimer& gt)
 	UpdateMainPassCB(gt);
 	UpdateMaterialCB(gt);
 
+	m_pPlayerCommander->Executee(gt);
+	m_pAICommander->AutoNavigate(gt);
+	m_pBoneCommander->Update();
+	//m_pCollideCommander->Executee();
+
 	//在这个方法里面完成游戏中所有的指令。
-	UpdateScence(gt);
+	m_pScence->UpdateData(gt, mCurrFrameResource);
+	//执行生成pawn的指令，使得Scence中生成一个摄像机。
+	m_pPawnMaster->Executee();
 }
 
 void MyShapesApp::Draw(const GameTimer& gt)
@@ -311,6 +293,8 @@ void MyShapesApp::Draw(const GameTimer& gt)
 		mCommandList.Get(), 
 		mOpaqueRitems);//内部包含的所有可渲染物体的指针
 
+	m_pScence->DrawScence(mCommandList.Get(), mCurrFrameResource);
+
 	mCommandList->ResourceBarrier(
 		1, 
 		&CD3DX12_RESOURCE_BARRIER::Transition(
@@ -333,7 +317,6 @@ void MyShapesApp::OnMouseDown(WPARAM btnState, int x, int y)
 {
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
-
 	SetCapture(mhMainWnd);
 }
 
@@ -367,6 +350,9 @@ void MyShapesApp::OnMouseMove(WPARAM btnState, int x, int y)
 
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
+
+	//记录新鼠标位置。
+	m_pPlayerCommander->mouseState.UpdateLocation(static_cast<LONG>(x), static_cast<LONG>(y));
 }
 
 void MyShapesApp::OnKeyboardInput(const GameTimer & gt)
@@ -389,10 +375,15 @@ void MyShapesApp::OnKeyboardInput(const GameTimer & gt)
 		mKeyLightTheta += 1.0f*dt;
 
 	if (GetAsyncKeyState(VK_UP) & 0x8000)
+	{
 		mKeyLightPhi -= 1.0f*dt;
+	}
 
-	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+	if (GetAsyncKeyState(VK_DOWN) & 0x8000) 
+	{
+		//为了以防万一，按下方向键下也会放弃鼠标捕获。
 		mKeyLightPhi += 1.0f*dt;
+	}
 
 	mKeyLightPhi = MathHelper::Clamp(mKeyLightPhi, 0.1f, XM_PIDIV2);
 }
@@ -529,6 +520,34 @@ void MyShapesApp::UpdateMaterialCB(const GameTimer & gt)
 			currMaterialCB->CopyData(mat->MatCBIndex, matConstants);
 		}
 	}
+}
+
+void MyShapesApp::UpdateCameraFromScence(const GameTimer & gt, UINT cameraIndexInScence)
+{
+	MyCamera* pCurrentCamera = m_pScence->GetCamera(cameraIndexInScence);
+	ASSERT(pCurrentCamera && "无法获取摄像机，请检查是否生成了至少一个PlayerPawn。");
+
+	//注意：这里的摄像机坐标应该是世界坐标，不要用局部坐标，局部坐标基本不变，会导致摄像机静止。
+	XMVECTOR pos = XMVectorSet(pCurrentCamera->Pos->World._41, pCurrentCamera->Pos->World._42, pCurrentCamera->Pos->World._43, 1.0f);
+	XMVECTOR target = XMVectorSet(pCurrentCamera->Target->World._41, pCurrentCamera->Target->World._42, pCurrentCamera->Target->World._43, 1.0f);
+	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+	static XMFLOAT4 lastValue;
+	static XMFLOAT4 currValue;
+	lastValue = currValue;
+	XMStoreFloat4(&currValue, target);
+	static int sameCount = 0;
+	if (lastValue.x == currValue.x 
+		&& lastValue.y == currValue.y
+		&& lastValue.z == currValue.z
+		&& lastValue.w == currValue.w)
+	{
+		++sameCount;
+	}
+
+	//计算世界至观察矩阵。
+	XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
+	XMStoreFloat4x4(&mView, view);
 }
 
 void MyShapesApp::BuildDescriptorHeap()
@@ -949,11 +968,10 @@ void MyShapesApp::BuildFrameResources()
 	{
 		mFrameResource.push_back(std::make_unique<FrameResource>(
 			md3dDevice.Get(),		
-			1,					//PassConstant的数量
-			1000,
-			//TODO
-			//(UINT)mAllRitems.size(),//ObjectConstants的数量。
-			(UINT)mMaterials.size()));	
+			1,							//PassConstant的数量
+			(UINT)mAllRitems.size(),
+			(UINT)mMaterials.size(),	//普通渲染物体的数量。
+			totalRitemInScence));		//场景中可渲染物体的数量。
 	}
 }
 
@@ -1045,7 +1063,271 @@ void MyShapesApp::BuildRenderItems()
 	{
 		mOpaqueRitems.push_back(item.get());
 	}
+}
 
+void MyShapesApp::BuildScence()
+{
+	m_pScence = std::make_unique<Scence>(
+		totalRitemInScence, totalCameraInScence, &mMaterials, &mGeometries);
+
+	//创建PawnMaster，用于自动化生成Pawn。
+	BuildPawnMaster();
+	//创建玩家指令官、AI指令官、控制跟随指令官。
+	BuildPlayerCommander();
+	BuildAICommander();
+	BuildBoneCommander();
+	BuildCollideCommander();
+
+	//注册Pawn类
+	RegisterPawnClass();
+	//创建初始的pawn对象，可以在这里创建玩家角色，初始化场景，
+	//建议通过PawnMaster来创建。
+	BuildInitPawn();
+
+}
+
+void MyShapesApp::BuildPawnMaster()
+{
+	m_pPawnMaster = std::make_unique<PawnMaster>(PAWN_MASTER_COMMAND_MAX_NUM, m_pScence.get());
+}
+
+void MyShapesApp::BuildPlayerCommander()
+{
+	m_pPlayerCommander = std::make_unique<PlayerCommander>(COMMANDER_PLAYER_MAX_COMMANDS);
+}
+
+void MyShapesApp::BuildAICommander()
+{
+	m_pAICommander = std::make_unique<AICommander>(COMMANDER_AI_UNIT_MAX_NUM);
+}
+
+void MyShapesApp::BuildBoneCommander()
+{
+	m_pBoneCommander = std::make_unique<BoneCommander>(COMMANDER_FOLLOW_MAX_COMMANDS);
+}
+
+void MyShapesApp::BuildCollideCommander()
+{
+	m_pCollideCommander = std::make_unique<CollideCommander>(
+		COMMANDER_COLLIDE_MAX_RAY_NUM,
+		COMMANDER_COLLIDE_MAX_NUM);
+}
+
+void MyShapesApp::BuildShapeGeometry_for_Scence()
+{
+	//这里指定一个文件名，默认文件的扩展名为“.obj”，
+	//从指定的文件读取顶点信息，然后向mGeometries添加提取的子网格，
+	//一个文件中的子网格放到同一个Geometry中。
+	AddGeometry("Tank");
+
+	//主要的坦克网格。
+	AddGeometry("Tank_2");
+
+	//十字形的定位器网格。
+	AddGeometry("Allocator");
+
+	//弹药网格。
+	AddGeometry("Shell");
+
+	//地形网格。
+	AddGeometry("Land");
+
+	//ArmoredCar网格
+	AddGeometry("ArmoredCar");
+}
+
+//void MyShapesApp::BuildCollideCommander()
+//{
+//	m_pCollideCommander = std::make_unique<CollideCommander>(COMMANDER_COLLIDE_MAX_NUM);
+//}
+
+void MyShapesApp::RegisterPawnClass()
+{
+
+	RegisterGlobalCommanders(
+		m_pPawnMaster.get(),
+		m_pBoneCommander.get(),
+		m_pCollideCommander.get(),
+		m_pAICommander.get(),
+		m_pPlayerCommander.get());
+
+	//游戏中所有的Pawn注册要用到的Master和Commander。
+	PlayerPawn::Register();
+	ArmoredCar::Register();
+	ShellPawn::Register();
+	StaticPawn::Register();
+
+	ASSERT(gPlayerPawnType);
+	ASSERT(gArmoredCarPawnType);
+	ASSERT(gShellPawnType);
+	ASSERT(gStaticPawnType);
+
+}
+
+void MyShapesApp::BuildInitPawn()
+{
+	//玩家属性。
+	auto pPlayerProperty = PlayerPawn::NewProperty();
+	pPlayerProperty		->MoveSpeed = 5.0f;
+	pPlayerProperty		->RotationSpeed = 2.0f;
+	//记录一个玩家生成指令。
+	m_pPawnMaster->CreatePawn(gPlayerPawnType, pPlayerProperty);
+
+
+	//使用装甲车的默认属性进行创建。
+	gPawnMaster->CreatePawn(gArmoredCarPawnType, nullptr);
+
+	//地形
+	auto pStaticPawnProperty = StaticPawn::NewProperty();
+	pStaticPawnProperty->CBoxType = COLLIDE_TYPE_BOX_2;
+	pStaticPawnProperty->GeometryName = "Land";
+	pStaticPawnProperty->ShapeName = "Land";
+	pStaticPawnProperty->MaterialName = "grid";
+	pStaticPawnProperty->InitRotation = { 0.0f, 0.0f, 0.0f };
+	pStaticPawnProperty->InitTranslation = { 0.0f, 0.0f, 0.0f };
+	pStaticPawnProperty->CBoxSize.XM_MinXYZ = { -1.0f,	-1.0f,	-1.0f };
+	pStaticPawnProperty->CBoxSize.XM_MaxXYZ = { +1.0f,	+1.0f,	+1.0f };
+	m_pPawnMaster->CreatePawn(gStaticPawnType, pStaticPawnProperty);
+
+	//下面是四个空气墙，用于瞄准的碰撞检测。
+	//X轴负向
+	pStaticPawnProperty = StaticPawn::NewProperty();
+	pStaticPawnProperty->CBoxType = COLLIDE_TYPE_BOX_2;
+	pStaticPawnProperty->GeometryName = "shapeGeo";
+	pStaticPawnProperty->ShapeName = "box";
+	pStaticPawnProperty->MaterialName = "box";
+	pStaticPawnProperty->InitRotation = { 0.0f, 0.0f, 0.0f };
+	pStaticPawnProperty->InitTranslation =		{ -800.0f,	0.0f,		0.0f };			//向X轴负向移动
+	pStaticPawnProperty->CBoxSize.XM_MinXYZ =	{ -1.0f,	-800.0f,	-800.0f };	//设置包围盒的大小
+	pStaticPawnProperty->CBoxSize.XM_MaxXYZ =	{ +1.0f,	+800.0f,	+800.0f };		//设置包围盒的大小
+	m_pPawnMaster->CreatePawn(gStaticPawnType, pStaticPawnProperty);
+
+	//X轴正向
+	pStaticPawnProperty = StaticPawn::NewProperty();
+	pStaticPawnProperty->CBoxType = COLLIDE_TYPE_BOX_2;
+	pStaticPawnProperty->GeometryName = "shapeGeo";
+	pStaticPawnProperty->ShapeName = "box";
+	pStaticPawnProperty->MaterialName = "box";
+	pStaticPawnProperty->InitRotation = { 0.0f, 0.0f, 0.0f };
+	pStaticPawnProperty->InitTranslation =		{ 800.0f,	0.0f,		0.0f };			//向X轴正向移动
+	pStaticPawnProperty->CBoxSize.XM_MinXYZ =	{ -1.0f,	-800.0f,	-800.0f };	//设置包围盒的大小
+	pStaticPawnProperty->CBoxSize.XM_MaxXYZ =	{ +1.0f,	+800.0f,	+800.0f };		//设置包围盒的大小
+	m_pPawnMaster->CreatePawn(gStaticPawnType, pStaticPawnProperty);
+
+	//Z轴负向
+	pStaticPawnProperty = StaticPawn::NewProperty();
+	pStaticPawnProperty->CBoxType = COLLIDE_TYPE_BOX_2;
+	pStaticPawnProperty->GeometryName = "shapeGeo";
+	pStaticPawnProperty->ShapeName = "box";
+	pStaticPawnProperty->MaterialName = "box";
+	pStaticPawnProperty->InitRotation = { 0.0f, 0.0f, 0.0f };
+	pStaticPawnProperty->InitTranslation =		{ 0.0f,		0.0f,		-800.0f };			//向Z轴负向移动
+	pStaticPawnProperty->CBoxSize.XM_MinXYZ =	{ -800.0f,	-800.0f,	-1.0f };	//设置包围盒的大小
+	pStaticPawnProperty->CBoxSize.XM_MaxXYZ =	{ +800.0f,	+800.0f,	+1.0f };		//设置包围盒的大小
+	m_pPawnMaster->CreatePawn(gStaticPawnType, pStaticPawnProperty);
+
+	//Z轴正向
+	pStaticPawnProperty = StaticPawn::NewProperty();
+	pStaticPawnProperty->CBoxType = COLLIDE_TYPE_BOX_2;
+	pStaticPawnProperty->GeometryName = "shapeGeo";
+	pStaticPawnProperty->ShapeName = "box";
+	pStaticPawnProperty->MaterialName = "box";
+	pStaticPawnProperty->InitRotation = { 0.0f, 0.0f, 0.0f };
+	pStaticPawnProperty->InitTranslation =		{ 0.0f,		0.0f,		800.0f };			//向Z轴正向移动
+	pStaticPawnProperty->CBoxSize.XM_MinXYZ =	{ -800.0f,	-800.0f,	-1.0f };	//设置包围盒的大小
+	pStaticPawnProperty->CBoxSize.XM_MaxXYZ =	{ +800.0f,	+800.0f,	+1.0f };		//设置包围盒的大小
+	m_pPawnMaster->CreatePawn(gStaticPawnType, pStaticPawnProperty);
+	
+
+
+	//为了保证摄像机一定存在，现在就执行生成pawn的指令，使得Scence中生成一个摄像机。
+	m_pPawnMaster->Executee();
+}
+
+void MyShapesApp::AddGeometry(const string & fileName)
+{
+	string filePath = "objs/" + fileName + ".obj";
+	//用于存储网格信息的临时变量。
+	unique_ptr<unordered_map<
+		string, 
+		unique_ptr<GeometryGenerator::MeshData>>> shapes;
+
+	//读取文件。
+	try
+	{
+		shapes = ObjReader::ReadObjFile(filePath);
+	}
+	catch (SimpleException& e)
+	{
+		throw SimpleException(
+			("读取Obj文件失败，请检查文件路径：" + filePath).c_str(), 
+			__FILE__, 
+			__LINE__);
+	}
+
+	auto geo = std::make_unique<MeshGeometry>();
+	geo->Name = fileName;
+
+	//这个文件中的顶点定义。
+	std::vector<Vertex> totalVertices;
+	//这个文件中的所有索引。
+	std::vector<uint16_t> totalIndices;
+	//对应单独子网格的顶点偏移。
+	UINT currVertexOffset = 0;
+	//对应单独网格的索引偏移。
+	UINT currIndexOffset = 0;
+
+	//遍历每一个子网格。
+	for (auto& shape : *shapes)
+	{
+		//子网格。
+		SubmeshGeometry subMesh;
+
+		//属性设定。
+		subMesh.BaseVertexLocation = currVertexOffset;
+		subMesh.StartIndexLocation = currIndexOffset;
+		subMesh.IndexCount = static_cast<UINT>(shape.second->Indices32.size());
+
+		//追加顶点和索引值到vector中
+		totalVertices.	insert(
+			totalVertices.end(),
+			std::begin(shape.second->Vertices),
+			std::end(shape.second->Vertices));
+		totalIndices.	insert(
+			totalIndices.end(),
+			std::begin(shape.second->GetIndices16()),
+			std::end(shape.second->GetIndices16()));
+
+		//向Geometry添加这个子网格。
+		geo->DrawArgs[shape.first] = subMesh;
+
+		//为下一个子网格准备偏移值。
+		currVertexOffset += static_cast<UINT>(shape.second->Vertices.size());
+		currIndexOffset += subMesh.IndexCount;
+	}
+
+	//顶点缓冲的总大小。
+	const UINT vbByteSize = currVertexOffset	* sizeof(Vertex);
+	//索引缓冲的总大小。
+	const UINT ibByteSize = currIndexOffset		* sizeof(std::uint16_t);
+
+	geo->VertexBufferByteSize	= vbByteSize;
+	geo->IndexBufferByteSize	= ibByteSize;
+	geo->VertexByteStride		= static_cast<UINT>(sizeof(Vertex));
+	geo->IndexFormat			= DXGI_FORMAT_R16_UINT;
+
+	ThrowIfFailed(D3DCreateBlob(vbByteSize, &geo->VertexBufferCPU));
+	ThrowIfFailed(D3DCreateBlob(ibByteSize, &geo->IndexBufferCPU));
+
+	CopyMemory(geo->VertexBufferCPU->GetBufferPointer(), totalVertices.data(), vbByteSize);
+	CopyMemory(geo->IndexBufferCPU->GetBufferPointer(), totalIndices.data(), ibByteSize);
+
+	geo->VertexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),	mCommandList.Get(),
+		totalVertices.data(),	vbByteSize, geo->VertexBufferUploader);
+	geo->IndexBufferGPU = d3dUtil::CreateDefaultBuffer(md3dDevice.Get(),	mCommandList.Get(),
+		totalIndices.data(),	ibByteSize, geo->IndexBufferUploader);
+
+	mGeometries[geo->Name] = std::move(geo);
 }
 
 void MyShapesApp::DrawRenderItems(ID3D12GraphicsCommandList * cmdList, const std::vector<RenderItem*>& ritems)
@@ -1120,33 +1402,4 @@ XMFLOAT3 MyShapesApp::HelpCalculateFresnelR0(float refractionIndex)
 	return XMFLOAT3(R0_X_or_Y_or_Z, R0_X_or_Y_or_Z, R0_X_or_Y_or_Z);
 }
 
-//游戏的主要逻辑循环
-void MyShapesApp::UpdateScence(const GameTimer& gt)
-{
-	/*
-	//更新玩家操作的Pawn。
-	m_playerCommander.LogCommand(m_controlItemMaster, m_pawnMaster, gt);
 
-	//AI操作更新，在这里控制敌人移动以及各种物体的自动位移，比如子弹的飞行，道具的移动……
-	m_AICommander.LogCommand(m_controlItemMaster, m_pawnMaster, gt);
-
-	//跟随操作，在这里执行ControlItem级别的旋转和变换，主要用来使得ControlItem的平移和旋转之间产生联系。
-	m_followCommander.LogCommand(m_controlItemMaster, m_pawnMaster, gt);
-
-	//ControlItemMaster执行命令，变换ControlItem的旋转和位移。
-	m_controlItemMaster.ExcecuteeCommands();
-
-	//Scence对象拥有所有的ControlItem和RenderItem，
-	//使用ControlItem来更新RenderItem的世界变换矩阵，
-	//同时更新
-	m_scence.UpdateData();
-
-	//使用场景中的第一个摄像机位置来进行渲染。
-	m_scence.DrawFromCamera(0);
-
-	m_collideCommander.LogCommand(m_controlItemMaster, m_pawnMaster, gt);
-
-	//PawnMaster执行生产和销毁Pawn的功能。
-	m_pawnMaster.ExcecuteeCommands();
-	*/
-}
