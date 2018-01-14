@@ -5,7 +5,7 @@
 小坦克会不停的向玩家靠近，这个游戏并不完整，只有基本的操作控制，没有**得分**和**死亡**的概念。
 
 游戏截图：
-![](screenShots/tankWar2.png)
+![](screenShots/tankWar1.gif)
 ![](screenShots/tankWar2.png)
 ![](screenShots/tankWar3.png)
 
