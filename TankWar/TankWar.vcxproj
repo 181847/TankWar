@@ -22,7 +22,7 @@
     <ProjectGuid>{AF510996-42A6-4572-8239-B524979E8CF6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>TankWar</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -216,6 +216,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TankWar.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -249,8 +249,8 @@ void PlayerControlCommandTemplate::MouseMove(BasePawn* pPawn, MouseState mouseSt
 	//限制摄像机的镜头俯仰角角度，上至下90度范围内。
 	pPlayerPawn->m_pCamera->Target->Rotation.x = MathHelper::Clamp(
 		pPlayerPawn->m_pCamera->Target->Rotation.x,
-		-XM_PIDIV2,	
-		XM_PI / 6 - 0.01f);	
+		-XM_PI / 6,
+		XM_PIDIV2 - 0.01f);	
 
 	
 }
