@@ -1,9 +1,8 @@
 #include "BasePawn.h"
 
-/*
-
 BasePawn::BasePawn()
 {
+
 }
 
 
@@ -15,6 +14,5 @@ BasePawn::~BasePawn()
 //基础的几个PawnType宏定义在BasePawn.h中。
 PawnType BasePawn::GetType()
 {
-	return m_type;
+	ASSERT(false && "BasePawn获取类型的方法没有被覆盖。");
 }
-*/

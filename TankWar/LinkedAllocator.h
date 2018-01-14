@@ -12,6 +12,9 @@ private:
 public:
 	//allocatorSize--内存池中初始的元素数量。
 	LinkedAllocator(UINT allocatorSize);
+	LinkedAllocator(const LinkedAllocator&) = delete;
+	LinkedAllocator& operator =(const LinkedAllocator&) = delete;
+	~LinkedAllocator();
 
 	//申请一个元素指针，这个元素的处于内部的一个链表的结点中，
 	//当内存池元素不足时，在DeBug模式下，会抛出SimpleException。
@@ -29,6 +32,11 @@ inline LinkedAllocator<ELEMENT>::LinkedAllocator(UINT allocatorSize)
 	offset_from_Element_to_DeLinkedElement = 
 		(int)(	(char*)&this->m_root - 
 				(char*)&m_root.element);
+}
+
+template<typename ELEMENT>
+inline LinkedAllocator<ELEMENT>::~LinkedAllocator()
+{
 }
 
 template<typename ELEMENT>
