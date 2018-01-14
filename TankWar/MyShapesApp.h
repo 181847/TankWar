@@ -1,10 +1,24 @@
 #pragma once
-#include "../../../../Common/d3dApp.h"
-#include "../../../../Common/MathHelper.h"
-#include "../../../../Common/UploadBuffer.h"
-#include "../../../../Common/GeometryGenerator.h"
+#include "Common/d3dApp.h"
+#include "Common/MathHelper.h"
+#include "Common/UploadBuffer.h"
+#include "Common/GeometryGenerator.h"
 #include "FrameResource.h"
 #include "Scence.h"
+#include "PawnMaster.h"
+#include "PlayerCommander.h"
+#include "BoneCommander.h"
+#include "AICommander.h"
+#include "CollideCommander.h"
+
+#include "PlayerPawn.h"
+#include "ArmoredCar.h"
+#include "ShellPawn.h"
+#include "StaticPawn.h"
+#include "ObjReader.h"
+
+#include "GCommanders.h"
+
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -80,6 +94,9 @@ private:
 	void UpdateMainPassCB(const GameTimer& gt);
 	void UpdateMaterialCB(const GameTimer& gt);
 
+	//从场景中指定序号的摄像头处更摄像机。
+	void UpdateCameraFromScence(const GameTimer& gt, UINT cameraIndexInScence);
+
 
 	//创建一个DescriptorHeap，这个Heap中存储了程序中所有要用到Resource的Descriptor，
 	//包括每个FrameResource中的资源的Descriptor都会在这一个Heap中。
@@ -102,6 +119,7 @@ private:
 	void BuildFrameResources();
 	//创建所有可渲染对象。
 	void BuildRenderItems();
+
 
 	//向CommandList记录渲染RenderItem中所有物体的CommandList。
 	void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& ritems);
@@ -179,9 +197,63 @@ private:
 	float mKeyLightPhi = 0.2f*XM_PI;
 	float mKeyLightRadius = 1.0f;
 
-
 	//*******************************************游戏代码定义部分**************************************************************************************************************************************************
+
+
+	//场景中最多渲染物体的数量。
+	UINT totalRitemInScence = 5000;
+	//场景中最多摄像头的数量。
+	UINT totalCameraInScence = 3;
+
+//PawnMaster一次最多能够记住多少个生成或者删除Pawn的指令。
+#define PAWN_MASTER_COMMAND_MAX_NUM 200
+//PlayerCommander一次最多能够记住的Player数量。
+#define COMMANDER_PLAYER_MAX_COMMANDS 3
+//FollowCommander一次最多能够记录的跟随指令数量。
+#define COMMANDER_FOLLOW_MAX_COMMANDS 1000
+//AICommander最多可控制多少个AI对象。
+#define COMMANDER_AI_UNIT_MAX_NUM 10000
+//碰撞区域中最多有多少个射线
+#define COMMANDER_COLLIDE_MAX_RAY_NUM 20000
+//最多有多少个碰撞体。
+#define COMMANDER_COLLIDE_MAX_NUM 2000000
+
 public:
-	void UpdateScence(const GameTimer& gt);
+	//创建场景对象。
+	void BuildScence();
+	//创建PawnMaster，用于自动化生成Pawn。
+	void BuildPawnMaster();
+	//创建玩家指令官、AI指令官、控制跟随指令官。
+	void BuildPlayerCommander();
+	void BuildAICommander();
+	void BuildBoneCommander();
+	void BuildCollideCommander();
+	//创建Scence中所有需要用到的网格，这些网格全部从Obj文件中读取，
+	//一个Obj文件作为一个单独的MeshGeometry，
+	//一个Obj文件中单独的几何体作为其对应的一个SubMesh。
+	void BuildShapeGeometry_for_Scence();
+
+	//注册Pawn类到各个需要的PawnMaster和Commander中。
+	void RegisterPawnClass();
+	//创建初始的pawn对象，可以在这里创建玩家角色，初始化场景，
+	//建议通过PawnMaster来创建。
+	void BuildInitPawn();
+	//从指定的文件中添加几何体合集，
+	//默认文件名为“.obj”，默认文件路径在项目资源的“objs”文件夹之下，
+	//所以参数只需要填入文件名字的前一部分就可以了，
+	//添加的Geometry名字将会被设定为这个fileName。
+	void AddGeometry(const string& fileName);
+
+
+public:
+	//场景对象
+	std::unique_ptr<Scence> m_pScence;
+	//PawnMaster
+	std::unique_ptr<PawnMaster> m_pPawnMaster;
+	
+	std::unique_ptr<PlayerCommander> m_pPlayerCommander;
+	std::unique_ptr<AICommander> m_pAICommander;
+	std::unique_ptr<BoneCommander> m_pBoneCommander;
+	std::unique_ptr<CollideCommander> m_pCollideCommander;
 	//*******************************************游戏代码定义部分**************************************************************************************************************************************************
 };

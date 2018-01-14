@@ -22,7 +22,7 @@
     <ProjectGuid>{AF510996-42A6-4572-8239-B524979E8CF6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>TankWar</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -153,10 +153,28 @@
     <ClCompile Include="..\..\..\..\Common\GameTimer.cpp" />
     <ClCompile Include="..\..\..\..\Common\GeometryGenerator.cpp" />
     <ClCompile Include="..\..\..\..\Common\MathHelper.cpp" />
+    <ClCompile Include="AICommander.cpp" />
+    <ClCompile Include="ArmoredCar.cpp" />
+    <ClCompile Include="ArmoredCarPawnProperty.cpp" />
     <ClCompile Include="BasePawn.cpp" />
+    <ClCompile Include="BoneCommander.cpp" />
+    <ClCompile Include="CollideCommander.cpp" />
+    <ClCompile Include="ControlItem.cpp" />
     <ClCompile Include="FrameResource.cpp" />
+    <ClCompile Include="GCommanders.cpp" />
     <ClCompile Include="MyShapesApp.cpp" />
+    <ClCompile Include="MyTools.cpp" />
+    <ClCompile Include="ObjReader.cpp" />
+    <ClCompile Include="PawnMaster.cpp" />
+    <ClCompile Include="PerFrameCommander.cpp" />
+    <ClCompile Include="PlayerCommander.cpp" />
+    <ClCompile Include="PlayerPawn.cpp" />
+    <ClCompile Include="PlayerPawnProperty.cpp" />
     <ClCompile Include="Scence.cpp" />
+    <ClCompile Include="ShellPawn.cpp" />
+    <ClCompile Include="ShellPawnProperty.cpp" />
+    <ClCompile Include="StaticPawn.cpp" />
+    <ClCompile Include="StaticPawnProperty.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Common\Camera.h" />
@@ -168,13 +186,39 @@
     <ClInclude Include="..\..\..\..\Common\GeometryGenerator.h" />
     <ClInclude Include="..\..\..\..\Common\MathHelper.h" />
     <ClInclude Include="..\..\..\..\Common\UploadBuffer.h" />
+    <ClInclude Include="AICommander.h" />
+    <ClInclude Include="ArmoredCar.h" />
+    <ClInclude Include="ArmoredCarPawnProperty.h" />
     <ClInclude Include="BasePawn.h" />
+    <ClInclude Include="BoneCommander.h" />
+    <ClInclude Include="CollideCommander.h" />
     <ClInclude Include="DeLinkedList.h" />
     <ClInclude Include="FrameResource.h" />
+    <ClInclude Include="GCommanders.h" />
+    <ClInclude Include="LinkedAllocator.h" />
     <ClInclude Include="MyAssert.h" />
     <ClInclude Include="MyShapesApp.h" />
     <ClInclude Include="MyStaticAllocator.h" />
+    <ClInclude Include="MyTools.h" />
+    <ClInclude Include="ObjReader.h" />
+    <ClInclude Include="PawnMaster.h" />
+    <ClInclude Include="PerFrameCommander.h" />
+    <ClInclude Include="PlayerCommander.h" />
+    <ClInclude Include="PlayerPawn.h" />
+    <ClInclude Include="PlayerPawnProperty.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Scence.h" />
+    <ClInclude Include="ControlItem.h" />
+    <ClInclude Include="ShellPawn.h" />
+    <ClInclude Include="ShellPawnProperty.h" />
+    <ClInclude Include="StaticPawn.h" />
+    <ClInclude Include="StaticPawnProperty.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="TankWar.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
